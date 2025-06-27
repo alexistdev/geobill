@@ -1,0 +1,60 @@
+package com.alexistdev.geobill.controllers;
+
+import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.request.RegisterRequest;
+import com.alexistdev.geobill.services.UserService;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@CrossOrigin(origins = "http://localhost:4200/login")
+@RestController
+@RequestMapping("/v1/api/auth")
+public class AuthController {
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @PostMapping("/register")
+    public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
+        ResponseData<User> responseData = new ResponseData<>();
+        handleErrors(errors, responseData);
+
+        if(!responseData.isStatus()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        }
+
+        try {
+            User user = modelMapper.map(userRequest, User.class);
+            responseData.setPayload(userService.registerUser(user));
+            responseData.setStatus(true);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+        }catch (Exception e) {
+            responseData.setStatus(false);
+            responseData.getMessages().add(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        }
+    }
+
+    private void handleErrors(Errors errors, ResponseData<?> responseData){
+        if (errors.hasErrors()) {
+            for (ObjectError error : errors.getAllErrors()) {
+                responseData.getMessages().add(error.getDefaultMessage());
+            }
+            responseData.setStatus(false);
+        } else {
+            responseData.setStatus(true);
+        }
+    }
+}
