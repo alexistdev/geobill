@@ -22,7 +22,28 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/assets/css/bootstrap.min.css",
+              "src/assets/css/bootstrap-extended.css",
+              "src/assets/css/app.css",
+              "src/assets/css/icons.css",
+              "src/assets/css/header-colors.css"
+            ],
+            "scripts": [
+              "src/assets/js/pace.min.js",
+              "src/assets/js/jquery.min.js",
+              "src/assets/js/bootstrap.bundle.min.js",
+              "src/assets/plugins/simplebar/js/simplebar.min.js",
+              "src/assets/plugins/metismenu/js/metisMenu.min.js",
+              "src/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js",
+              "src/assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js",
+              "src/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js",
+              "src/assets/plugins/chartjs/js/chart.js",
+              "src/assets/plugins/sparkline-charts/jquery.sparkline.min.js",
+              "src/assets/plugins/raphael/raphael-min.js",
+              "src/assets/plugins/morris/js/morris.js",
+              "src/assets/js/index2.js",
+              "src/assets/js/app.js"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -86,5 +107,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "a0ce3a60-e472-4ca0-811e-065776050f04"
   }
 }
