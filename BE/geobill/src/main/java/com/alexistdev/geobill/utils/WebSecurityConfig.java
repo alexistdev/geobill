@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.utils;
 
+import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/v1/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/v1/api/users/get_all_users").hasAuthority(Role.ADMIN.toString())
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())

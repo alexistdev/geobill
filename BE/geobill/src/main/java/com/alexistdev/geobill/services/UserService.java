@@ -5,6 +5,8 @@ import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,6 +47,11 @@ public class UserService implements UserDetailsService {
         user.setModifiedDate(now);
         return userRepo.save(user);
     }
+
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepo.findByRoleNot(Role.ADMIN, pageable);
+    }
+
 
 
 }
