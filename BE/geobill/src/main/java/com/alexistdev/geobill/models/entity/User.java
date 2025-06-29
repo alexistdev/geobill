@@ -43,6 +43,10 @@ public class User extends BaseEntity<String> implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if(role == null){
+            return Collections.emptyList();
+        }
+
         SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role.name());
         return Collections.singletonList(simpleGrantedAuthority);
     }
