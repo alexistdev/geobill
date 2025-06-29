@@ -1,7 +1,9 @@
 package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
 import com.alexistdev.geobill.services.UserService;
 import jakarta.validation.Valid;
@@ -45,6 +47,25 @@ public class AuthController {
             responseData.getMessages().add(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponseData<UserDTO>> login(@Valid @RequestBody LoginRequest loginRequest, Errors errors) {
+        ResponseData<UserDTO> responseData = new ResponseData<>();
+        handleErrors(errors, responseData);
+
+        User user = userService.authenticate(loginRequest);
+
+        if (user != null) {
+            UserDTO result =  modelMapper.map(user, UserDTO.class);
+            responseData.setPayload(result);
+            responseData.getMessages().add("User is valid");
+            responseData.setStatus(true);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        }
+
+        responseData.getMessages().add("Invalid username or password");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
     }
 
     private void handleErrors(Errors errors, ResponseData<?> responseData){
