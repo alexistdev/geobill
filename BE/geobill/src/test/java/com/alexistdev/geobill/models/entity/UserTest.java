@@ -1,7 +1,5 @@
-package com.alexistdev.geobill.entity;
+package com.alexistdev.geobill.models.entity;
 
-import com.alexistdev.geobill.models.entity.Role;
-import com.alexistdev.geobill.models.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

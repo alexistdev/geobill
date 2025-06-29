@@ -1,6 +1,5 @@
-package com.alexistdev.geobill.entity;
+package com.alexistdev.geobill.models.entity;
 
-import com.alexistdev.geobill.models.entity.Domaintld;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

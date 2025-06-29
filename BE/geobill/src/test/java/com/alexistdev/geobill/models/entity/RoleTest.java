@@ -1,6 +1,5 @@
-package com.alexistdev.geobill.entity;
+package com.alexistdev.geobill.models.entity;
 
-import com.alexistdev.geobill.models.entity.Role;
 import org.apache.commons.lang3.EnumUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
