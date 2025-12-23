@@ -63,7 +63,7 @@ public class AuthController {
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         }
-
+        responseData.setStatus(false);
         responseData.getMessages().add("Invalid username or password");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
     }
