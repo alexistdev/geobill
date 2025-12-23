@@ -35,4 +35,12 @@ public class BaseEntity<T> {
     protected Date modifiedDate;
 
     protected Boolean isDeleted = Boolean.FALSE;
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
 }
