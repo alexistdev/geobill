@@ -1,9 +1,9 @@
-import {ChangeDetectorRef, Component, OnInit, NgZone} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import {Loginservice} from './loginservice';
-import {Localstorageservice} from '../utils/localstorage/localstorageservice';
-import {NgIf} from '@angular/common';
+import { Loginservice } from './loginservice';
+import { Localstorageservice } from '../utils/localstorage/localstorageservice';
+import { NgIf } from '@angular/common';
 
 
 @Component({
@@ -19,16 +19,15 @@ export class Login implements OnInit {
 
   loginForm!: FormGroup;
 
-  public loginError:boolean = false;
-  isAdmin:string = '';
+  public loginError: boolean = false;
+  isAdmin: string = '';
 
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
     private loginService: Loginservice,
     private localStorage: Localstorageservice,
-    private cdRef: ChangeDetectorRef,
-    private ngZone: NgZone) {
+    private cdRef: ChangeDetectorRef) {
   }
 
   ngOnInit() {
@@ -38,31 +37,27 @@ export class Login implements OnInit {
     });
   }
 
-  doLogin(){
-    if(this.loginForm.valid){
+  doLogin() {
+    if (this.loginForm.valid) {
       // Optional: this.loginForm.disable();
       this.loginService.AuthLogin(
         this.loginForm.controls['emailUsername'].value,
         this.loginForm.controls['password'].value
       ).subscribe({
         next: (res: any) => {
-          this.ngZone.run(() => {
-            if(res && res.success){
-              this.loginError = false;
-              this.router.navigate(['/user']);
-            } else {
-              console.log("posisi:2 - Login Failed");
-              this.loginError = true;
-            }
-            this.cdRef.markForCheck();
-          });
+          if (res && res.success) {
+            this.loginError = false;
+            this.router.navigate(['/user']);
+          } else {
+            console.log("posisi:2 - Login Failed");
+            this.loginError = true;
+          }
+          this.cdRef.detectChanges();
         },
         error: (err) => {
-          this.ngZone.run(() => {
-            console.log("posisi:3 - Error");
-            this.loginError = true;
-            this.cdRef.markForCheck();
-          });
+          console.log("posisi:3 - Error");
+          this.loginError = true;
+          this.cdRef.detectChanges();
         }
       });
     } else {
@@ -71,9 +66,9 @@ export class Login implements OnInit {
     }
   }
 
-  doReset(){
+  doReset() {
     this.loginForm.reset();
-    this.loginError=false;
+    this.loginError = false;
     this.loginForm.enable();
   }
 }

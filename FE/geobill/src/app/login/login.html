@@ -22,20 +22,18 @@
                 <div class="mb-3 text-center">
                   <img src="images/logo-icon.png" width="60" alt="GeoBill">
                 </div>
-                @if (loginError) {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                  Invalid Email or Password!
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-hidden="true" aria-label="Close"
-                    (click)="doReset()"></button>
-                </div>
-                }
-
-
 
               </div>
               <div class="text-center mb-4">
                 <h5 class="">Rocker Admin</h5>
                 <p class="mb-0">Please log in to your account</p>
+                @if (loginError) {
+                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    Invalid Email or Password!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-hidden="true" aria-label="Close"
+                            (click)="doReset()"></button>
+                  </div>
+                }
               </div>
               <div class="form-body">
                 <form class="row g-3" [formGroup]="loginForm" (ngSubmit)="doLogin()">
