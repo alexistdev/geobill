@@ -11,11 +11,11 @@ import java.util.UUID;
 @Table(
         name = DatabaseTableNames.TB_ROLE_MENUS,
         uniqueConstraints = {
-                @UniqueConstraint(name="uk_role_menu",columnNames = {"role_id", "menu_id"})
+                @UniqueConstraint(name="uk_role_menu",columnNames = {"role_id", "menu_uuid"})
         },
         indexes = {
                 @Index(name="idx_role_menu_role_id",columnList = "role_id"),
-                @Index(name="idx_role_menu_menu_id",columnList = "menu_id")
+                @Index(name="idx_role_menu_menu_id",columnList = "menu_uuid")
         }
 )
 public class RoleMenu extends BaseEntity<String> implements Serializable {
@@ -27,7 +27,7 @@ public class RoleMenu extends BaseEntity<String> implements Serializable {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "role",nullable = false, length = 50)
+    @Column(name = "role_id",nullable = false, length = 50)
     private Role role;
 
     @NotNull
