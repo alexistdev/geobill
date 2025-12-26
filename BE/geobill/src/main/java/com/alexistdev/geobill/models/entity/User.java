@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.models.entity;
 
+import com.alexistdev.geobill.config.DatabaseTableNames;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Entity
-@Table(name="tb_users")
+@Table(name= DatabaseTableNames.TB_USERS)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

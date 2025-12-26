@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.models.entity;
 
+import com.alexistdev.geobill.config.DatabaseTableNames;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Entity
-@Table(name = "tb_menus")
+@Table(name = DatabaseTableNames.TB_MENUS)
 public class Menu extends BaseEntity<String> implements Serializable {
 
     @Id

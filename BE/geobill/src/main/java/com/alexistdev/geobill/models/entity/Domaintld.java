@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.models.entity;
 
+import com.alexistdev.geobill.config.DatabaseTableNames;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 @Setter
 @Getter
-@Table(name = "tb_tlds")
+@Table(name = DatabaseTableNames.TB_DOMAINTLD)
 @Entity
 public class Domaintld extends BaseEntity<String> implements Serializable {
     @Id
