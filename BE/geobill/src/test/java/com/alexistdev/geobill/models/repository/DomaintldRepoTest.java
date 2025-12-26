@@ -29,8 +29,13 @@ public class DomaintldRepoTest {
     @Autowired
     private DomaintldRepo domaintldRepo;
 
+    private String domainTldName1;
+    private String domainTldName2;
+
     @BeforeEach
     void setUp() {
+        domainTldName1 = ".com";
+        domainTldName2 = ".co.id";
         User testUser = new User();
         testUser.setEmail("testUser@gmail.com");
         testUser.setPassword("password");
@@ -51,11 +56,11 @@ public class DomaintldRepoTest {
     @Test
     @DisplayName("Test Save Domaintld")
     void testSaveDomaintld() {
-        Domaintld domainTld = createDomaintld(".com");
+        Domaintld domainTld = createDomaintld(domainTldName1);
         Domaintld savedDomainTld = domaintldRepo.save(domainTld);
 
         Assertions.assertNotNull(savedDomainTld);
-        Assertions.assertEquals(".com", savedDomainTld.getName());
+        Assertions.assertEquals(domainTldName1, savedDomainTld.getName());
         Assertions.assertEquals("system", savedDomainTld.getCreatedBy());
         Assertions.assertNotNull(savedDomainTld.getCreatedDate());
         Assertions.assertFalse(savedDomainTld.getIsDeleted());
@@ -64,22 +69,22 @@ public class DomaintldRepoTest {
     @Test
     @DisplayName("Test Find By Domaintld UUID")
     void testFindByDomaintldUUID() {
-        Domaintld domainTld = createDomaintld(".com");
+        Domaintld domainTld = createDomaintld(domainTldName1);
         entityManager.persist(domainTld);
         entityManager.flush();
         Optional<Domaintld> foundDomainTld = domaintldRepo.findById(domainTld.getId());
 
         Assertions.assertTrue(foundDomainTld.isPresent(), "DomainTLD should be present in the database");
-        Assertions.assertEquals(".com", foundDomainTld.get().getName());
+        Assertions.assertEquals(domainTldName1, foundDomainTld.get().getName());
     }
 
     @Test
     @DisplayName("Test Find All Domaintlds")
     void testFindAllDomaintlds() {
-        Domaintld domainTld1 = createDomaintld(".com");
+        Domaintld domainTld1 = createDomaintld(domainTldName1);
         entityManager.persist(domainTld1);
 
-        Domaintld domainTld2 = createDomaintld(".co.id");
+        Domaintld domainTld2 = createDomaintld(domainTldName2);
         entityManager.persist(domainTld2);
 
         List<Domaintld> allDomaintlds = domaintldRepo.findAll();
@@ -89,7 +94,7 @@ public class DomaintldRepoTest {
     @Test
     @DisplayName("Test Delete Domaintlds")
     void testDeleteDomaintlds() {
-        Domaintld domainTld = createDomaintld(".com");
+        Domaintld domainTld = createDomaintld(domainTldName1);
         entityManager.persist(domainTld);
         entityManager.flush();
         domaintldRepo.delete(domainTld);
@@ -100,10 +105,10 @@ public class DomaintldRepoTest {
     @Test
     @DisplayName("Test Delete All Domainstlds")
     void testDeleteAllDomainstlds() {
-        Domaintld domainTld1 = createDomaintld(".com");
+        Domaintld domainTld1 = createDomaintld(domainTldName1);
         entityManager.persist(domainTld1);
 
-        Domaintld domainTld2 = createDomaintld(".co.id");
+        Domaintld domainTld2 = createDomaintld(domainTldName2);
         entityManager.persist(domainTld2);
 
         domaintldRepo.deleteAll();
@@ -124,7 +129,7 @@ public class DomaintldRepoTest {
     @Test
     @DisplayName("Test Update Domaintld")
     void testUpdateDomaintld() {
-        Domaintld domainTld = createDomaintld(".com");
+        Domaintld domainTld = createDomaintld(domainTldName1);
         entityManager.persist(domainTld);
         entityManager.flush();
 
