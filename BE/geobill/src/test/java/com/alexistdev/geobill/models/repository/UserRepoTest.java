@@ -89,8 +89,8 @@ public class UserRepoTest {
     }
 
     @Test
-    @DisplayName("Test Find By User Id")
-    void testFindByUserId() {
+    @DisplayName("Test Find By User UUID")
+    void testFindByUserUUID() {
         User user = new User();
         user.setFullName("Alexsander Hendra Wijaya");
         user.setPassword("123456");
