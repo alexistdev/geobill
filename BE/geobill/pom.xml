@@ -121,7 +121,17 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.4.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>6.2.0.Final</version>  <!-- Use the latest version -->
+		</dependency>
 		<!-- End: Excell import -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hibernate5</artifactId>
+			<version>2.13.0</version> <!-- Or the latest version -->
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -2,9 +2,11 @@ package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.dto.UserDTO;
+import com.alexistdev.geobill.models.entity.Menu;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
+import com.alexistdev.geobill.services.MenuService;
 import com.alexistdev.geobill.services.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(origins = "http://localhost:4200/login")
@@ -27,6 +32,9 @@ public class AuthController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private MenuService menuService;
 
     @PostMapping("/register")
     public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
@@ -58,6 +66,10 @@ public class AuthController {
 
         if (user != null) {
             UserDTO result =  modelMapper.map(user, UserDTO.class);
+
+            List<Menu> menus = menuService.getMenusByRole(user.getRole());
+
+            result.setMenus(menus);
             responseData.setPayload(result);
             responseData.getMessages().add("User is valid");
             responseData.setStatus(true);
