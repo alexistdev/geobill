@@ -62,22 +62,21 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedRoleMenus() {
         log.info("Seeding role menus");
         RoleMenu roleMenu = new RoleMenu();
-        roleMenu.setRole(Role.USER);
+        roleMenu.setRole(Role.ADMIN);
 
-        List<Menu> foundMenu = menuRepo.findAll();
-        roleMenu.setMenu(foundMenu.get(0));
-
+        Menu menuAdmin = menuRepo.findByName("Dashboard ADMIN");
+        roleMenu.setMenu(menuAdmin);
         roleMenu.setCreatedBy("System");
         roleMenu.setModifiedBy("System");
         roleMenu.setCreatedDate(new java.util.Date());
         roleMenu.setModifiedDate(new java.util.Date());
 
         roleMenuRepo.save(roleMenu);
-
+        Menu menuUser = menuRepo.findByName("Dashboard User");
         RoleMenu roleMenu2 = new RoleMenu();
 
-        roleMenu2.setRole(Role.ADMIN);
-        roleMenu2.setMenu(foundMenu.get(1));
+        roleMenu2.setRole(Role.USER);
+        roleMenu2.setMenu(menuUser);
         roleMenu2.setCreatedBy("System");
         roleMenu2.setModifiedBy("System");
         roleMenu2.setCreatedDate(new java.util.Date());

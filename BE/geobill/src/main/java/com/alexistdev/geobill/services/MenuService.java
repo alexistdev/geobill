@@ -4,6 +4,7 @@ import com.alexistdev.geobill.models.entity.Menu;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.repository.MenuRepo;
 import com.alexistdev.geobill.models.repository.RoleMenuRepo;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,9 @@ public class MenuService {
             }
         }
         return menus;
+    }
+
+    public Menu getMenuByName(String name) {
+        return menuRepo.findByName(name);
     }
 }

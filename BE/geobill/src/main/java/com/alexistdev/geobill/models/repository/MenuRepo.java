@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface MenuRepo extends JpaRepository<Menu, UUID> {
+
+    Menu findByName(String menuName);
 }
