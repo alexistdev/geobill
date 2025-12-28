@@ -17,11 +17,11 @@ import java.util.Date;
 @Getter
 @Setter
 @MappedSuperclass
-//@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class BaseEntity<T> {
 
     @CreatedBy
-    protected T  createdBy;
+    protected T createdBy;
 
     @LastModifiedBy
     protected T modifiedBy;

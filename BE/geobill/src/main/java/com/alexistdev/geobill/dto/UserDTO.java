@@ -14,7 +14,7 @@ public class UserDTO {
     private String fullName;
     private String email;
     private String role;
-    private List<Menu> menus;
+    private List<MenuDTO> menus;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 }

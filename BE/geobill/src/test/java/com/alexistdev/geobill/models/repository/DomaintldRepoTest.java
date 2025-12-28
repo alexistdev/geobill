@@ -39,8 +39,8 @@ public class DomaintldRepoTest {
         User testUser = new User();
         testUser.setEmail("testUser@gmail.com");
         testUser.setPassword("password");
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(testUser,null,new ArrayList<>());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(testUser, null,
+                new ArrayList<>());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
@@ -61,7 +61,7 @@ public class DomaintldRepoTest {
 
         Assertions.assertNotNull(savedDomainTld);
         Assertions.assertEquals(domainTldName1, savedDomainTld.getName());
-        Assertions.assertEquals("system", savedDomainTld.getCreatedBy());
+        Assertions.assertEquals("testUser@gmail.com", savedDomainTld.getCreatedBy());
         Assertions.assertNotNull(savedDomainTld.getCreatedDate());
         Assertions.assertFalse(savedDomainTld.getIsDeleted());
     }
@@ -145,19 +145,19 @@ public class DomaintldRepoTest {
     @Test
     @DisplayName("Test Serializable")
     void testSerializable() {
-        Assertions.assertInstanceOf(Serializable.class,domaintldRepo);
+        Assertions.assertInstanceOf(Serializable.class, domaintldRepo);
     }
 
     @Test
     @DisplayName("Test DomainTld Entity")
     void testDomainTldEntity() {
-        Assertions.assertInstanceOf(Domaintld.class,new Domaintld());
+        Assertions.assertInstanceOf(Domaintld.class, new Domaintld());
     }
 
     @Test
     @DisplayName("Test DomainTld Repo")
     void testDomainTldRepo() {
-        Assertions.assertInstanceOf(DomaintldRepo.class,domaintldRepo);
+        Assertions.assertInstanceOf(DomaintldRepo.class, domaintldRepo);
     }
 
 }

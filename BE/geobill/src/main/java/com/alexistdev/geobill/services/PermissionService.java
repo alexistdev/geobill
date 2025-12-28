@@ -25,11 +25,11 @@ public class PermissionService {
     @Autowired
     private MenuRepo menuRepo;
 
-    public RoleMenu addPermission(Role role, UUID menuId){
+    public RoleMenu addPermission(Role role, UUID menuId) {
         Menu foundMenu = menuRepo.findById(menuId)
                 .orElseThrow(() -> new RuntimeException("Menu not found with id:" + menuId));
 
-        if(Role.ADMIN.equals(role)){
+        if (Role.ADMIN.equals(role)) {
             throw new RuntimeException("Role not found");
         }
 
@@ -38,7 +38,5 @@ public class PermissionService {
         roleMenu.setMenu(foundMenu);
         return roleMenuRepo.save(roleMenu);
     }
-
-
 
 }

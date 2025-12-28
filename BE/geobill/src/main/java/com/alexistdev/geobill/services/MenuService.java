@@ -25,17 +25,17 @@ public class MenuService {
     private RoleMenuRepo roleMenuRepo;
 
     @Transactional
-    public List<Menu> getMenusByRole(Role role){
+    public List<Menu> getMenusByRole(Role role) {
         List<Menu> menus = roleMenuRepo.findByRole(role).stream()
                 .map(roleMenu -> roleMenu.getMenu())
                 .collect(Collectors.toList());
 
-        //force init of lazy loaded relationship (parent and children)
-        for(Menu menu : menus){
-            if(menu.getParent() != null) {
+        // force init of lazy loaded relationship (parent and children)
+        for (Menu menu : menus) {
+            if (menu.getParent() != null) {
                 menu.getParent().getName();
             }
-            if(menu.getChildren() != null && !menu.getChildren().isEmpty()) {
+            if (menu.getChildren() != null && !menu.getChildren().isEmpty()) {
                 menu.getChildren().size();
             }
         }

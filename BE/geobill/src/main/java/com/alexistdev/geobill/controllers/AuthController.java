@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.controllers;
 
+import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.models.entity.Menu;
@@ -67,7 +68,10 @@ public class AuthController {
         if (user != null) {
             UserDTO result =  modelMapper.map(user, UserDTO.class);
 
-            List<Menu> menus = menuService.getMenusByRole(user.getRole());
+            List<MenuDTO> menus = menuService.getMenusByRole(user.getRole())
+                     .stream()
+                     .map(menu-> modelMapper.map(menu, MenuDTO.class))
+                     .collect(Collectors.toList());
 
             result.setMenus(menus);
             responseData.setPayload(result);

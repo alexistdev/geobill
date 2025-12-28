@@ -24,7 +24,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if(menuRepo.count() == 0) { //check if the menu table is empty (not seeded)
+        if (menuRepo.count() == 0) { // check if the menu table is empty (not seeded)
             seedMenus();
             seedRoleMenus();
         }
@@ -32,45 +32,45 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private void seedMenus() {
         log.info("Seeding menus");
-        Menu menu1 = new Menu();
-        menu1.setName("Dashboard User");
-        menu1.setUrlink("/users/dashboard");
-        menu1.setClasslink("DashboardController");
-        menu1.setIsDeleted(false);
-        menu1.setCreatedBy("System");
-        menu1.setModifiedBy("System");
-        menu1.setCreatedDate(new java.util.Date());
-        menu1.setModifiedDate(new java.util.Date());
-        menu1.setSortOrder(1);
-        menuRepo.save(menu1);
-
-        Menu menu2 = new Menu();
-        menu2.setName("Dashboard ADMIN");
-        menu2.setUrlink("/admin/dashboard");
-        menu2.setClasslink("DashboardController");
-        menu2.setIsDeleted(false);
-        menu2.setCreatedBy("System");
-        menu2.setModifiedBy("System");
-        menu2.setCreatedDate(new java.util.Date());
-        menu2.setModifiedDate(new java.util.Date());
-        menu2.setSortOrder(1);
-        menuRepo.save(menu2);
+        List<Menu> menus = List.of(
+                createMenu("Dashboard User", "/users/dashboard", "DashboardController", 1),
+                createMenu("Dashboard ADMIN", "/admin/dashboard", "DashboardAdminController", 1),
+                createMenu("Master Data", "#", "MasterData", 1),
+                createMenu("Data Menu", "/admin/menu", "DataMenu", 2));
+        menuRepo.saveAll(menus);
 
         log.info("Finished seeding menus");
     }
 
     private void seedRoleMenus() {
         log.info("Seeding role menus");
-        Menu menuAdmin = menuRepo.findByName("Dashboard ADMIN");
+        Menu menuAdmin1 = menuRepo.findByName("Dashboard ADMIN");
+        Menu menuAdmin2 = menuRepo.findByName("Master Data");
+        Menu menuAdmin3 = menuRepo.findByName("Data Menu");
         Menu menuUser = menuRepo.findByName("Dashboard User");
 
         List<RoleMenu> roleMenus = List.of(
-                createRoleMenu(Role.ADMIN, menuAdmin),
-                createRoleMenu(Role.USER, menuUser)
-        );
+                createRoleMenu(Role.ADMIN, menuAdmin1),
+                createRoleMenu(Role.ADMIN, menuAdmin2),
+                createRoleMenu(Role.ADMIN, menuAdmin3),
+                createRoleMenu(Role.USER, menuUser));
 
         roleMenuRepo.saveAll(roleMenus);
         log.info("Finished seeding role menus");
+    }
+
+    private Menu createMenu(String name, String url, String classLink, int sortOrder) {
+        Menu menu = new Menu();
+        menu.setName(name);
+        menu.setUrlink(url);
+        menu.setClasslink(classLink);
+        menu.setIsDeleted(false);
+        menu.setCreatedBy("System");
+        menu.setModifiedBy("System");
+        menu.setCreatedDate(new java.util.Date());
+        menu.setModifiedDate(new java.util.Date());
+        menu.setSortOrder(sortOrder);
+        return menu;
     }
 
     private RoleMenu createRoleMenu(Role role, Menu menu) {
