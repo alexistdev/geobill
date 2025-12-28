@@ -47,7 +47,23 @@ export class Login implements OnInit {
         next: (res: any) => {
           if (res && res.success) {
             this.loginError = false;
-            this.router.navigate(['/user']);
+            // Navigate based on user role
+            const role = res.role || res.payload?.role;
+            if (role) {
+              const roleLower = role.toLowerCase();
+              if (roleLower === 'admin') {
+                this.router.navigate(['/admin/dashboard']);
+              } else if (roleLower === 'staff') {
+                this.router.navigate(['/staff/dashboard']);
+              } else if (roleLower === 'user') {
+                this.router.navigate(['/users/dashboard']);
+              } else {
+                // Default fallback
+                this.router.navigate(['/users/dashboard']);
+              }
+            } else {
+              this.router.navigate(['/users/dashboard']);
+            }
           } else {
             console.log("posisi:2 - Login Failed");
             this.loginError = true;

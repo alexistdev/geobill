@@ -30,7 +30,11 @@ export class Loginservice {
           this.localStorageService.setItem("role", data.role);
           this.localStorageService.setItem("email", data.email);
           this.localStorageService.setItem("keyPs", userPw);
-          return { success: true, role: data.role };
+          // Store menus as JSON string
+          if (data.menus) {
+            this.localStorageService.setItem("menus", JSON.stringify(data.menus));
+          }
+          return { success: true, role: data.role, payload: data };
         }),
         catchError((err) => {
         console.error(err);
