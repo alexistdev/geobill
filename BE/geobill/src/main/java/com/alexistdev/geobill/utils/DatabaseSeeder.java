@@ -61,27 +61,27 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private void seedRoleMenus() {
         log.info("Seeding role menus");
-        RoleMenu roleMenu = new RoleMenu();
-        roleMenu.setRole(Role.ADMIN);
-
         Menu menuAdmin = menuRepo.findByName("Dashboard ADMIN");
-        roleMenu.setMenu(menuAdmin);
+        Menu menuUser = menuRepo.findByName("Dashboard User");
+
+        List<RoleMenu> roleMenus = List.of(
+                createRoleMenu(Role.ADMIN, menuAdmin),
+                createRoleMenu(Role.USER, menuUser)
+        );
+
+        roleMenuRepo.saveAll(roleMenus);
+        log.info("Finished seeding role menus");
+    }
+
+    private RoleMenu createRoleMenu(Role role, Menu menu) {
+        RoleMenu roleMenu = new RoleMenu();
+        roleMenu.setRole(role);
+        roleMenu.setMenu(menu);
         roleMenu.setCreatedBy("System");
         roleMenu.setModifiedBy("System");
         roleMenu.setCreatedDate(new java.util.Date());
         roleMenu.setModifiedDate(new java.util.Date());
-
-        roleMenuRepo.save(roleMenu);
-        Menu menuUser = menuRepo.findByName("Dashboard User");
-        RoleMenu roleMenu2 = new RoleMenu();
-
-        roleMenu2.setRole(Role.USER);
-        roleMenu2.setMenu(menuUser);
-        roleMenu2.setCreatedBy("System");
-        roleMenu2.setModifiedBy("System");
-        roleMenu2.setCreatedDate(new java.util.Date());
-        roleMenu2.setModifiedDate(new java.util.Date());
-        roleMenuRepo.save(roleMenu2);
-        log.info("Finished seeding role menus");
+        roleMenu.setIsDeleted(false);
+        return roleMenu;
     }
 }
