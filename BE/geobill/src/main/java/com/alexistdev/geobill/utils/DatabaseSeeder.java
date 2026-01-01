@@ -46,13 +46,15 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("Seeding menus");
         Menu menu1 = createMenu("Dashboard ADMIN", "/admin/dashboard", "DashboardController", 1, null);
         Menu menu2 = createMenu("Dashboard User", "/user/dashboard", "DashboardController", 1, null);
-        Menu menu3 = createMenu("Master Data", "#", "MasterData", 1, null);
+        Menu menu3 = createMenu("Data Transaksi", "#", "Transaksi", 1, null);
         List<Menu> menus = List.of(menu1, menu2, menu3);
         menuRepo.saveAll(menus);
 
-        Menu menuParent = menuRepo.findByName("Master Data");
-        Menu menuChild = createMenu("Data Menu", "/admin/menu", "DataMenu", 2, menuParent.getId());
-        menuRepo.save(menuChild);
+        Menu menuParent = menuRepo.findByName("Data Transaksi");
+        if(menuParent != null) {
+            Menu menuChild = createMenu("Data Invoice", "/user/invoice", "DataInvoice", 2, menuParent.getId());
+            menuRepo.save(menuChild);
+        }
 
         log.info("Finished seeding menus");
     }
@@ -61,16 +63,16 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("Seeding role menus");
         Menu menuAdmin = menuRepo.findByName("Dashboard ADMIN");
         Menu menuUser1 = menuRepo.findByName("Dashboard User");
-        Menu menuUser2 = menuRepo.findByName("Master Data");
-        Menu menuUser3 = menuRepo.findByName("Data Menu");
-
-        List<RoleMenu> roleMenus = List.of(
-                createRoleMenu(Role.ADMIN, menuAdmin),
-                createRoleMenu(Role.ADMIN, menuUser1),
-                createRoleMenu(Role.ADMIN, menuUser2),
-                createRoleMenu(Role.USER, menuUser3));
-
-        roleMenuRepo.saveAll(roleMenus);
+        Menu menuUser2 = menuRepo.findByName("Data Transaksi");
+        Menu menuUser3 = menuRepo.findByName("Data Invoice");
+        if(menuAdmin != null || menuUser1 != null || menuUser2 != null || menuUser3 != null) {
+            List<RoleMenu> roleMenus = List.of(
+                    createRoleMenu(Role.ADMIN, menuAdmin),
+                    createRoleMenu(Role.USER, menuUser1),
+                    createRoleMenu(Role.USER, menuUser2),
+                    createRoleMenu(Role.USER, menuUser3));
+            roleMenuRepo.saveAll(roleMenus);
+        }
         log.info("Finished seeding role menus");
     }
 
