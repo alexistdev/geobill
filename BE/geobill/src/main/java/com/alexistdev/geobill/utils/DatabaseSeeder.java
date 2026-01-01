@@ -7,35 +7,34 @@ import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.MenuRepo;
 import com.alexistdev.geobill.models.repository.RoleMenuRepo;
 import com.alexistdev.geobill.models.repository.UserRepo;
-import com.alexistdev.geobill.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
 
-    @Autowired
-    private MenuRepo menuRepo;
 
-    @Autowired
-    private RoleMenuRepo roleMenuRepo;
+    private final MenuRepo menuRepo;
+    private final RoleMenuRepo roleMenuRepo;
+    private final UserRepo userRepo;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    private UserRepo userRepo;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private static final String SYSTEM_USER = "System";
+    private static final String DEFAULT_PASSWORD = "password";
 
     @Override
-    public void run(String... args) throws Exception {
-        if (menuRepo.count() == 0) { // check if the menu table is empty (not seeded)
+    public void run(String... args) {
+        if (menuRepo.count() == 0) {
             seedMenus();
             seedRoleMenus();
             seedUsers();
@@ -44,42 +43,44 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private void seedMenus() {
         log.info("Seeding menus");
+
         Menu menu1 = createMenu("Dashboard ADMIN", "/admin/dashboard", "DashboardController", 1, null);
         Menu menu2 = createMenu("Dashboard User", "/user/dashboard", "DashboardController", 1, null);
         Menu menu3 = createMenu("Data Transaksi", "#", "Transaksi", 1, null);
-        List<Menu> menus = List.of(menu1, menu2, menu3);
-        menuRepo.saveAll(menus);
+        menuRepo.saveAll(List.of(menu1, menu2, menu3));
 
-        Menu menuParent = menuRepo.findByName("Data Transaksi");
-        if(menuParent != null) {
-            Menu menuChild = createMenu("Data Invoice", "/user/invoice", "DataInvoice", 2, menuParent.getId());
+        Optional<Menu> menuParent = menuRepo.findByName("Data Transaksi");
+
+        menuParent.ifPresent(menu -> {
+            Menu menuChild = createMenu("Data Invoice", "/user/invoice", "DataInvoice", 2, menu.getId());
             menuRepo.save(menuChild);
-        }
+        });
 
         log.info("Finished seeding menus");
     }
 
     private void seedRoleMenus() {
         log.info("Seeding role menus");
-        Menu menuAdmin = menuRepo.findByName("Dashboard ADMIN");
-        Menu menuUser1 = menuRepo.findByName("Dashboard User");
-        Menu menuUser2 = menuRepo.findByName("Data Transaksi");
-        Menu menuUser3 = menuRepo.findByName("Data Invoice");
-        if(menuAdmin != null || menuUser1 != null || menuUser2 != null || menuUser3 != null) {
-            List<RoleMenu> roleMenus = List.of(
-                    createRoleMenu(Role.ADMIN, menuAdmin),
-                    createRoleMenu(Role.USER, menuUser1),
-                    createRoleMenu(Role.USER, menuUser2),
-                    createRoleMenu(Role.USER, menuUser3));
-            roleMenuRepo.saveAll(roleMenus);
-        }
+
+        Optional<Menu> menuAdmin = menuRepo.findByName("Dashboard ADMIN");
+        Optional<Menu> menuUser1 = menuRepo.findByName("Dashboard User");
+        Optional<Menu> menuUser2 = menuRepo.findByName("Data Transaksi");
+        Optional<Menu> menuUser3 = menuRepo.findByName("Data Invoice");
+
+        List<RoleMenu> roleMenus = List.of(
+                Objects.requireNonNull(menuAdmin.map(menu2 -> createRoleMenu(Role.ADMIN, menu2)).orElse(null)),
+                Objects.requireNonNull(menuUser1.map(menu1 -> createRoleMenu(Role.USER, menu1)).orElse(null)),
+                Objects.requireNonNull(menuUser2.map(value -> createRoleMenu(Role.USER, value)).orElse(null)),
+                Objects.requireNonNull(menuUser3.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)));
+        roleMenuRepo.saveAll(roleMenus);
+
         log.info("Finished seeding role menus");
     }
 
     private void seedUsers() {
         log.info("Seeding users");
-        User user = createUser("user","user@gmail.com", "password", Role.USER);
-        User admin = createUser("admin","admin@gmail.com", "password", Role.ADMIN);
+        User user = createUser("user", "user@gmail.com", Role.USER);
+        User admin = createUser("admin", "admin@gmail.com", Role.ADMIN);
         List<User> users = List.of(user, admin);
         userRepo.saveAll(users);
         log.info("Finished seeding users");
@@ -91,8 +92,8 @@ public class DatabaseSeeder implements CommandLineRunner {
         menu.setUrlink(url);
         menu.setClasslink(classLink);
         menu.setIsDeleted(false);
-        menu.setCreatedBy("System");
-        menu.setModifiedBy("System");
+        menu.setCreatedBy(SYSTEM_USER);
+        menu.setModifiedBy(SYSTEM_USER);
         menu.setParentId(parentId);
         menu.setCreatedDate(new java.util.Date());
         menu.setModifiedDate(new java.util.Date());
@@ -104,23 +105,23 @@ public class DatabaseSeeder implements CommandLineRunner {
         RoleMenu roleMenu = new RoleMenu();
         roleMenu.setRole(role);
         roleMenu.setMenu(menu);
-        roleMenu.setCreatedBy("System");
-        roleMenu.setModifiedBy("System");
+        roleMenu.setCreatedBy(SYSTEM_USER);
+        roleMenu.setModifiedBy(SYSTEM_USER);
         roleMenu.setCreatedDate(new java.util.Date());
         roleMenu.setModifiedDate(new java.util.Date());
         roleMenu.setIsDeleted(false);
         return roleMenu;
     }
 
-    private User createUser(String fullName,String email,String password, Role role) {
+    private User createUser(String fullName, String email, Role role) {
         User user = new User();
         user.setFullName(fullName);
         user.setEmail(email);
         user.setRole(role);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
+        user.setPassword(bCryptPasswordEncoder.encode(DatabaseSeeder.DEFAULT_PASSWORD));
         user.setDeleted(false);
-        user.setCreatedBy("System");
-        user.setModifiedBy("System");
+        user.setCreatedBy(SYSTEM_USER);
+        user.setModifiedBy(SYSTEM_USER);
         user.setCreatedDate(new java.util.Date());
         user.setModifiedDate(new java.util.Date());
         return user;
