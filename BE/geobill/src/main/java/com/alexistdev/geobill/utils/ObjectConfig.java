@@ -31,7 +31,7 @@ public class ObjectConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/v1/api/**")
+                registry.addMapping("/api/v1/**")
                         .allowedOrigins("http://localhost:4200") // Angular dev server
                         .allowedHeaders("Authorization", "Content-Type")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

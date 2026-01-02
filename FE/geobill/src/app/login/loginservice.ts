@@ -19,7 +19,7 @@ export class Loginservice {
       'Accept': 'application/json'
     });
 
-    return this.http.post<any>('http://localhost:8082/v1/api/auth/login', {'email': userName , 'password' : userPw},{ headers: headers,
+    return this.http.post<any>('http://localhost:8082/api/v1/auth/login', {'email': userName , 'password' : userPw},{ headers: headers,
       withCredentials: true }).pipe(
         map(res => {
           if(!res || !res.payload) {
