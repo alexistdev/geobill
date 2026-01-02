@@ -27,7 +27,8 @@
               "src/assets/css/bootstrap-extended.css",
               "src/assets/css/app.css",
               "src/assets/css/icons.css",
-              "src/assets/css/header-colors.css"
+              "src/assets/css/header-colors.css",
+              "src/assets/css/dark-theme.css"
             ],
             "scripts": [
               "src/assets/js/pace.min.js",
