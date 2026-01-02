@@ -20,6 +20,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +37,8 @@ public class AuthController {
 
     @Autowired
     private MenuService menuService;
+
+    private static final Logger logger = Logger.getLogger(AuthController.class.getName());
 
     @PostMapping("/register")
     public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
@@ -72,13 +75,14 @@ public class AuthController {
                      .stream()
                      .map(menu-> modelMapper.map(menu, MenuDTO.class))
                      .collect(Collectors.toList());
-
+            logger.info("User is valid :" + result.getEmail());
             result.setMenus(menus);
             responseData.setPayload(result);
             responseData.getMessages().add("User is valid");
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         }
+        logger.info("Invalid username or password :" + loginRequest.getEmail());
         responseData.setStatus(false);
         responseData.getMessages().add("Invalid username or password");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
@@ -87,6 +91,7 @@ public class AuthController {
     private void handleErrors(Errors errors, ResponseData<?> responseData){
         if (errors.hasErrors()) {
             for (ObjectError error : errors.getAllErrors()) {
+                logger.info(error.getDefaultMessage());
                 responseData.getMessages().add(error.getDefaultMessage());
             }
             responseData.setStatus(false);

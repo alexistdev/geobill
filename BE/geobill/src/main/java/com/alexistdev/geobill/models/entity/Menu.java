@@ -38,13 +38,7 @@ public class Menu extends BaseEntity<String> implements Serializable {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    @JsonIgnore
-    private Menu parent;
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("sortOrder ASC")
-    private List<Menu> children = new ArrayList<>();
+    @Column(name = "parent_id")
+    private UUID parentId;
 
 }
