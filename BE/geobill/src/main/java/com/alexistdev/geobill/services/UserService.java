@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Slf4j
 @Service
@@ -27,6 +28,8 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    private static final Logger logger = Logger.getLogger(UserService.class.getName());
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String.format("User %s not found", email)));
@@ -35,6 +38,7 @@ public class UserService implements UserDetailsService {
     public User registerUser(User user) {
         boolean userExist = userRepo.findByEmail(user.getEmail()).isPresent();
         if (userExist) {
+            logger.info(String.format("User %s already exists", user.getEmail()));
             throw new RuntimeException(
                     String.format("User %s already exists", user.getEmail())
             );
@@ -59,6 +63,7 @@ public class UserService implements UserDetailsService {
         if (userExist.isPresent()) {
             boolean authCheck = bCryptPasswordEncoder.matches(loginRequest.getPassword(), userExist.get().getPassword());
             if (!authCheck) {
+                logger.info("Authentication failed, password is invalid");
                 return null;
             }
             return userExist.get();
