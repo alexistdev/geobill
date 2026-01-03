@@ -24,11 +24,16 @@ public class MenuTest {
         menu.setName("Dashboard");
         menu.setUrlink("/dashboard");
         menu.setClasslink("DashboardController");
+        menu.setIcon("home");
+        menu.setSortOrder(1);
+        menu.setTypeMenu(1);
+        menu.setParentId(UUID.randomUUID());
+        menu.setCreatedBy("System");
+        menu.setModifiedBy("System");
         menu.setCreatedDate(new java.util.Date());
         menu.setModifiedDate(new java.util.Date());
         menu.setDeleted(false);
-        menu.setCreatedBy("System");
-        menu.setModifiedBy("System");
+
     }
 
     @Test
@@ -52,6 +57,14 @@ public class MenuTest {
         String classlink = "SettingsController";
         menu.setClasslink(classlink);
         Assertions.assertEquals(classlink, menu.getClasslink());
+    }
+
+    @Test
+    @DisplayName("Should return typemenu of saved menu")
+    void testGetAndSetTypeMenu() {
+        int typeMenu = 1;
+        menu.setTypeMenu(typeMenu);
+        Assertions.assertEquals(typeMenu, menu.getTypeMenu());
     }
 
     @Test
@@ -106,4 +119,63 @@ public class MenuTest {
         menu.setClasslink(null);
         Assertions.assertNull(menu.getClasslink());
     }
+
+    @Test
+    @DisplayName("Should return urlink of saved menu")
+    void testGetAndSetUrlink() {
+        String urlink = "/settings";
+        menu.setUrlink(urlink);
+        Assertions.assertEquals(urlink, menu.getUrlink());
+    }
+
+    @Test
+    @DisplayName("Should return icon of saved menu")
+    void testGetAndSetIcon() {
+        String icon = "settings";
+        menu.setIcon(icon);
+        Assertions.assertEquals(icon, menu.getIcon());
+    }
+
+    @Test
+    @DisplayName("Should return sortOrder of saved menu")
+    void testGetAndSetSortOrder() {
+        int sortOrder = 2;
+        menu.setSortOrder(sortOrder);
+        Assertions.assertEquals(sortOrder, menu.getSortOrder());
+    }
+
+    @Test
+    @DisplayName("Should return parentId of saved menu")
+    void testGetAndSetParentId() {
+        UUID parentId = UUID.randomUUID();
+        menu.setParentId(parentId);
+        Assertions.assertEquals(parentId, menu.getParentId());
+    }
+
+    @Test
+    @DisplayName("Should verify parentId is UUID")
+    void testParentIdTypeIsUUID() {
+        try{
+            Field field = Menu.class.getDeclaredField("parentId");
+            field.setAccessible(true);
+            Assertions.assertEquals(UUID.class, field.getType());
+        } catch (NoSuchFieldException  e){
+            fail("parentId field should exist in Menu class");
+        }
+    }
+
+    @Test
+    @DisplayName("Should verify default value of sortOrder is 0")
+    void testDefaultSortOrderValue() {
+        Menu newMenu = new Menu();
+        Assertions.assertEquals(0, newMenu.getSortOrder());
+    }
+
+    @Test
+    @DisplayName("Should handle setting icon to null")
+    void testSetIconWithNullValue() {
+        menu.setIcon(null);
+        Assertions.assertNull(menu.getIcon());
+    }
+
 }

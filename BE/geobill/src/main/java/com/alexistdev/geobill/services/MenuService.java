@@ -51,6 +51,7 @@ public class MenuService {
         menu.setUrlink(menuDTO.getUrlink());
         menu.setClasslink(menuDTO.getClasslink());
         menu.setIcon(menuDTO.getIcon());
+        menu.setTypeMenu(menuDTO.getTypeMenu());
 
         // Parse and set sort order
         if (menuDTO.getSortOrder() != null && !menuDTO.getSortOrder().isEmpty()) {
@@ -73,6 +74,7 @@ public class MenuService {
         menu.setUrlink(menuDTO.getUrlink());
         menu.setClasslink(menuDTO.getClasslink());
         menu.setIcon(menuDTO.getIcon());
+        menu.setTypeMenu(menuDTO.getTypeMenu());
 
         // Parse and set sort order
         if (menuDTO.getSortOrder() != null && !menuDTO.getSortOrder().isEmpty()) {

@@ -41,4 +41,7 @@ public class Menu extends BaseEntity<String> implements Serializable {
     @Column(name = "parent_id")
     private UUID parentId;
 
+    @Column(name = "type_menu", nullable = false)
+    private int typeMenu;
+
 }
