@@ -2,8 +2,6 @@
 
 GeoBill is a billing software website tailored for those launching hosting businesses. It aims to provide a cost-effective alternative to expensive commercial hosting software. GeoBill is built using Angular 20 for the frontend and Java Spring Boot 3 for the backend.
 
-## Golang Version:
-GeoBill Backend with Go Language: [https://github.com/alexistdev/geobill_golang_versions](https://github.com/alexistdev/geobill_golang_versions)
 
 ## Frontend
 
