@@ -55,8 +55,6 @@ GeoBill Backend with Go Language: [https://github.com/alexistdev/geobill_golang_
    ```bash
    mvn spring-boot:run
    ```
-   ```
-7. After registration, update the user's role to "ADMIN" in your database since the registration API defaults to the "USER" role.
-8. Set up Basic Authentication in Postman or Insomnia using the email and password provided during registration.
+6. Set up Basic Authentication in Postman or Insomnia using the email and password provided during registration.
 
 With these steps, you'll have the GeoBill application up and running, ready for customization and use.
