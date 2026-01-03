@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface MenuRepo extends JpaRepository<Menu, UUID> {
 
     Optional<Menu> findByName(String menuName);
+
+    Optional<Menu> findByCode(String code);
 }

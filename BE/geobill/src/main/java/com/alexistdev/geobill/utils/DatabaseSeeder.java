@@ -44,15 +44,15 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedMenus() {
         log.info("Seeding menus");
 
-        Menu menu1 = createMenu("Dashboard ADMIN", "/admin/dashboard", "DashboardController", 1, null);
-        Menu menu2 = createMenu("Dashboard User", "/user/dashboard", "DashboardController", 1, null);
-        Menu menu3 = createMenu("Data Transaksi", "#", "Transaksi", 1, null);
+        Menu menu1 = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
+        Menu menu2 = createMenu("Dashboard", "/user/dashboard", "menu-title d-flex align-items-center", 1, null,2,"us1","");
+        Menu menu3 = createMenu("Services", "#", "menu-title d-flex align-items-center", 1, null,2,"us2","bx bx-cube");
         menuRepo.saveAll(List.of(menu1, menu2, menu3));
 
-        Optional<Menu> menuParent = menuRepo.findByName("Data Transaksi");
+        Optional<Menu> menuParent = menuRepo.findByCode("us2");
 
         menuParent.ifPresent(menu -> {
-            Menu menuChild = createMenu("Data Invoice", "/user/invoice", "DataInvoice", 2, menu.getId());
+            Menu menuChild = createMenu("My Services", "/user/services", "", 2, menu.getId(),2,"us3","bx bx-envelope");
             menuRepo.save(menuChild);
         });
 
@@ -62,10 +62,10 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedRoleMenus() {
         log.info("Seeding role menus");
 
-        Optional<Menu> menuAdmin = menuRepo.findByName("Dashboard ADMIN");
-        Optional<Menu> menuUser1 = menuRepo.findByName("Dashboard User");
-        Optional<Menu> menuUser2 = menuRepo.findByName("Data Transaksi");
-        Optional<Menu> menuUser3 = menuRepo.findByName("Data Invoice");
+        Optional<Menu> menuAdmin = menuRepo.findByCode("ad1");
+        Optional<Menu> menuUser1 = menuRepo.findByCode("us1");
+        Optional<Menu> menuUser2 = menuRepo.findByCode("us2");
+        Optional<Menu> menuUser3 = menuRepo.findByCode("us3");
 
         List<RoleMenu> roleMenus = List.of(
                 Objects.requireNonNull(menuAdmin.map(menu2 -> createRoleMenu(Role.ADMIN, menu2)).orElse(null)),
@@ -86,7 +86,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("Finished seeding users");
     }
 
-    private Menu createMenu(String name, String url, String classLink, int sortOrder, UUID parentId) {
+    private Menu createMenu(String name, String url, String classLink, int sortOrder, UUID parentId, int typeMenu, String code, String icon) {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setUrlink(url);
@@ -98,6 +98,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         menu.setCreatedDate(new java.util.Date());
         menu.setModifiedDate(new java.util.Date());
         menu.setSortOrder(sortOrder);
+        menu.setTypeMenu(typeMenu);
+        menu.setIcon(icon);
+        menu.setCode(code);
         return menu;
     }
 

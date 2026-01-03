@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Localstorageservice } from '../../utils/localstorage/localstorageservice';
-import {Sidebar} from '../../share/sidebar/sidebar';
 import {Menutop} from '../../share/menutop/menutop';
 
 @Component({
@@ -17,7 +16,7 @@ export class UserDashboard implements OnInit {
   constructor(private localStorage: Localstorageservice) { }
 
   ngOnInit() {
-    // Dashboard user initialization
+
   }
 
 }

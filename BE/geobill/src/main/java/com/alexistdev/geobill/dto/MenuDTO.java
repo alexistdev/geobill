@@ -15,5 +15,6 @@ public class MenuDTO {
     private String sortOrder;
     private String icon;
     private int typeMenu;
+    private String code;
     private UUID parentId;
 }

@@ -13,13 +13,13 @@ export class Localstorageservice {
     return isPlatformBrowser(this.platformId);
   }
 
-  setItem(key: string, val:string):void {
+  setItem(key: string, val: string): void {
     if (this.isBrowser()) {
-      sessionStorage.setItem(key,this.encode(val));
+      sessionStorage.setItem(key, this.encode(val));
     }
   }
 
-  getItem(key:string):string {
+  getItem(key: string): string {
     if (!this.isBrowser()) {
       return '';
     }
@@ -46,7 +46,11 @@ export class Localstorageservice {
     return null;
   }
 
-  clearItem():void {
+  setItemAsObject<T>(key: string, value: T): void {
+    this.setItem(key, JSON.stringify(value));
+  }
+
+  clearItem(): void {
     if (this.isBrowser()) {
       sessionStorage.clear();
     }
