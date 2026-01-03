@@ -21,6 +21,16 @@ GeoBill Backend with Go Language: [https://github.com/alexistdev/geobill_golang_
    ```bash
    ng serve
    ```
+4. For testing purposes, the following credentials can be used. Please ensure the backend is running before attempting to login:
+   ```bash
+   Role User:
+   Username: user@gmail.com
+   Password: password
+
+   Role Admin:
+   Username: admin@gmail.com
+   Password: password
+   ```
 
 ## Backend
 
@@ -45,14 +55,6 @@ GeoBill Backend with Go Language: [https://github.com/alexistdev/geobill_golang_
    ```bash
    mvn spring-boot:run
    ```
-6. Register a new user at the following endpoint using Postman or Insomnia:
-   - **POST** `http://localhost:8082/v1/api/auth/register`
-   ```json
-   {
-     "fullName": "Administrator",
-     "email": "admin@gmail.com",
-     "password": "1234"
-   }
    ```
 7. After registration, update the user's role to "ADMIN" in your database since the registration API defaults to the "USER" role.
 8. Set up Basic Authentication in Postman or Insomnia using the email and password provided during registration.
