@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Localstorageservice } from '../../utils/localstorage/localstorageservice';
-import {Sidebar} from '../../share/sidebar/sidebar';
 
 @Component({
   selector: 'app-staff-dashboard',

@@ -45,14 +45,14 @@ public class DatabaseSeeder implements CommandLineRunner {
         log.info("Seeding menus");
 
         Menu menu1 = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
-        Menu menu2 = createMenu("Dashboard", "/user/dashboard", "menu-title d-flex align-items-center", 1, null,2,"us1","");
-        Menu menu3 = createMenu("Services", "#", "menu-title d-flex align-items-center", 1, null,2,"us2","bx bx-cube");
+        Menu menu2 = createMenu("Dashboard", "/user/dashboard", "menu-title d-flex align-items-center", 1, null,2,"us1","bx bx-home-alt");
+        Menu menu3 = createMenu("Services", "#", "menu-title d-flex align-items-center", 2, null,2,"us2","bx bx-collection");
         menuRepo.saveAll(List.of(menu1, menu2, menu3));
 
         Optional<Menu> menuParent = menuRepo.findByCode("us2");
 
         menuParent.ifPresent(menu -> {
-            Menu menuChild = createMenu("My Services", "/user/services", "", 2, menu.getId(),2,"us3","bx bx-envelope");
+            Menu menuChild = createMenu("My Services", "/user/services", "", 1, menu.getId(),2,"us3","bx bx-server");
             menuRepo.save(menuChild);
         });
 

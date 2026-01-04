@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Localstorageservice } from '../utils/localstorage/localstorageservice';
-import { catchError, map, Observable, Observer, of } from 'rxjs';
+import { CredentialEncryptedService } from '../utils/auth/credential-encrypted.service';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class Loginservice {
 
   constructor(
     private http: HttpClient,
-    private localStorageService: Localstorageservice
+    private localStorageService: Localstorageservice,
+    private credentialService: CredentialEncryptedService
   ) { }
 
   AuthLogin(userName: string, userPw: string): Observable<any> {
@@ -28,14 +30,19 @@ export class Loginservice {
           return { success: false };
         }
         const data = res.payload;
+
+        // Simpan credentials dengan enkripsi AES-256
+        this.credentialService.setCredentials(userName, userPw);
+
+        // Simpan data user lainnya (bukan credentials) di sessionStorage
         this.localStorageService.setItem("userId", data.id);
         this.localStorageService.setItem("role", data.role);
-        this.localStorageService.setItem("email", data.email);
-        this.localStorageService.setItem("keyPs", userPw);
+
         // Store menus as object
         if (data.menus) {
           this.localStorageService.setItemAsObject("menus", data.menus);
         }
+
         return { success: true, role: data.role, payload: data };
       }),
       catchError((err) => {

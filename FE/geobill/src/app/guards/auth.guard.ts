@@ -1,23 +1,35 @@
 import { inject, PLATFORM_ID } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { Localstorageservice } from '../utils/localstorage/localstorageservice';
+import { CredentialEncryptedService } from '../utils/auth/credential-encrypted.service';
 import { isPlatformBrowser } from '@angular/common';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const platformId = inject(PLATFORM_ID);
-  
+
   // During SSR, allow the route to pass (will be handled on client side)
   if (!isPlatformBrowser(platformId)) {
     return true;
   }
 
   const localStorageService = inject(Localstorageservice);
+  const credentialService = inject(CredentialEncryptedService);
   const router = inject(Router);
 
+  // Check if session is expired
+  if (credentialService.isSessionExpired()) {
+    credentialService.clearCredentials();
+    localStorageService.clearItem();
+    router.navigate(['/login']);
+    return false;
+  }
+
+  // Check if credentials exist
+  const credentials = credentialService.getCredentials();
   const userId = localStorageService.getItem('userId');
   const role = localStorageService.getItem('role');
 
-  if (userId && role) {
+  if (credentials && userId && role) {
     return true;
   }
 
