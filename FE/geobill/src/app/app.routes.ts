@@ -6,6 +6,7 @@ import {Notfoundcomponent} from './share/notfoundcomponent/notfoundcomponent';
 import {Login} from './login/login';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
+import {HostingService} from './users/hosting-service/hosting-service';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -28,6 +29,12 @@ export const routes: Routes = [
   {
     path: 'users/dashboard',
     component: UserDashboard,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['USER'] }
+  },
+  {
+    path: 'users/services',
+    component: HostingService,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'] }
   },

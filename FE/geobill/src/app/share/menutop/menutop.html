@@ -1,30 +1,32 @@
 <ul class="navbar-nav align-items-center flex-grow-1">
 
-  @for (menu of menus; track menu.id){
-  @if (!menu.parentId) {
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="javascript:;" data-bs-toggle="dropdown">
-      <div class="parent-icon">
-        <i class="bx" [ngClass]="menu.icon || 'bx-cube'"></i>
-      </div>
-      <div class="menu-title d-flex align-items-center">{{ menu.name }}</div>
-      @if (menu.children && menu.children.length > 0) {
-      <div class="ms-auto dropy-icon"><i class='bx bx-chevron-down'></i></div>
-      }
-    </a>
-
-    @if (menu.children && menu.children.length > 0) {
-    <ul class="dropdown-menu">
-      @for (sub of menu.children; track sub.id) {
-      <li>
-        <a class="dropdown-item" [href]="sub.urlink">
-          <i class="bx" [ngClass]="sub.icon || 'bx-radio-circle'"></i>{{ sub.name }}
+  @for (menu of menus; track menu.id) {
+    @if (!menu.parentId) {
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret"
+           [href]="menu.children && menu.children.length > 0 ? '#' : menu.urlink" data-bs-toggle="dropdown">
+          <div class="parent-icon">
+            <i class="bx" [ngClass]="menu.icon || 'bx-cube'"></i>
+          </div>
+          <div class="menu-title d-flex align-items-center">{{ menu.name }}</div>
+          @if (menu.children && menu.children.length > 0) {
+            <div class="ms-auto dropy-icon"><i class='bx bx-chevron-down'></i></div>
+          }
         </a>
+
+
+        @if (menu.children && menu.children.length > 0) {
+          <ul class="dropdown-menu">
+            @for (sub of menu.children; track sub.id) {
+              <li>
+                <a class="dropdown-item" [href]="sub.urlink">
+                  <i class="bx" [ngClass]="sub.icon || 'bx-radio-circle'"></i>{{ sub.name }}
+                </a>
+              </li>
+            }
+          </ul>
+        }
       </li>
-      }
-    </ul>
     }
-  </li>
-  }
   }
 </ul>
