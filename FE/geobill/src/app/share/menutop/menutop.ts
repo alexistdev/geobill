@@ -24,18 +24,21 @@ export class Menutop implements OnInit{
   }
 
   buildMenuTree(menuItems: Menu[], parentId: string | null = null): Menu[] {
-    const result: Menu[] = [];
+    return menuItems
+      .filter(item => item.parentId === parentId)
+      .map(item => {
+        const newItem = { ...item };
+        const children = this.buildMenuTree(menuItems, newItem.id);
 
-    for(const item of menuItems) {
-      if(item.parentId === parentId) {
-        const children = this.buildMenuTree(menuItems, item.id);
-        if(children.length > 0) {
-          item.children = children;
+        if (children.length > 0) {
+          newItem.children = children;
         }
-        result.push(item);
-      }
-    }
-
-    return result;
+        return newItem;
+      })
+      .sort((a, b) => {
+        const orderA = parseInt(a.sortOrder) || 0;
+        const orderB = parseInt(b.sortOrder) || 0;
+        return orderA - orderB;
+      });
   }
 }
