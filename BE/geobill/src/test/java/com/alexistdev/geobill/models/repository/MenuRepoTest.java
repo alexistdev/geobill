@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -28,6 +29,8 @@ public class MenuRepoTest {
     @Autowired
     private MenuRepo menuRepo;
 
+    private static final String SYSTEM_USER = "System";
+
     @BeforeEach
     void setUp() {
         User testUser = new User();
@@ -38,24 +41,28 @@ public class MenuRepoTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private Menu createMenu(String name, String urlink, String classlink) {
+    private Menu createMenu(String name, String url, String classLink, int sortOrder, UUID parentId, int typeMenu, String code, String icon) {
         Menu menu = new Menu();
         menu.setName(name);
-        menu.setUrlink(urlink);
-        menu.setClasslink(classlink);
-        menu.setCreatedBy("system");
-        menu.setCreatedDate(new java.util.Date());
-        menu.setModifiedBy("system");
-        menu.setModifiedDate(new java.util.Date());
+        menu.setUrlink(url);
+        menu.setClasslink(classLink);
         menu.setIsDeleted(false);
-        menu.setSortOrder(1);
+        menu.setCreatedBy(SYSTEM_USER);
+        menu.setModifiedBy(SYSTEM_USER);
+        menu.setParentId(parentId);
+        menu.setCreatedDate(new java.util.Date());
+        menu.setModifiedDate(new java.util.Date());
+        menu.setSortOrder(sortOrder);
+        menu.setTypeMenu(typeMenu);
+        menu.setIcon(icon);
+        menu.setCode(code);
         return menu;
     }
 
     @Test
     @DisplayName("Test Save Menu")
     void testSaveMenu() {
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         Menu savedMenu = menuRepo.save(menu);
         Assertions.assertNotNull(savedMenu);
         Assertions.assertEquals(menu.getName(), savedMenu.getName());
@@ -72,7 +79,7 @@ public class MenuRepoTest {
     @Test
     @DisplayName("Test Find By UUID")
     void testFindByUUID(){
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
         Optional<Menu> foundMenu = menuRepo.findById(menu.getId());
@@ -83,11 +90,11 @@ public class MenuRepoTest {
     @Test
     @DisplayName("Test Find All Menu")
     void testFindAllMenu() {
-        Menu menu1 = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu1 = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu1);
         entityManager.flush();
 
-        Menu menu2 = createMenu("Settings","/settings","SettingsController");
+        Menu menu2 = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu2);
         entityManager.flush();
 
@@ -98,7 +105,7 @@ public class MenuRepoTest {
     @Test
     @DisplayName("Test Delete Menu")
     void testDeleteMenu(){
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
         menuRepo.delete(menu);
@@ -109,11 +116,11 @@ public class MenuRepoTest {
     @Test
     @DisplayName("Test Delete All Menus")
     void testDeleteAllMenus() {
-        Menu menu1 = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu1 = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu1);
         entityManager.flush();
 
-        Menu menu2 = createMenu("Settings","/settings","SettingsController");
+        Menu menu2 = createMenu("Dashboard", "/users/dashboard", "menu-title d-flex align-items-center", 1, null,2,"us1","bx bx-home-alt");
         entityManager.persist(menu2);
         entityManager.flush();
 
@@ -125,7 +132,7 @@ public class MenuRepoTest {
     @Test
     @DisplayName("Test Update Menus")
     void testUpdateMenus() {
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
 

@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -29,6 +30,9 @@ public class RoleMenuRepoTest {
 
     @Autowired
     private RoleMenuRepo roleMenuRepo;
+
+    private static final String SYSTEM_USER = "System";
+    private static final String DEFAULT_PASSWORD = "password";
 
     @BeforeEach
     void setUp() {
@@ -42,17 +46,21 @@ public class RoleMenuRepoTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private Menu createMenu(String name, String urlink, String classlink) {
+    private Menu createMenu(String name, String url, String classLink, int sortOrder, UUID parentId, int typeMenu, String code, String icon) {
         Menu menu = new Menu();
         menu.setName(name);
-        menu.setUrlink(urlink);
-        menu.setClasslink(classlink);
-        menu.setCreatedBy("system");
-        menu.setCreatedDate(new java.util.Date());
-        menu.setModifiedBy("system");
-        menu.setModifiedDate(new java.util.Date());
+        menu.setUrlink(url);
+        menu.setClasslink(classLink);
         menu.setIsDeleted(false);
-        menu.setSortOrder(1);
+        menu.setCreatedBy(SYSTEM_USER);
+        menu.setModifiedBy(SYSTEM_USER);
+        menu.setParentId(parentId);
+        menu.setCreatedDate(new java.util.Date());
+        menu.setModifiedDate(new java.util.Date());
+        menu.setSortOrder(sortOrder);
+        menu.setTypeMenu(typeMenu);
+        menu.setIcon(icon);
+        menu.setCode(code);
         return menu;
     }
 
@@ -71,7 +79,7 @@ public class RoleMenuRepoTest {
     @Test
     @DisplayName("Test Save RoleMenu")
     void testSaveRoleMenu() {
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
 
@@ -94,7 +102,7 @@ public class RoleMenuRepoTest {
     @Test
     @DisplayName("Test Find By RoleMenu UUID")
     void testFindByRoleMenuUUID(){
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
 
@@ -111,7 +119,7 @@ public class RoleMenuRepoTest {
     @Test
     @DisplayName("Test Find All RoleMenu")
     void testFindAllRoleMenu() {
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
 
@@ -134,7 +142,7 @@ public class RoleMenuRepoTest {
     @Test
     @DisplayName("Test Delete RoleMenu")
     void testDeleteRoleMenu() {
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
 
@@ -150,11 +158,11 @@ public class RoleMenuRepoTest {
     @Test
     @DisplayName("Test Delete All RoleMenu")
     void testDeleteAllRoleMenu() {
-        Menu menu1 = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu1 = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu1);
         entityManager.flush();
 
-        Menu menu2 = createMenu("Settings","/settings","SettingsController");
+        Menu menu2 = createMenu("Dashboard", "/users/dashboard", "menu-title d-flex align-items-center", 1, null,2,"us1","bx bx-home-alt");
         entityManager.persist(menu2);
         entityManager.flush();
 
@@ -173,7 +181,7 @@ public class RoleMenuRepoTest {
 
     @Test
     void testUpdateRoleMenu() {
-        Menu menu = createMenu("Dashboard","/dashboard","DashboardController");
+        Menu menu = createMenu("Dashboard", "/admin/dashboard", "menu-title d-flex align-items-center", 1, null,1, "ad1","bx bx-home-alt");
         entityManager.persist(menu);
         entityManager.flush();
 
