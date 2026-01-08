@@ -6,5 +6,6 @@ public class DatabaseTableNames {
     public static final String TB_DOMAINTLD = "tb_tlds";
     public static final String TB_MENUS = "tb_menus";
     public static final String TB_ROLE_MENUS = "tb_role_menus";
+    public static final String TB_PRODUCT_TYPES = "tb_product_types";
 
 }

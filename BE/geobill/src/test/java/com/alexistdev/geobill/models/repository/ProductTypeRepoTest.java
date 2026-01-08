@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -149,5 +150,31 @@ public class ProductTypeRepoTest {
 
         Assertions.assertTrue(isDeletedBool,
                 "Product should be soft-deleted in the database");
+    }
+
+    @Test
+    @DisplayName("Test Find By Name Including Deleted")
+    void testFindByNameIncludingDeleted() {
+        ProductType productType1 = createProductType("VPS");
+        entityManager.persist(productType1);
+
+        ProductType productType2 = createProductType("Dedicated Server");
+        productType2.setIsDeleted(true);
+        entityManager.persist(productType2);
+        entityManager.flush();
+        entityManager.clear();
+
+        Optional<ProductType> foundProductType1 = productTypeRepo.findByNameIncludingDeleted("VPS");
+        Assertions.assertTrue(foundProductType1.isPresent());
+        Assertions.assertEquals("VPS", foundProductType1.get().getName());
+        Assertions.assertFalse(foundProductType1.get().getIsDeleted());
+
+        Optional<ProductType> foundProductType2 = productTypeRepo.findByNameIncludingDeleted("Dedicated Server");
+        Assertions.assertTrue(foundProductType2.isPresent());
+        Assertions.assertEquals("Dedicated Server", foundProductType2.get().getName());
+        Assertions.assertTrue(foundProductType2.get().getIsDeleted());
+
+        Optional<ProductType> foundProductType3 = productTypeRepo.findByNameIncludingDeleted("Nonexistent Product Type");
+        Assertions.assertFalse(foundProductType3.isPresent());
     }
 }
