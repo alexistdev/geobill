@@ -16,4 +16,7 @@ public interface ProductTypeRepo extends JpaRepository<ProductType, UUID> {
 
     @Query(value = "SELECT * FROM tb_product_types WHERE name = :name", nativeQuery = true)
     Optional<ProductType> findByNameIncludingDeleted(@Param("name") String name);
+
+    @Query("SELECT pt FROM ProductType pt WHERE pt.name LIKE %:keyword% and pt.isDeleted=false")
+    Page<ProductType> findByFilter(@Param("keyword") String keyword, Pageable pageable);
 }

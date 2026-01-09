@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.models.repository;
 
+import com.alexistdev.geobill.models.entity.BaseEntity;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.entity.User;
 import org.junit.jupiter.api.Assertions;
@@ -9,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
@@ -76,8 +80,8 @@ public class ProductTypeRepoTest {
     }
 
     @Test
-    @DisplayName("Test Find All ProductType")
-    void testFindAllProductType(){
+    @DisplayName("Test Find All ProductTypes")
+    void testFindAllProductTypes(){
         ProductType productType1 = createProductType("VPS");
         ProductType productType2 = createProductType("Dedicated Server");
         entityManager.persist(productType1);
@@ -176,5 +180,38 @@ public class ProductTypeRepoTest {
 
         Optional<ProductType> foundProductType3 = productTypeRepo.findByNameIncludingDeleted("Nonexistent Product Type");
         Assertions.assertFalse(foundProductType3.isPresent());
+    }
+
+    @Test
+    @DisplayName("Test Find By Name Not Found")
+    void testFindByNameNotFound() {
+        Optional<ProductType> foundProductType = productTypeRepo.findByNameIncludingDeleted("Nonexistent Product Type");
+        Assertions.assertFalse(foundProductType.isPresent());
+    }
+
+    @Test
+    @DisplayName("Test Find By Filter with keyword")
+    void testFindByFilter() {
+        ProductType sharedHosting = createProductType("Shared Server");
+        ProductType vps = createProductType("VPS");
+        ProductType dedicatedServer = createProductType("Dedicated Server");
+        ProductType deletedProduct = createProductType("Deleted Server");
+        deletedProduct.setIsDeleted(true);
+
+        entityManager.persist(vps);
+        entityManager.persist(dedicatedServer);
+        entityManager.persist(sharedHosting);
+        entityManager.persist(deletedProduct);
+        entityManager.flush();
+        entityManager.clear();
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ProductType> result = productTypeRepo.findByFilter("Server", pageable);
+
+        Assertions.assertEquals(2, result.getTotalElements());
+        Assertions.assertTrue(result.stream().anyMatch(productType -> productType.getName().equals("Shared Server")));
+        Assertions.assertTrue(result.stream().anyMatch(productType -> productType.getName().equals("Dedicated Server")));
+        Assertions.assertFalse(result.stream().anyMatch(productType -> productType.getName().equals("Deleted Server")));
+        Assertions.assertFalse(result.stream().anyMatch(BaseEntity::getIsDeleted));
     }
 }
