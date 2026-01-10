@@ -23,6 +23,10 @@ public class ProductTypeService {
         return productTypeRepo.findByIsDeletedFalse(pageable);
     }
 
+    public Page<ProductType> getAllProductTypesByFilter(Pageable pageable, String keyword) {
+        return productTypeRepo.findByFilter(keyword.toLowerCase(), pageable);
+    }
+
     public ProductType save(ProductType productType) {
         Optional<ProductType> foundProductType = productTypeRepo.findByNameIncludingDeleted(productType.getName());
         if(foundProductType.isPresent()){
