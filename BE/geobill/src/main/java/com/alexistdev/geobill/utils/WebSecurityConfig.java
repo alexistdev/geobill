@@ -34,6 +34,12 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/users/get_all_users").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET,
+                                "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/menus").hasAuthority(Role.ADMIN.toString())
                         .anyRequest().authenticated()
                 )
