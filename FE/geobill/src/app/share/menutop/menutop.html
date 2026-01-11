@@ -3,8 +3,10 @@
   @for (menu of menus; track menu.id) {
     @if (!menu.parentId) {
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret"
-           [href]="menu.children && menu.children.length > 0 ? '#' : menu.urlink" data-bs-toggle="dropdown">
+        <a class="nav-link"
+           [ngClass]="{'dropdown-toggle dropdown-toggle-nocaret': menu.children && menu.children.length > 0}"
+           [attr.data-bs-toggle]="menu.children && menu.children.length > 0 ? 'dropdown' : null"
+           [href]="menu.children && menu.children.length > 0 ? '#' : menu.urlink">
           <div class="parent-icon">
             <i class="bx" [ngClass]="menu.icon || 'bx-cube'"></i>
           </div>
