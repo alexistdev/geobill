@@ -1,6 +1,5 @@
 package com.alexistdev.geobill.dto;
 
-import com.alexistdev.geobill.models.entity.Menu;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,4 +16,5 @@ public class UserDTO {
     private List<MenuDTO> menus;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private String homeURL;
 }

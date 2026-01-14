@@ -4,6 +4,7 @@ import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.models.entity.Menu;
+import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
@@ -38,6 +39,11 @@ public class AuthController {
     @Autowired
     private MenuService menuService;
 
+    private final String homeAdmin = "/admin/dashboard";
+    private final String homeStaff = "/staff/dashboard";
+    private final String homeUser = "/users/dashboard";
+
+
     private static final Logger logger = Logger.getLogger(AuthController.class.getName());
 
     @PostMapping("/register")
@@ -70,11 +76,23 @@ public class AuthController {
 
         if (user != null) {
             UserDTO result =  modelMapper.map(user, UserDTO.class);
+            String role = result.getRole();
+
+            result.setHomeURL(homeUser);
+
+            if(role.equals(Role.ADMIN.toString())){
+                result.setHomeURL(homeAdmin);
+            }
+
+            if(role.equals(Role.STAFF.toString())){
+                result.setHomeURL(homeStaff);
+            }
 
             List<MenuDTO> menus = menuService.getMenusByRole(user.getRole())
                      .stream()
                      .map(menu-> modelMapper.map(menu, MenuDTO.class))
                      .collect(Collectors.toList());
+
             logger.info("User is valid :" + result.getEmail());
             result.setMenus(menus);
             responseData.setPayload(result);
