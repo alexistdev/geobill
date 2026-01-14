@@ -1,10 +1,8 @@
 package com.alexistdev.geobill.utils;
 
-import com.alexistdev.geobill.models.entity.Menu;
-import com.alexistdev.geobill.models.entity.Role;
-import com.alexistdev.geobill.models.entity.RoleMenu;
-import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.models.entity.*;
 import com.alexistdev.geobill.models.repository.MenuRepo;
+import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import com.alexistdev.geobill.models.repository.RoleMenuRepo;
 import com.alexistdev.geobill.models.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +23,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final RoleMenuRepo roleMenuRepo;
     private final UserRepo userRepo;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ProductTypeRepo productTypeRepo;
 
     private static final String SYSTEM_USER = "System";
     private static final String DEFAULT_PASSWORD = "password";
@@ -35,6 +34,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedMenus();
             seedRoleMenus();
             seedUsers();
+            seedProductType();
         }
     }
 
@@ -43,6 +43,26 @@ public class DatabaseSeeder implements CommandLineRunner {
         Menu menuAdmin2 = createMenu("Master Data", "#", "menu-title d-flex align-items-center", 2, null,1,"ad2","bx bx-book-alt");
 
         return List.of(menuAdmin1, menuAdmin2);
+    }
+
+    private void seedProductType(){
+        log.info("Seeding product types");
+        List<ProductType> allProductTypes = new ArrayList<>();
+        ProductType productType1 = createProductType("Shared Hosting");
+        ProductType productType2 = createProductType("VPS");
+        allProductTypes.addAll(List.of(productType1, productType2));
+        productTypeRepo.saveAll(allProductTypes);
+        log.info("Finished seeding product types");
+    }
+
+    private ProductType createProductType(String name) {
+        ProductType productType = new ProductType();
+        productType.setName(name);
+        productType.setCreatedBy(SYSTEM_USER);
+        productType.setModifiedBy(SYSTEM_USER);
+        productType.setCreatedDate(new java.util.Date());
+        productType.setModifiedDate(new java.util.Date());
+        return productType;
     }
 
     private void seedMenus() {
