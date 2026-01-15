@@ -1,0 +1,29 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Apiresponse } from '../../../share/response/apiresponse';
+import { Producttypemodel } from './producttypemodel.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class Producttypeservice {
+
+  private apiUrl = '/api/v1/producttypes';
+
+  constructor(private http: HttpClient) { }
+
+  getProductType(page: number, size: number, sortBy: string, direction: string): Observable<Apiresponse<Producttypemodel>> {
+    return this.http.get<Apiresponse<Producttypemodel>>(
+      `${this.apiUrl}?page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`,
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    );
+  }
+
+  getProductTypeByFilter(keyword: string, page: number, size: number, sortBy: string, direction: string): Observable<Apiresponse<Producttypemodel>> {
+    return this.http.get<Apiresponse<Producttypemodel>>(
+      `${this.apiUrl}/search?filter=${keyword}&page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`,
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    );
+  }
+}

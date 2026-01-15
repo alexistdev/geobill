@@ -2,19 +2,23 @@ import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/com
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Localstorageservice} from '../utils/localstorage/localstorageservice';
+import {CredentialEncryptedService} from '../utils/auth/credential-encrypted.service';
 
 @Injectable()
 export class BasicAuthInterceptor implements HttpInterceptor {
-  constructor(private localStorageService: Localstorageservice) {}
+
+  constructor(private localStorageService: Localstorageservice,
+              private credentialEncryptedService: CredentialEncryptedService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const username: string = this.localStorageService.getItem('email') || '';
-    const password: string = this.localStorageService.getItem('keyPs') || '';
 
-    const decodeUsername: string = this.localStorageService.decode(username);
-    const decodePassword: string = this.localStorageService.decode(password);
+    const credentials = this.credentialEncryptedService.getCredentials();
 
-    const authToken: string = btoa(`${decodeUsername}:${decodePassword}`);
+    if(!credentials){
+      return next.handle(req);
+    }
+
+    const authToken: string = btoa(`${credentials.email}:${credentials.password}`);
 
     const authReq = req.clone({
       setHeaders: {
