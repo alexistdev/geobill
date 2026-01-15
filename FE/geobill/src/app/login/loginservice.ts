@@ -43,7 +43,14 @@ export class Loginservice {
           this.localStorageService.setItemAsObject("menus", data.menus);
         }
 
-        return { success: true, role: data.role, payload: data };
+        return {
+          success: true,
+          role: data.role,
+          payload: {
+            ...data,
+            homeUrl: data.homeUrl
+          }
+        };
       }),
       catchError((err) => {
         console.error(err);
