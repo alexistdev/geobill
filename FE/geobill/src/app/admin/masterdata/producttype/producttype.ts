@@ -54,7 +54,7 @@ export class Producttype implements OnInit {
     }
   }
 
-  loadData(page: number, size: number = 1): void {
+  loadData(page: number, size: number = 10): void {
     this.pageNumber = page;
     this.pageSize = size;
     this.keyword = this.searchQuery;
@@ -121,7 +121,8 @@ export class Producttype implements OnInit {
     return typeof value === 'number';
   }
 
-  onPageSizeChange() {
+  onPageSizeChange(event: any) {
+    this.pageSize = parseInt(event.target.value, 10);
     this.loadData(0, this.pageSize);
   }
 
