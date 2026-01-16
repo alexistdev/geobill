@@ -8,6 +8,7 @@ import { Apiresponse } from '../../../share/response/apiresponse';
 import {Router} from '@angular/router';
 import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
 import {Pagination} from '../../../share/pagination/pagination';
+import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 
 @Component({
   selector: 'app-producttype',
@@ -36,6 +37,8 @@ export class Producttype implements OnInit {
   public currentFormData: any = {};
   public currentConfirmationText = '';
 
+  private searchSubject = new Subject<string>();
+
   currentEditMode: boolean = false;
   selectedProvinceId: number | undefined = 0;
   private platformId = inject(PLATFORM_ID);
@@ -54,6 +57,14 @@ export class Producttype implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.loadData(this.pageNumber);
     }
+    //set delay for request sent to backend
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe((searchTerm:string) => {
+      this.searchQuery = searchTerm.toLowerCase();
+      this.loadData(this.pageNumber);
+    });
   }
 
   loadData(page: number, size: number = 10): void {
@@ -114,9 +125,9 @@ export class Producttype implements OnInit {
     if (this.pageNumber > 0) {
       this.pageNumber = 0;
     }
-
-    this.searchQuery = searchTerm.toLowerCase();
-    this.loadData(this.pageNumber, this.pageSize);
+    this.searchSubject.next(searchTerm);
+    // this.searchQuery = searchTerm.toLowerCase();
+    // this.loadData(this.pageNumber, this.pageSize);
   }
 
   isNumber(value: any): boolean {
