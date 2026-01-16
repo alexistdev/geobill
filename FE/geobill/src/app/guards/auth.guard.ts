@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2026.
+ * Project: GeoBill
+ * Author: Alexsander Hendra Wijaya
+ * Github: https://github.com/alexistdev
+ * Email: alexistdev@gmail.com
+ */
+
 import { inject, PLATFORM_ID } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { Localstorageservice } from '../utils/localstorage/localstorageservice';

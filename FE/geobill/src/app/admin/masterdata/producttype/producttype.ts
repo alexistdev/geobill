@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) 2026.
+ * Project: GeoBill
+ * Author: Alexsander Hendra Wijaya
+ * Github: https://github.com/alexistdev
+ * Email: alexistdev@gmail.com
+ */
+
 import {Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject} from '@angular/core';
 import { Menutop } from '../../../share/menutop/menutop';
-import { Searchmodal } from '../../../share/searchmodal/searchmodal';
 import { Payload } from '../../../share/response/payload';
 import { Producttypemodel } from './producttypemodel.model';
 import { Producttypeservice } from './producttypeservice';
@@ -9,14 +16,15 @@ import {Router} from '@angular/router';
 import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
 import {Pagination} from '../../../share/pagination/pagination';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
+import {Producttypemodal} from './producttypemodal/producttypemodal';
 
 @Component({
   selector: 'app-producttype',
   imports: [
     CommonModule,
     Menutop,
-    Searchmodal,
-    Pagination
+    Pagination,
+    Producttypemodal
   ],
   templateUrl: './producttype.html',
   styleUrl: './producttype.css',
@@ -126,8 +134,6 @@ export class Producttype implements OnInit {
       this.pageNumber = 0;
     }
     this.searchSubject.next(searchTerm);
-    // this.searchQuery = searchTerm.toLowerCase();
-    // this.loadData(this.pageNumber, this.pageSize);
   }
 
   isNumber(value: any): boolean {
@@ -145,18 +151,32 @@ export class Producttype implements OnInit {
   }
 
   openModal(type: 'form' | 'confirm', data?: any, provinceId?: number) {
-    this.selectedProvinceId = provinceId;
-    this.currentModalType = type;
+    console.log("posisi: 8 - openModal");
+
+    // this.selectedProvinceId = provinceId;
+    // this.currentModalType = type;
     this.showModal = true;
-    if (type === 'form') {
-      this.currentFormData = data || {};
-    } else {
-      this.currentConfirmationText = data || 'Are you sure you want to proceed?';
-    }
+    // if (type === 'form') {
+    //   this.currentFormData = data || {};
+    // } else {
+    //   this.currentConfirmationText = data || 'Are you sure you want to proceed?';
+    // }
   }
 
   closeModal() {
     this.showModal = false;
   }
 
+  doSaveData(formValue: any  & { id?: number }){
+
+  }
+
+  openEditModal(province: any) {
+
+  }
+
+  onDeleteConfirm(){
+    console.log("posisi: 10 - onDeleteConfirm");
+    this.closeModal();
+  }
 }

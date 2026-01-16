@@ -1,3 +1,11 @@
+<!--
+  ~ Copyright (c) 2026.
+  ~ Project: GeoBill
+  ~ Author: Alexsander Hendra Wijaya
+  ~ Github: https://github.com/alexistdev
+  ~ Email: alexistdev@gmail.com
+  -->
+
 <div class="wrapper">
   <!--start header wrapper-->
   <div class="header-wrapper">
@@ -679,7 +687,7 @@
               <div class="d-flex align-items-center">
                 <div class="d-flex justify-content-start">
                   <div class="btn-group m-2" role="group" aria-label="Button group with nested dropdown">
-                    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addProductType"><i class="bx bx-add-to-queue"></i></button>
+                    <button type="button" class="btn btn-dark" (click)="openModal('form')" ><i class="bx bx-add-to-queue"></i></button>
                   </div>
                 </div>
                 <div>
@@ -731,7 +739,8 @@
                           <td class="text-center">{{ producttype.createdBy }}</td>
                           <td class="text-center">{{ producttype.createdDate }}</td>
                           <td class="text-center">
-                            <button class="btn btn-primary"><i class='bx bxs-pencil me-0'></i></button>
+                            <button class="btn btn-primary m-1"><i class='bx bxs-pencil me-0'></i></button>
+                            <button class="btn btn-danger m-1"><i class='bx bxs-trash me-0'></i></button>
                           </td>
                         </tr>
                       } @empty {
@@ -770,7 +779,15 @@
   <!--end page wrapper -->
 
   <!-- search modal -->
-  <app-searchmodal></app-searchmodal>
+  <app-producttypemodal
+    [show]="showModal"
+    [modalType]="currentModalType"
+    [formData]="currentFormData"
+    [confirmationText]="currentConfirmationText"
+    (confirmDelete)="onDeleteConfirm()"
+    (formSubmit)="doSaveData($event)"
+    (close)="closeModal()"
+  ></app-producttypemodal>
   <!-- end search modal -->
 
 

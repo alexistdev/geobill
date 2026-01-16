@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2026.
+ * Project: GeoBill
+ * Author: Alexsander Hendra Wijaya
+ * Github: https://github.com/alexistdev
+ * Email: alexistdev@gmail.com
+ */
+
 import { inject, PLATFORM_ID } from '@angular/core';
 import { Router, CanActivateFn, ActivatedRouteSnapshot } from '@angular/router';
 import { Localstorageservice } from '../utils/localstorage/localstorageservice';
@@ -5,7 +13,7 @@ import { isPlatformBrowser } from '@angular/common';
 
 export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) => {
   const platformId = inject(PLATFORM_ID);
-  
+
   // During SSR, allow the route to pass (will be handled on client side)
   if (!isPlatformBrowser(platformId)) {
     return true;
