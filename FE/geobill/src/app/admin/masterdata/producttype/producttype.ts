@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject} from '@angular/core';
 import { Menutop } from '../../../share/menutop/menutop';
 import { Searchmodal } from '../../../share/searchmodal/searchmodal';
 import { Payload } from '../../../share/response/payload';
@@ -6,13 +6,16 @@ import { Producttypemodel } from './producttypemodel.model';
 import { Producttypeservice } from './producttypeservice';
 import { Apiresponse } from '../../../share/response/apiresponse';
 import {Router} from '@angular/router';
-import {CredentialEncryptedService} from '../../../utils/auth/credential-encrypted.service';
+import {CommonModule, isPlatformBrowser} from '@angular/common';
+import {Pagination} from '../../../share/pagination/pagination';
 
 @Component({
   selector: 'app-producttype',
   imports: [
+    CommonModule,
     Menutop,
-    Searchmodal
+    Searchmodal,
+    Pagination
   ],
   templateUrl: './producttype.html',
   styleUrl: './producttype.css'
@@ -34,6 +37,7 @@ export class Producttype implements OnInit {
 
   currentEditMode: boolean = false;
   selectedProvinceId: number | undefined = 0;
+  private platformId = inject(PLATFORM_ID);
 
   protected readonly Number = Number;
 
@@ -45,10 +49,12 @@ export class Producttype implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadData(this.pageNumber);
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadData(this.pageNumber);
+    }
   }
 
-  loadData(page: number, size: number = 10): void {
+  loadData(page: number, size: number = 1): void {
     this.pageNumber = page;
     this.pageSize = size;
     this.keyword = this.searchQuery;
@@ -80,7 +86,7 @@ export class Producttype implements OnInit {
     this.totalPages = this.payload.totalPages;
     this.pageSize = this.payload.pageable.pageSize;
 
-    this.producttypes = this.payload.content.map(producttypemodel => {
+    const newItems =  this.payload.content.map(producttypemodel => {
       return {
         ...producttypemodel,
         name: this.capitalizeWords(producttypemodel.name),
@@ -88,7 +94,12 @@ export class Producttype implements OnInit {
         modifiedDate: producttypemodel.modifiedDate
       };
     });
+
+    this.producttypes = [...newItems];
+
+    this.cdr.markForCheck();
     this.cdr.detectChanges();
+
   }
 
   private capitalizeWords(input: string): string {

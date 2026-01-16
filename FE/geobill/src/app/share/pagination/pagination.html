@@ -1,0 +1,27 @@
+<nav>
+  <ul class="pagination justify-content-end mt-3">
+    <li class="page-item" [class.disabled]="pageNumber === 0">
+      <a class="page-link" (click)="pageNumber > 0 && onPageClick(pageNumber-1)"
+         style="cursor:pointer">Previous</a>
+    </li>
+    @for (p of getDisplayedPages(); track $index) {
+      <li
+        class="page-item"
+        [class.active]="(isNumber(p) ? Number(p)-1 : null) === pageNumber">
+        @if (p !== '...') {
+          <a class="page-link"
+             href="#"
+             (click)="isNumber(p) ? onPageClick(Number(p)-1) : null; $event.preventDefault()"
+             style="cursor:pointer">{{ p }}</a>
+        } @else {
+          <span class="page-link">...</span>
+        }
+      </li>
+    }
+    <li class="page-item" [class.disabled]="pageNumber === totalPages - 1">
+      <a class="page-link"
+         (click)="pageNumber < totalPages - 1 && onPageClick(pageNumber + 1)"
+         style="cursor:pointer">Next</a>
+    </li>
+  </ul>
+</nav>
