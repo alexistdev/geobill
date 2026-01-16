@@ -677,25 +677,17 @@
           <div class="card radius-10">
             <div class="card-header">
               <div class="d-flex align-items-center">
+                <div class="d-flex justify-content-start">
+                  <div class="btn-group m-2" role="group" aria-label="Button group with nested dropdown">
+                    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addProductType"><i class="bx bx-add-to-queue"></i></button>
+                  </div>
+                </div>
                 <div>
-                  <h6 class="mb-0">Data Product Type</h6>
+                  <div class="input-group m-2"> <span class="input-group-text bg-danger-subtle" id="search-producttype"><i class="bx bx-search-alt-2"></i></span>
+                    <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="search-producttype">
+                  </div>
                 </div>
-                <div class="dropdown ms-auto">
-                  <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i
-                    class='bx bx-dots-horizontal-rounded font-22 text-option'></i>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="javascript:;">Action</a>
-                    </li>
-                    <li><a class="dropdown-item" href="javascript:;">Another action</a>
-                    </li>
-                    <li>
-                      <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="javascript:;">Something else here</a>
-                    </li>
-                  </ul>
-                </div>
+
               </div>
             </div>
 
@@ -704,28 +696,21 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="d-flex justify-content-start">
-                    <div class="btn-group m-2" role="group" aria-label="Button group with nested dropdown">
-                      <button type="button" class="btn btn-dark"><i class="bx bx-add-to-queue"></i>
-                      </button>
-                      <button type="button" class="btn btn-danger"><i class='bx bx-search-alt me-0'></i>
-                      </button>
-                    </div>
-
-                    <div class="btn-group m-2">
-                      <input type="date" class="form-control" id="bsValidation8" placeholder="Date of Birth" required>
-                    </div>
-                  </div>
+                        <div class="btn-group m-2">
+                          <input type="date" class="form-control" id="bsValidation8" placeholder="Date of Birth" required>
+                        </div>
+                      </div>
                       <div class="d-flex justify-content-end">
-                    <div class="btn-group m-2">
-                      <button type="button" class="btn btn-outline-primary" disabled>Sort</button>
-                      <select class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split"
+                        <div class="btn-group m-2">
+                          <button type="button" class="btn btn-outline-primary" disabled>Sort</button>
+                          <select class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split"
                               (change)="onPageSizeChange($event)">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                      </select>
-                    </div>
-                  </div>
+                              <option value="10">10</option>
+                              <option value="20">20</option>
+                              <option value="50">50</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
 
                   <table class="table table-bordered mb-0 table-responsive">
@@ -787,6 +772,26 @@
   <!-- search modal -->
   <app-searchmodal></app-searchmodal>
   <!-- end search modal -->
+
+
+
+  <!-- Start Modal Add Product Type -->
+  <div class="modal fade" id="addProductType" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Product Type</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur.</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--End Modal Add Product Type -->
 
 
   <!--start overlay-->

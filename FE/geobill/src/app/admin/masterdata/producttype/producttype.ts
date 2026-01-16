@@ -6,7 +6,7 @@ import { Producttypemodel } from './producttypemodel.model';
 import { Producttypeservice } from './producttypeservice';
 import { Apiresponse } from '../../../share/response/apiresponse';
 import {Router} from '@angular/router';
-import {CommonModule, isPlatformBrowser} from '@angular/common';
+import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
 import {Pagination} from '../../../share/pagination/pagination';
 
 @Component({
@@ -18,7 +18,8 @@ import {Pagination} from '../../../share/pagination/pagination';
     Pagination
   ],
   templateUrl: './producttype.html',
-  styleUrl: './producttype.css'
+  styleUrl: './producttype.css',
+  providers: [DatePipe]
 })
 export class Producttype implements OnInit {
   producttypes: Producttypemodel[] = [];
@@ -44,7 +45,8 @@ export class Producttype implements OnInit {
   constructor(
     private producttypeservice: Producttypeservice,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private datePipe: DatePipe
   ) {
   }
 
@@ -70,7 +72,7 @@ export class Producttype implements OnInit {
       next: (data) => this.updateProductTypePageData(data),
       error: (err) => {
         if (err.message === 'Session expired') {
-          console.warn('User session ended. Redirecting...2');
+          console.warn('User session ended. Redirecting...');
           this.router.navigate(['/login']);
         }  else {
           console.error(err);
@@ -90,8 +92,8 @@ export class Producttype implements OnInit {
       return {
         ...producttypemodel,
         name: this.capitalizeWords(producttypemodel.name),
-        createdDate: producttypemodel.createdDate,
-        modifiedDate: producttypemodel.modifiedDate
+        createdDate: producttypemodel.createdDate ? this.datePipe.transform(producttypemodel.createdDate,'dd-MM-yyyy HH:mm:ss'): '',
+        modifiedDate: producttypemodel.modifiedDate ? this.datePipe.transform(producttypemodel.modifiedDate,'dd-MM-yyyy HH:mm:ss'): ''
       };
     });
 
