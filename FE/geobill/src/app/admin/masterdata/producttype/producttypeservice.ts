@@ -11,6 +11,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Apiresponse } from '../../../share/response/apiresponse';
 import { Producttypemodel } from './producttypemodel.model';
+import {Producttyperequest} from './producttyperequest.model';
+import {Producttype} from './producttype';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +35,12 @@ export class Producttypeservice {
       `${this.apiUrl}/search?filter=${keyword}&page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`,
       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
     );
+  }
+
+  saveProductType(producttype: Producttyperequest): Observable<Apiresponse<Producttype>> {
+    return this.http.post<Apiresponse<Producttype>>(
+        `${this.apiUrl}`, producttype,
+            { headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+      });
   }
 }

@@ -6,7 +6,7 @@
  * Email: alexistdev@gmail.com
  */
 
-import {Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject, ViewChild, ElementRef} from '@angular/core';
 import { Menutop } from '../../../share/menutop/menutop';
 import { Payload } from '../../../share/response/payload';
 import { Producttypemodel } from './producttypemodel.model';
@@ -17,6 +17,7 @@ import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
 import {Pagination} from '../../../share/pagination/pagination';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 import {Producttypemodal} from './producttypemodal/producttypemodal';
+import {Producttyperequest} from './producttyperequest.model';
 
 @Component({
   selector: 'app-producttype',
@@ -31,6 +32,11 @@ import {Producttypemodal} from './producttypemodal/producttypemodal';
   providers: [DatePipe]
 })
 export class Producttype implements OnInit {
+
+  // @ViewChild('addButton', { static: true }) addButton!: ElementRef<HTMLButtonElement>;
+
+  @ViewChild('addButton', { static: false }) addButton?: ElementRef<HTMLButtonElement>;
+
   producttypes: Producttypemodel[] = [];
   payload?: Payload<Producttypemodel>
   totalData: number = 0;
@@ -48,7 +54,7 @@ export class Producttype implements OnInit {
   private searchSubject = new Subject<string>();
 
   currentEditMode: boolean = false;
-  selectedProvinceId: number | undefined = 0;
+  selectedProductTypeId: number | undefined = 0;
   private platformId = inject(PLATFORM_ID);
 
   protected readonly Number = Number;
@@ -57,7 +63,8 @@ export class Producttype implements OnInit {
     private producttypeservice: Producttypeservice,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private el: ElementRef
   ) {
   }
 
@@ -150,29 +157,44 @@ export class Producttype implements OnInit {
     this.loadData(this.pageNumber, this.pageSize);
   }
 
-  openModal(type: 'form' | 'confirm', data?: any, provinceId?: number) {
-    console.log("posisi: 8 - openModal");
-
-    // this.selectedProvinceId = provinceId;
-    // this.currentModalType = type;
+  openModal(type: 'form' | 'confirm', data?: any, productTypeId?: number) {
+    this.selectedProductTypeId = productTypeId;
+    this.currentModalType = type;
     this.showModal = true;
-    // if (type === 'form') {
-    //   this.currentFormData = data || {};
-    // } else {
-    //   this.currentConfirmationText = data || 'Are you sure you want to proceed?';
-    // }
+    if (type === 'form') {
+      this.currentFormData = data || {};
+    } else {
+      this.currentConfirmationText = data || 'Are you sure you want to proceed?';
+    }
   }
 
   closeModal() {
+    this.el.nativeElement.blur();
     this.showModal = false;
   }
 
-  doSaveData(formValue: any  & { id?: number }){
-
+  doSaveData(formValue: Producttyperequest  & { id?: number }){
+    const request : Producttyperequest & { id? : number } = {
+      name: formValue.name,
+      id: formValue.id
+    }
+    this.producttypeservice.saveProductType(request).subscribe({
+      next: (data) => {
+        this.closeModal();
+        this.loadData(this.pageNumber, this.pageSize);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    })
   }
 
-  openEditModal(province: any) {
-
+  openEditModal(productType: any) {
+    this.showModal = true;
+    this.currentModalType = 'form';
+    this.currentFormData = {...productType};
+    this.currentEditMode = true;
+    this.currentConfirmationText = '';
   }
 
   onDeleteConfirm(){

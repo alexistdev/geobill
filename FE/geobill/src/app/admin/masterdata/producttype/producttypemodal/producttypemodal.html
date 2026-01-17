@@ -1,0 +1,44 @@
+
+<!--
+  ~ Copyright (c) 2026.
+  ~ Project: GeoBill
+  ~ Author: Alexsander Hendra Wijaya
+  ~ Github: https://github.com/alexistdev
+  ~ Email: alexistdev@gmail.com
+  -->
+
+<div #modalContainer class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" inert>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ modalType === 'form' ? (formData?.id ? 'Edit Product Type' : 'Add New Product Type') : 'Confirmation' }}</h5>
+        <button type="button" class="btn-close" (click)="onClose()"></button>
+      </div>
+      <div class="modal-body">
+        @if (modalType === 'form') {
+          <form [formGroup]="userForm">
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="name" formControlName="name">
+              @if (userForm.get('name')?.invalid && userForm.get('name')?.touched) {
+                <div class="text-danger">Name is required and must be at most 100 characters.</div>
+              }
+            </div>
+          </form>
+        } @else {
+          <p>{{ confirmationText }}</p>
+        }
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
+        @if (modalType === 'form') {
+          <button type="button" class="btn btn-primary" (click)="validateAndConfirm()">{{ formData?.id ? 'Update' : 'Save' }}</button>
+        } @else {
+          <button type="button" class="btn btn-danger" (click)="deleteConfirm()">Confirm Delete</button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+
