@@ -34,8 +34,6 @@ declare var Lobibox: any;
 })
 export class Producttype implements OnInit {
 
-  // @ViewChild('addButton', { static: true }) addButton!: ElementRef<HTMLButtonElement>;
-
   @ViewChild('addButton', { static: false }) addButton?: ElementRef<HTMLButtonElement>;
 
   producttypes: Producttypemodel[] = [];
@@ -80,7 +78,7 @@ export class Producttype implements OnInit {
       distinctUntilChanged()
     ).subscribe((searchTerm:string) => {
       this.searchQuery = searchTerm.toLowerCase();
-      this.loadData(this.pageNumber);
+      this.loadData(this.pageNumber,this.pageSize);
     });
   }
 

@@ -752,11 +752,14 @@
                         <td colspan="2" class="text-start text-color-grey"
                           style="font-size: 0.75rem;margin-left: 10px;"> Total Data : {{ totalData }} row.
                         </td>
-                        <td *ngIf="payload" colspan="6" class="text-end">
+                        @if (payload) {
+                          <td colspan="6" class="text-end">
 
-                          <app-pagination [pageNumber]="pageNumber" [totalPages]="totalPages" [pageSize]="pageSize"
-                            (pageChange)="onPageChanged($event)"></app-pagination>
-                        </td>
+                            <app-pagination [pageNumber]="pageNumber" [totalPages]="totalPages" [pageSize]="pageSize"
+                                            (pageChange)="onPageChanged($event)"></app-pagination>
+                          </td>
+                        }
+
                       </tr>
                     </tfoot>
                   </table>
