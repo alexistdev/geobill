@@ -35,7 +35,8 @@ public class GeobillApplication {
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		modelMapper.createTypeMap(Date.class, LocalDateTime.class)
-				.setConverter(context -> LocalDateTime.ofInstant(
+				.setConverter(
+						context -> context.getSource() == null ? null : LocalDateTime.ofInstant(
 						context.getSource().toInstant(),
 						ZoneId.systemDefault()));
 

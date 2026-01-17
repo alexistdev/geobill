@@ -69,7 +69,9 @@ public class ProductTypeController {
 
         handleNonEmptyPage(responseData,productTypePage,page);
 
-        Page<ProductTypeDTO> productTypeDTOS = productTypePage.map(productType -> modelMapper.map(productType, ProductTypeDTO.class));
+        Page<ProductTypeDTO> productTypeDTOS = productTypePage
+                .map(productType
+                        -> modelMapper.map(productType, ProductTypeDTO.class));
         responseData.setPayload(productTypeDTOS);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
