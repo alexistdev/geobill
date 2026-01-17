@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.service;
 
+import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import com.alexistdev.geobill.services.ProductTypeService;
@@ -83,10 +84,13 @@ public class ProductTypeServiceTest {
     void testSaveProductTypeExistingNotDeleted() {
         when(productTypeRepo.findByNameIncludingDeleted(productType.getName())).thenReturn(Optional.of(productType));
 
-        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> productTypeService.save(productType));
+        DuplicateException exception = Assertions.assertThrows(DuplicateException.class,
+                () -> productTypeService.save(productType));
 
-        Assertions.assertEquals("ProductType already exist", exception.getMessage());
-        verify(productTypeRepo,times(1)).findByNameIncludingDeleted(productType.getName());
+        Assertions.assertEquals("ProductType with name 'Shared Hosting' already exists",
+                exception.getMessage());
+        verify(productTypeRepo,times(1)).
+                findByNameIncludingDeleted(productType.getName());
         verify(productTypeRepo,never()).save(productType);
     }
 

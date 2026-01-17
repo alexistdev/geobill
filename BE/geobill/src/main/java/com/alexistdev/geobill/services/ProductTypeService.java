@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,8 +33,8 @@ public class ProductTypeService {
             ProductType existing = foundProductType.get();
 
             if(!existing.getDeleted()){
-                log.info("ProductType already exist");
-               throw new IllegalArgumentException("ProductType already exist");
+                log.info("ProductType with name '" + productType.getName() + "' already exists");
+               throw new DuplicateException("ProductType with name '" + productType.getName() + "' already exists");
             }
 
             existing.setDeleted(false);
