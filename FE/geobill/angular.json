@@ -19,6 +19,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/lobibox/sounds",
+                "output": "sounds"
               }
             ],
             "styles": [
@@ -28,12 +33,15 @@
               "src/assets/css/app.css",
               "src/assets/css/icons.css",
               "src/assets/css/header-colors.css",
-              "src/assets/css/dark-theme.css"
+              "src/assets/css/dark-theme.css",
+              "node_modules/lobibox/css/lobibox.css"
             ],
             "scripts": [
               "src/assets/js/pace.min.js",
               "src/assets/js/jquery.min.js",
-              "src/assets/js/bootstrap.bundle.min.js"
+              "src/assets/js/bootstrap.bundle.min.js",
+              "node_modules/lobibox/js/lobibox.js"
+
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",

@@ -171,3 +171,4 @@ export class Producttypemodal implements OnInit, OnChanges {
     this.confirmDelete.emit();
   }
 }
+

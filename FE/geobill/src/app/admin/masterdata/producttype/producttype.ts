@@ -18,6 +18,7 @@ import {Pagination} from '../../../share/pagination/pagination';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 import {Producttypemodal} from './producttypemodal/producttypemodal';
 import {Producttyperequest} from './producttyperequest.model';
+declare var Lobibox: any;
 
 @Component({
   selector: 'app-producttype',
@@ -86,7 +87,7 @@ export class Producttype implements OnInit {
     this.pageNumber = page;
     this.pageSize = size;
     this.keyword = this.searchQuery;
-    const sortBy = 'id';
+    const sortBy = 'createdDate';
     const direction = 'desc';
     const isFiltering = this.keyword !== "";
 
@@ -179,7 +180,10 @@ export class Producttype implements OnInit {
       id: formValue.id
     }
     this.producttypeservice.saveProductType(request).subscribe({
-      next: (data) => {
+      next: () => {
+        if(isPlatformBrowser(this.platformId)){
+          this.LobiboxMessage('success', 'Data berhasil disimpan');
+        }
         this.closeModal();
         this.loadData(this.pageNumber, this.pageSize);
       },
@@ -200,5 +204,18 @@ export class Producttype implements OnInit {
   onDeleteConfirm(){
     console.log("posisi: 10 - onDeleteConfirm");
     this.closeModal();
+  }
+
+  LobiboxMessage(type: string, msg: string):void {
+    if (typeof Lobibox !== 'undefined') {
+      Lobibox.notify(type, {
+        pauseDelayOnHover: true,
+        continueDelayOnInactiveTab: false,
+        position: 'top right',
+        msg: msg
+      });
+    } else {
+      console.warn('Lobibox is not defined.Ensure it is loaded correctly.');
+    }
   }
 }

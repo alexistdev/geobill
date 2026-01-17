@@ -31,13 +31,14 @@
     "@angular/ssr": "^20.0.4",
     "crypto-js": "^4.2.0",
     "express": "^5.1.0",
+    "lobibox": "^1.2.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "^0.15.1"
   },
   "devDependencies": {
     "@angular/build": "^20.0.4",
-    "@angular/cli": "^20.0.4",
+    "@angular/cli": "^21.1.0",
     "@angular/compiler-cli": "^20.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.1",
