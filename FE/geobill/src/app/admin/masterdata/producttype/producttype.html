@@ -738,7 +738,9 @@
                         <td class="text-center">{{ producttype.createdDate }}</td>
                         <td class="text-center">
                           <button class="btn btn-primary m-1" (click)="openEditModal(producttype)"><i class='bx bxs-pencil me-0'></i></button>
-                          <button class="btn btn-danger m-1"><i class='bx bxs-trash me-0'></i></button>
+                          <button class="btn btn-danger m-1"
+                                  (click)="openDeleteModal(producttype)">
+                          <i class='bx bxs-trash me-0'></i></button>
                         </td>
                       </tr>
                       } @empty {

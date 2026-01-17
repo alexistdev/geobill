@@ -50,4 +50,10 @@ export class Producttypeservice {
         { headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       });
   }
+
+  deleteProductType(id: string): Observable<Apiresponse<Producttype>> {
+    return this.http.delete<Apiresponse<Producttype>>(
+      `${this.apiUrl}/${id}`,
+    )
+  }
 }

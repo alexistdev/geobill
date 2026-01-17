@@ -53,7 +53,7 @@ export class Producttype implements OnInit {
   private searchSubject = new Subject<string>();
 
   currentEditMode: boolean = false;
-  selectedProductTypeId: number | undefined = 0;
+  selectedProductTypeId: string | undefined = '';
   private platformId = inject(PLATFORM_ID);
 
   protected readonly Number = Number;
@@ -157,15 +157,11 @@ export class Producttype implements OnInit {
     this.loadData(this.pageNumber, this.pageSize);
   }
 
-  openModal(type: 'form' | 'confirm', data?: any, productTypeId?: number) {
+  openModal(type: 'form' | 'confirm', data?: any, productTypeId?: string) {
     this.selectedProductTypeId = productTypeId;
     this.currentModalType = type;
     this.showModal = true;
-    if (type === 'form') {
-      this.currentFormData = data || {};
-    } else {
-      this.currentConfirmationText = data || 'Are you sure you want to proceed?';
-    }
+    this.currentFormData = data || {};
   }
 
   closeModal() {
@@ -220,7 +216,33 @@ export class Producttype implements OnInit {
     this.currentConfirmationText = '';
   }
 
+  openDeleteModal(productType: any) {
+    this.showModal = true;
+    this.currentModalType = 'confirm';
+    this.currentConfirmationText = 'Are you sure you want to delete this product type?';
+    this.selectedProductTypeId = productType.id;
+  }
+
   onDeleteConfirm(){
+    if(this.selectedProductTypeId){
+        this.producttypeservice.deleteProductType(this.selectedProductTypeId).subscribe({
+          next: () => {
+            this.LobiboxMessage('error', 'Data berhasil dihapus','bx bx-check-circle');
+            this.closeModal();
+            this.loadData(this.pageNumber, this.pageSize);
+          },
+          error: (err) => {
+            let errorMessage = 'An unexpected error occurred.';
+            try {
+              console.error(err);
+              errorMessage = err.error?.messages?.[0] || errorMessage;
+            } catch (e){
+              console.error('Error while processing error:', e);
+            }
+            this.LobiboxMessage('error', errorMessage,'bx bx-x-circle');
+          }
+        })
+    }
     this.closeModal();
   }
 
@@ -231,7 +253,7 @@ export class Producttype implements OnInit {
         size: 'mini',
         rounded: true,
         delayIndicator: false,
-        icon: icon,//'bx bx-x-circle',
+        icon: icon,
         continueDelayOnInactiveTab: false,
         position: 'top right',
         msg: msg

@@ -30,11 +30,13 @@
         }
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
+
         @if (modalType === 'form') {
+          <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
           <button type="button" class="btn btn-primary" (click)="validateAndConfirm()">{{ formData?.id ? 'Update' : 'Save' }}</button>
         } @else {
-          <button type="button" class="btn btn-danger" (click)="deleteConfirm()">Confirm Delete</button>
+          <button type="button" class="btn btn-primary" (click)="onClose()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteConfirm()">Delete</button>
         }
       </div>
     </div>
