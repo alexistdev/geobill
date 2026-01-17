@@ -191,7 +191,8 @@ export class Producttype implements OnInit {
     apiCall.subscribe({
       next: () => {
         if(isPlatformBrowser(this.platformId)){
-          this.LobiboxMessage(isUpdate ? 'warning' : 'success', isUpdate ? 'Data berhasil diubah' : 'Data berhasil disimpan', isUpdate ? 'bx bx-x-success' : 'bx bx-x-success');
+          this.LobiboxMessage(isUpdate ? 'warning' : 'success', isUpdate ? 'Data berhasil diubah' : 'Data berhasil disimpan',
+            isUpdate ? 'bx bx-check-circle' : 'bx bx-check-circle');
         }
         this.closeModal();
         this.loadData(this.pageNumber, this.pageSize);
