@@ -34,7 +34,7 @@ public class ObjectConfig {
                 registry.addMapping("/api/v1/**")
                         .allowedOrigins("http://localhost:4200") // Angular dev server
                         .allowedHeaders("Authorization", "Content-Type")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                         .allowCredentials(true);
             }
         };

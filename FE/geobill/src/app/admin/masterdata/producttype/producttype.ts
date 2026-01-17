@@ -6,7 +6,7 @@
  * Email: alexistdev@gmail.com
  */
 
-import {Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject, ViewChild, ElementRef} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject, ViewChild, ElementRef, NgZone} from '@angular/core';
 import { Menutop } from '../../../share/menutop/menutop';
 import { Payload } from '../../../share/response/payload';
 import { Producttypemodel } from './producttypemodel.model';
@@ -65,7 +65,8 @@ export class Producttype implements OnInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private datePipe: DatePipe,
-    private el: ElementRef
+    private el: ElementRef,
+    private ngZone: NgZone
   ) {
   }
 
@@ -172,6 +173,7 @@ export class Producttype implements OnInit {
   closeModal() {
     this.el.nativeElement.blur();
     this.showModal = false;
+    this.cdr.detectChanges();
   }
 
   doSaveData(formValue: Producttyperequest  & { id?: number }){
@@ -179,16 +181,34 @@ export class Producttype implements OnInit {
       name: formValue.name,
       id: formValue.id
     }
-    this.producttypeservice.saveProductType(request).subscribe({
+
+    const isUpdate = !!request.id;
+
+    const apiCall = request.id
+    ? this.producttypeservice.updateProductType(request)
+      : this.producttypeservice.saveProductType(request);
+
+    apiCall.subscribe({
       next: () => {
         if(isPlatformBrowser(this.platformId)){
-          this.LobiboxMessage('success', 'Data berhasil disimpan');
+          this.LobiboxMessage(isUpdate ? 'warning' : 'success', isUpdate ? 'Data berhasil diubah' : 'Data berhasil disimpan', isUpdate ? 'bx bx-x-success' : 'bx bx-x-success');
         }
         this.closeModal();
         this.loadData(this.pageNumber, this.pageSize);
       },
       error: (err) => {
-        console.error(err);
+        let errorMessage = 'An unexpected error occurred.';
+
+        try {
+          console.error(err);
+          errorMessage = err.error?.messages?.[0] || errorMessage;
+        } catch (e){
+          console.error('Error while processing error:', e);
+        }
+        this.LobiboxMessage('error', errorMessage,'bx bx-x-circle');
+        this.ngZone.run(() => {
+          this.closeModal();
+        });
       }
     })
   }
@@ -202,14 +222,17 @@ export class Producttype implements OnInit {
   }
 
   onDeleteConfirm(){
-    console.log("posisi: 10 - onDeleteConfirm");
     this.closeModal();
   }
 
-  LobiboxMessage(type: string, msg: string):void {
+  LobiboxMessage(type: string, msg: string, icon: string):void {
     if (typeof Lobibox !== 'undefined') {
       Lobibox.notify(type, {
         pauseDelayOnHover: true,
+        size: 'mini',
+        rounded: true,
+        delayIndicator: false,
+        icon: icon,//'bx bx-x-circle',
         continueDelayOnInactiveTab: false,
         position: 'top right',
         msg: msg

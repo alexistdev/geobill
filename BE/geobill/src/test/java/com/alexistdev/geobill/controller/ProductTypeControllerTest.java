@@ -63,4 +63,45 @@ public class ProductTypeControllerTest {
         verify(productTypeService, times(1)).getAllProductTypes(pageable);
         verify(modelMapper, times(2)).map(any(ProductType.class), eq(ProductTypeDTO.class));
     }
+
+    @Test
+    @DisplayName("Test Get All Product Types Fallback - Fallback on Invalid Sort")
+    void testGetAllProductTypesFallback() {
+        String invalidSort = "nonExistentField";
+        Pageable invalidPageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, invalidSort));
+        Pageable fallbackPageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
+
+        when(productTypeService.getAllProductTypes(invalidPageable)).thenThrow(new RuntimeException("Invalid property"));
+        when(productTypeService.getAllProductTypes(fallbackPageable)).thenReturn(new PageImpl<>(List.of()));
+
+        ResponseEntity<ResponseData<Page<ProductTypeDTO>>> response =
+                productTypeController.getAllProductTypes(0, 10, invalidSort, "asc");
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(productTypeService).getAllProductTypes(fallbackPageable);
+    }
+
+    @Test
+    @DisplayName("Test Get All Product Types - Empty Result")
+    void testGetAllProductTypesEmpty() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
+        when(productTypeService.getAllProductTypes(pageable)).thenReturn(new PageImpl<>(List.of()));
+
+        ResponseEntity<ResponseData<Page<ProductTypeDTO>>> response =
+                productTypeController.getAllProductTypes(0, 10, "id", "asc");
+
+        Assertions.assertFalse(response.getBody().isStatus());
+        Assertions.assertEquals("No product type found", response.getBody().getMessages().get(0));
+    }
+
+    @Test
+    @DisplayName("Test Get All Product Types - Descending Order")
+    void testGetAllProductTypesDescending() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "name"));
+        when(productTypeService.getAllProductTypes(pageable)).thenReturn(new PageImpl<>(List.of()));
+
+        productTypeController.getAllProductTypes(0, 10, "name", "desc");
+
+        verify(productTypeService).getAllProductTypes(pageable);
+    }
 }

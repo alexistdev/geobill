@@ -3,17 +3,14 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.config.ValidationConstant;
 import com.alexistdev.geobill.dto.ProductTypeDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.request.ProductTypeRequest;
 import com.alexistdev.geobill.services.ProductTypeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
 import org.modelmapper.ModelMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -122,10 +119,18 @@ public class ProductTypeController {
         try {
             ProductType result = productTypeService.save(modelMapper.map(request, ProductType.class));
             responseData.getMessages().add(ValidationConstant.success("Product Type"));
+            responseData.setPayload(modelMapper.map(result, ProductTypeDTO.class));
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+        } catch (DuplicateException d){
+            log.error("Error creating Product Type", d);
+            responseData.getMessages().add(d.getMessage());
+            responseData.setPayload(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
         } catch (Exception e) {
             log.error("Error creating Product Type", e);
+            responseData.getMessages().add("Error :" + e.getMessage());
+            responseData.setPayload(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
         }
     }

@@ -43,4 +43,11 @@ export class Producttypeservice {
             { headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       });
   }
+
+  updateProductType(request: Producttyperequest): Observable<Apiresponse<Producttype>> {
+    return this.http.patch<Apiresponse<Producttype>>(
+      `${this.apiUrl}`, request,
+        { headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+      });
+  }
 }

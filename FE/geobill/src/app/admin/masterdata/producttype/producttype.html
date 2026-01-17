@@ -775,9 +775,14 @@
   <!--end page wrapper -->
 
   <!-- search modal -->
-  <app-producttypemodal #producttypemodal [show]="showModal" [modalType]="currentModalType" [formData]="currentFormData"
-    [confirmationText]="currentConfirmationText" (confirmDelete)="onDeleteConfirm()" (formSubmit)="doSaveData($event)"
-    (close)="closeModal()"></app-producttypemodal>
+  <app-producttypemodal #producttypemodal
+  [show]="showModal"
+  [modalType]="currentModalType"
+  [formData]="currentFormData"
+  [confirmationText]="currentConfirmationText"
+  (confirmDelete)="onDeleteConfirm()"
+  (formSubmit)="doSaveData($event)"
+  (close)="closeModal()"></app-producttypemodal>
   <!-- end search modal -->
 
   <!--start overlay-->

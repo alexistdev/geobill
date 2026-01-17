@@ -1,9 +1,6 @@
 package com.alexistdev.geobill.models.entity;
 
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -21,6 +18,7 @@ import java.util.Date;
 public class BaseEntity<T> {
 
     @CreatedBy
+    @Column(updatable = false)
     protected T createdBy;
 
     @LastModifiedBy
@@ -28,6 +26,7 @@ public class BaseEntity<T> {
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(updatable = false)
     protected Date createdDate;
 
     @LastModifiedDate

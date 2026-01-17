@@ -7,8 +7,7 @@ import {CredentialEncryptedService} from '../utils/auth/credential-encrypted.ser
 @Injectable()
 export class BasicAuthInterceptor implements HttpInterceptor {
 
-  constructor(private localStorageService: Localstorageservice,
-              private credentialEncryptedService: CredentialEncryptedService) {}
+  constructor(private credentialEncryptedService: CredentialEncryptedService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 

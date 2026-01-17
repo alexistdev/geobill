@@ -7,5 +7,6 @@
  */
 
 export interface Producttyperequest {
+  id?: string | null;
   name: string;
 }
