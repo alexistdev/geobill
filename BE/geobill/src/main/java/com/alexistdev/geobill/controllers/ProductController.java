@@ -1,7 +1,6 @@
 package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.ProductDTO;
-import com.alexistdev.geobill.dto.ProductTypeDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.Product;

@@ -4,9 +4,7 @@ import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductRepo;
-import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import com.alexistdev.geobill.services.ProductService;
-import com.alexistdev.geobill.services.ProductTypeService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,24 +29,16 @@ public class ProductServiceTest {
     @Mock
     private ProductRepo productRepo;
 
-    @Mock
-    private ProductTypeRepo productTypeRepo;
-
-    @InjectMocks
-    private ProductTypeService productTypeService;
-
     @InjectMocks
     private ProductService productService;
 
     private Product product;
-    private ProductType productType;
     private UUID productId;
-    private UUID productTypeId;
 
     @BeforeEach
     void setUp() {
-        productTypeId = UUID.randomUUID();
-        productType = new ProductType();
+        UUID productTypeId = UUID.randomUUID();
+        ProductType productType = new ProductType();
         productType.setId(productTypeId);
         productType.setName("Shared Hosting");
         productType.setCreatedBy("system");

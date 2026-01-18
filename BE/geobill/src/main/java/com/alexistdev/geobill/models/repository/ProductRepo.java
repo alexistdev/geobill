@@ -1,7 +1,6 @@
 package com.alexistdev.geobill.models.repository;
 
 import com.alexistdev.geobill.models.entity.Product;
-import com.alexistdev.geobill.models.entity.ProductType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
