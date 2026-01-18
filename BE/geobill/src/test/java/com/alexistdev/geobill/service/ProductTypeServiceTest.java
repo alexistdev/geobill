@@ -210,4 +210,31 @@ public class ProductTypeServiceTest {
         verify(productTypeRepo, times(1)).findById(nonExistingId);
         verify(productTypeRepo, never()).save(any(ProductType.class));
     }
+
+
+    @Test
+    @Order(10)
+    @DisplayName("10:Test Find ProductType By UUID - ProductType Found")
+    void testFindProductTypeByUUIDFound() {
+        when(productTypeRepo.findById(productTypeId)).thenReturn(Optional.of(productType));
+
+        ProductType foundProductType = productTypeService.findByUUID(productTypeId);
+
+        Assertions.assertNotNull(foundProductType);
+        Assertions.assertEquals("Shared Hosting", foundProductType.getName());
+        verify(productTypeRepo, times(1)).findById(productTypeId);
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("11:Test Find ProductType By UUID - ProductType Not Found")
+    void testFindProductTypeByUUIDNotFound() {
+        UUID nonExistingId = UUID.randomUUID();
+        when(productTypeRepo.findById(nonExistingId)).thenReturn(Optional.empty());
+
+        ProductType foundProductType = productTypeService.findByUUID(nonExistingId);
+
+        Assertions.assertNull(foundProductType);
+        verify(productTypeRepo, times(1)).findById(nonExistingId);
+    }
 }

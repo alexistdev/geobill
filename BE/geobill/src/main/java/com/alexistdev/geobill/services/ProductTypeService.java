@@ -64,4 +64,8 @@ public class ProductTypeService {
         productTypeRepo.save(productType);
     }
 
+    public ProductType findByUUID(UUID uuid){
+        return productTypeRepo.findById(uuid).orElse(null);
+    }
+
 }
