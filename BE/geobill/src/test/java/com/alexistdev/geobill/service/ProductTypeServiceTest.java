@@ -4,11 +4,14 @@ import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import com.alexistdev.geobill.services.ProductTypeService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProductTypeServiceTest {
 
     @Mock
@@ -50,7 +54,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Get All ProductTypes")
+    @Order(1)
+    @DisplayName("1:Test Get All ProductTypes")
     void testGetAllProductTypes() {
         List<ProductType> productTypeList = Collections.singletonList(productType);
         Page<ProductType> productTypePage = new PageImpl<>(productTypeList);
@@ -66,7 +71,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Save ProductType - New ProductType")
+    @Order(2)
+    @DisplayName("2:Test Save ProductType - New ProductType")
     void testSaveProductTypeNew() {
         when(productTypeRepo.findByNameIncludingDeleted(productType.getName())).thenReturn(Optional.empty());
         when(productTypeRepo.save(any(ProductType.class))).thenReturn(productType);
@@ -80,7 +86,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Save ProductType - Existing ProductType Not Deleted")
+    @Order(3)
+    @DisplayName("3:Test Save ProductType - Existing ProductType Not Deleted")
     void testSaveProductTypeExistingNotDeleted() {
         when(productTypeRepo.findByNameIncludingDeleted(productType.getName())).thenReturn(Optional.of(productType));
 
@@ -95,7 +102,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Save ProductType - Existing ProductType Deleted")
+    @Order(4)
+    @DisplayName("4:Test Save ProductType - Existing ProductType Deleted")
     void testSaveProductTypeExistingDeleted() {
         productType.setIsDeleted(true);
         when(productTypeRepo.findByNameIncludingDeleted(productType.getName())).thenReturn(Optional.of(productType));
@@ -111,7 +119,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Update ProductType - Existing ProductType Not Deleted")
+    @Order(5)
+    @DisplayName("5:Test Update ProductType - Existing ProductType Not Deleted")
     void testUpdateProductTypeExistingNotDeleted() {
         ProductType updatedProductType = new ProductType();
         updatedProductType.setId(productTypeId);
@@ -130,7 +139,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Update ProductType - Existing ProductType Deleted")
+    @Order(6)
+    @DisplayName("6:Test Update ProductType - Existing ProductType Deleted")
     void testUpdateProductTypeExistingDeleted() {
         productType.setDeleted(true);
         ProductType updatedProductType = new ProductType();
@@ -151,7 +161,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Update ProductType - ProductType Not Found")
+    @Order(7)
+    @DisplayName("7:Test Update ProductType - ProductType Not Found")
     void testUpdateProductTypeNotFound() {
         UUID nonExistingId = UUID.randomUUID();
         ProductType updatedProductType = new ProductType();
@@ -171,7 +182,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Delete ProductType")
+    @Order(8)
+    @DisplayName("8:Test Delete ProductType")
     void testDeleteProductType() {
         when(productTypeRepo.findById(productTypeId)).thenReturn(Optional.of(productType));
         when(productTypeRepo.save(productType)).thenReturn(productType);
@@ -184,7 +196,8 @@ public class ProductTypeServiceTest {
     }
 
     @Test
-    @DisplayName("Test Delete ProductType - ProductType Not Found")
+    @Order(9)
+    @DisplayName("9:Test Delete ProductType - ProductType Not Found")
     void testDeleteProductTypeNotFound() {
         UUID nonExistingId = UUID.randomUUID();
         when(productTypeRepo.findById(nonExistingId)).thenReturn(Optional.empty());
