@@ -56,3 +56,8 @@ GeoBill is a billing software website tailored for those launching hosting busin
 6. Set up Basic Authentication in Postman or Insomnia using the email and password provided during registration.
 
 With these steps, you'll have the GeoBill application up and running, ready for customization and use.
+
+## Screenshots
+
+#### Administrator Page:
+![Administrator Page](https://github.com/alexistdev/geobill/blob/main/gambar/gambar1.png?raw=true)
