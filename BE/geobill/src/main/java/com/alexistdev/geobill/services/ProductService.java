@@ -3,6 +3,7 @@ package com.alexistdev.geobill.services;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.repository.ProductRepo;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,17 +28,19 @@ public class ProductService {
         return productRepo.findByFilter(keyword.toLowerCase(), pageable);
     }
 
+    @Transactional
     public Product save(Product product) {
         Optional<Product> foundProduct = productRepo.findByNameIncludingDeleted(product.getName());
         if(foundProduct.isPresent()){
             Product existing = foundProduct.get();
 
-            if(!existing.getIsDeleted()){
-                log.info("Product with name '" + product.getName() + "' already exists");
+            if(!existing.getDeleted()){
+                log.info("Product with name '{}' already exists", product.getName());
                 throw new DuplicateException("Product with name '" + product.getName() + "' already exists");
             }
 
-            existing.setIsDeleted(false);
+            updateProductFields(existing, product);
+            existing.setDeleted(false);
             product = existing;
         }
         return productRepo.save(product);
@@ -72,6 +75,22 @@ public class ProductService {
                 .orElseThrow(()-> new IllegalArgumentException("Product not found with ID:" + id));
         product.setIsDeleted(true);
         productRepo.save(product);
+    }
+
+    private void updateProductFields(Product target, Product source) {
+        target.setName(source.getName());
+        target.setPrice(source.getPrice());
+        target.setCycle(source.getCycle());
+        target.setCapacity(source.getCapacity());
+        target.setBandwith(source.getBandwith());
+        target.setAddon_domain(source.getAddon_domain());
+        target.setDatabase_account(source.getDatabase_account());
+        target.setFtp_account(source.getFtp_account());
+        target.setInfo1(source.getInfo1());
+        target.setInfo2(source.getInfo2());
+        target.setInfo3(source.getInfo3());
+        target.setInfo4(source.getInfo4());
+        target.setInfo5(source.getInfo5());
     }
 
 }
