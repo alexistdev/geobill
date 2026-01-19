@@ -36,9 +36,18 @@ public class GeobillApplication {
 		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		modelMapper.createTypeMap(Date.class, LocalDateTime.class)
 				.setConverter(
-						context -> context.getSource() == null ? null : LocalDateTime.ofInstant(
-						context.getSource().toInstant(),
-						ZoneId.systemDefault()));
+						context -> context.getSource() == null ? null
+								: LocalDateTime.ofInstant(
+										context.getSource().toInstant(),
+										ZoneId.systemDefault()));
+
+		// Custom mapping for Product to ProductDTO
+		modelMapper.createTypeMap(com.alexistdev.geobill.models.entity.Product.class,
+				com.alexistdev.geobill.dto.ProductDTO.class)
+				.addMappings(mapper -> {
+					mapper.map(src -> src.getProductType(),
+							com.alexistdev.geobill.dto.ProductDTO::setProductTypeDTO);
+				});
 
 		return modelMapper;
 	}

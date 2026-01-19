@@ -12,11 +12,12 @@ import java.util.UUID;
 
 public interface ProductRepo extends JpaRepository<Product, UUID> {
 
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productType WHERE p.isDeleted = false")
     Page<Product> findByIsDeletedFalse(Pageable pageable);
 
     @Query(value = "SELECT * FROM tb_products WHERE name = :name", nativeQuery = true)
     Optional<Product> findByNameIncludingDeleted(@Param("name") String name);
 
-    @Query("SELECT pt FROM Product pt WHERE pt.name LIKE %:keyword% and pt.isDeleted=false")
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productType WHERE p.name LIKE %:keyword% AND p.isDeleted = false")
     Page<Product> findByFilter(@Param("keyword") String keyword, Pageable pageable);
 }

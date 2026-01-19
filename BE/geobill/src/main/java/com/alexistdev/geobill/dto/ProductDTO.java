@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,8 @@ import lombok.Setter;
 public class ProductDTO {
     private String id;
     private String name;
-    private String productTypeId;
+    @JsonIgnoreProperties({ "createdDate", "modifiedDate", "createdBy", "modifiedBy" })
+    private ProductTypeDTO productTypeDTO;
     private Double price;
     private Integer cycle;
     private String capacity;

@@ -66,7 +66,16 @@ public class ProductController {
         responseData.getMessages().add(NO_PRODUCT_FOUND);
         responseData.setStatus(false);
 
-        handleNonEmptyPage(responseData, productPage, page);
+        if (!productPage.isEmpty()) {
+            responseData.setStatus(true);
+            if (!responseData.getMessages().isEmpty()) {
+                responseData.getMessages().removeFirst();
+            }
+            responseData.getMessages().add("Retrieved page " + page + " of products");
+        }
+        Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
+        responseData.setPayload(productDTOPage);
+
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
@@ -91,7 +100,16 @@ public class ProductController {
         }
         responseData.getMessages().add(NO_PRODUCT_FOUND);
         responseData.setStatus(false);
-        handleNonEmptyPage(responseData, productPage, page);
+
+        if (!productPage.isEmpty()) {
+            responseData.setStatus(true);
+            if (!responseData.getMessages().isEmpty()) {
+                responseData.getMessages().removeFirst();
+            }
+            responseData.getMessages().add("Retrieved page " + page + " of products");
+        }
+        Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
+        responseData.setPayload(productDTOPage);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
@@ -105,10 +123,10 @@ public class ProductController {
         }
 
         try {
-            Product result = convertToProduct(request);
-            responseData.getMessages().add("Product successfully added");
-            responseData.setPayload(toDTO(productService.save(result)));
+            Product created = productService.save(request);
             responseData.setStatus(true);
+            responseData.getMessages().add("Product created successfully");
+            responseData.setPayload(modelMapper.map(created, ProductDTO.class));
             return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
         } catch (DuplicateException d){
             log.error("Error creating Product", d);
@@ -120,52 +138,6 @@ public class ProductController {
             responseData.getMessages().add("Error :" + e.getMessage());
             responseData.setPayload(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
-        }
-    }
-
-    private Product convertToProduct(ProductRequest request){
-
-        ProductType foundProductType = productTypeService.findByUUID(UUID.fromString(request.getProductTypeId()));
-        Product created = new Product();
-        created.setProductType(foundProductType);
-        created.setName(request.getName());
-        created.setPrice(request.getPrice());
-        created.setCycle(request.getCycle());
-        created.setCapacity(request.getCapacity());
-        created.setBandwith(request.getBandwith());
-        created.setAddon_domain(request.getAddon_domain());
-        created.setDatabase_account(request.getDatabase_account());
-        created.setFtp_account(request.getFtp_account());
-        created.setInfo1(request.getInfo1());
-        created.setInfo2(request.getInfo2());
-        created.setInfo3(request.getInfo3());
-        created.setInfo4(request.getInfo4());
-        created.setInfo5(request.getInfo5());
-        return created;
-    }
-
-    private ProductDTO toDTO(Product product) {
-        ProductDTO dto = modelMapper.map(product, ProductDTO.class);
-        if (product.getProductType() != null) {
-            dto.setProductTypeId(product.getProductType().getId().toString());
-        }
-        return dto;
-    }
-
-    private void handleNonEmptyPage(ResponseData<Page<ProductDTO>> responseData, Page<Product> pageResult, int pageNumber) {
-        if (!pageResult.isEmpty()) {
-            responseData.setStatus(true);
-            if (!responseData.getMessages().isEmpty()) {
-                responseData.getMessages().removeFirst();
-            }
-            responseData.getMessages().add("Retrieved page " + pageNumber + " of products");
-
-            Page<ProductDTO> productDTOPage = pageResult.map(product -> {
-                ProductDTO dto = toDTO(product);
-                return dto;
-            });
-
-            responseData.setPayload(productDTOPage);
         }
     }
 
