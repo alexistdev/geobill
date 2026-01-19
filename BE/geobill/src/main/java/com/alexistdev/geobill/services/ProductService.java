@@ -2,12 +2,15 @@ package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.Product;
+import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductRepo;
+import com.alexistdev.geobill.request.ProductRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,6 +23,9 @@ public class ProductService {
     @Autowired
     private ProductRepo productRepo;
 
+    @Autowired
+    private ProductTypeService productTypeService;
+
     public Page<Product> getAllProducts(Pageable pageable){
         return productRepo.findByIsDeletedFalse(pageable);
     }
@@ -29,45 +35,47 @@ public class ProductService {
     }
 
     @Transactional
-    public Product save(Product product) {
-        Optional<Product> foundProduct = productRepo.findByNameIncludingDeleted(product.getName());
+    public Product save(ProductRequest request) {
+        Product saveProduct = new Product();
+
+        updateProductFields(saveProduct, request);
+
+        Optional<Product> foundProduct = productRepo.findByNameIncludingDeleted(request.getName());
+
         if(foundProduct.isPresent()){
             Product existing = foundProduct.get();
 
             if(!existing.getDeleted()){
-                log.info("Product with name '{}' already exists", product.getName());
-                throw new DuplicateException("Product with name '" + product.getName() + "' already exists");
+                log.info("Product with name '{}' already exists", request.getName());
+                throw new DuplicateException("Product with name '" + request.getName() + "' already exists");
             }
 
-            updateProductFields(existing, product);
+            updateProductFields(existing, request);
             existing.setDeleted(false);
-            product = existing;
+            saveProduct = existing;
         }
-        return productRepo.save(product);
+
+        return productRepo.save(saveProduct);
     }
 
-    public Product update(UUID id, Product product) {
+    public Product update(UUID id, ProductRequest request) {
         Product existingProduct = productRepo.findById(id)
                 .orElseThrow(()-> new IllegalArgumentException("Product not found with ID:" + id));
 
-        if(existingProduct.getIsDeleted()){
-            existingProduct.setName(product.getName());
-            existingProduct.setPrice(product.getPrice());
-            existingProduct.setCycle(product.getCycle());
-            existingProduct.setCapacity(product.getCapacity());
-            existingProduct.setBandwith(product.getBandwith());
-            existingProduct.setAddon_domain(product.getAddon_domain());
-            existingProduct.setDatabase_account(product.getDatabase_account());
-            existingProduct.setFtp_account(product.getFtp_account());
-            existingProduct.setInfo1(product.getInfo1());
-            existingProduct.setInfo2(product.getInfo2());
-            existingProduct.setInfo3(product.getInfo3());
-            existingProduct.setInfo4(product.getInfo4());
-            existingProduct.setInfo5(product.getInfo5());
-            existingProduct.setDeleted(false);
-            product = existingProduct;
+        Optional<Product> foundProduct = productRepo.findByNameIncludingDeleted(request.getName());
+        if(foundProduct.isPresent()){
+            if(!foundProduct.get().getId().equals(id)){
+                log.info("Product with name '{}' already exists", request.getName());
+                throw new DuplicateException("Product with name '" + request.getName() + "' already exists");
+            }
         }
-        return productRepo.save(product);
+
+        if(existingProduct.getDeleted()){
+            existingProduct.setDeleted(false);
+        }
+
+        updateProductFields(existingProduct, request);
+        return productRepo.save(existingProduct);
     }
 
     public void delete(UUID id) {
@@ -77,8 +85,11 @@ public class ProductService {
         productRepo.save(product);
     }
 
-    private void updateProductFields(Product target, Product source) {
+    private void updateProductFields(Product target, ProductRequest source) {
+        ProductType foundProductType = productTypeService.findByUUID(UUID.fromString(source.getProductTypeId()));
+
         target.setName(source.getName());
+        target.setProductType(foundProductType);
         target.setPrice(source.getPrice());
         target.setCycle(source.getCycle());
         target.setCapacity(source.getCapacity());
@@ -92,5 +103,7 @@ public class ProductService {
         target.setInfo4(source.getInfo4());
         target.setInfo5(source.getInfo5());
     }
+
+
 
 }

@@ -62,22 +62,22 @@ public class ProductRepoTest {
     private Product createProduct(String name, ProductType type, Double price, Integer cycle,
                                   String capacity, String bandwith, String addOnDomain,
                                   String database, String ftp) {
-        Product product = new Product();
-        product.setName(name);
-        product.setProductType(type);
-        product.setPrice(price);
-        product.setCycle(cycle);
-        product.setCapacity(capacity);
-        product.setBandwith(bandwith);
-        product.setAddon_domain(addOnDomain);
-        product.setDatabase_account(database);
-        product.setFtp_account(ftp);
-        product.setCreatedBy(SYSTEM_USER);
-        product.setCreatedDate(new java.util.Date());
-        product.setModifiedBy(SYSTEM_USER);
-        product.setModifiedDate(new java.util.Date());
-        product.setIsDeleted(false);
-        return product;
+        Product createdProduct = new Product();
+        createdProduct.setName(name);
+        createdProduct.setProductType(type);
+        createdProduct.setPrice(price);
+        createdProduct.setCycle(cycle);
+        createdProduct.setCapacity(capacity);
+        createdProduct.setBandwith(bandwith);
+        createdProduct.setAddon_domain(addOnDomain);
+        createdProduct.setDatabase_account(database);
+        createdProduct.setFtp_account(ftp);
+        createdProduct.setCreatedBy(SYSTEM_USER);
+        createdProduct.setCreatedDate(new java.util.Date());
+        createdProduct.setModifiedBy(SYSTEM_USER);
+        createdProduct.setModifiedDate(new java.util.Date());
+        createdProduct.setIsDeleted(false);
+        return createdProduct;
     }
 
     @Test
@@ -193,20 +193,23 @@ public class ProductRepoTest {
         Assertions.assertEquals(0, allProducts.size());
 
         //validate soft deleted
-        Object isDeleted = entityManager.getEntityManager()
-                .createNativeQuery("SELECT is_deleted FROM tb_products WHERE uuid = ?1")
+        List<?> results = entityManager.getEntityManager()
+                .createNativeQuery("SELECT is_deleted FROM tb_products WHERE uuid IN (?1, ?2)")
                 .setParameter(1, product1.getId())
-                .getSingleResult();
+                .setParameter(2, product2.getId())
+                .getResultList();
 
-        boolean isDeletedBool = false;
-        if (isDeleted instanceof Boolean) {
-            isDeletedBool = (Boolean) isDeleted;
-        } else if (isDeleted instanceof Number) {
-            isDeletedBool = ((Number) isDeleted).intValue() == 1;
+        Assertions.assertEquals(2, results.size(), "Both products should still exist in the DB");
+
+        for (Object isDeleted : results) {
+            boolean isDeletedBool = false;
+            if (isDeleted instanceof Boolean) {
+                isDeletedBool = (Boolean) isDeleted;
+            } else if (isDeleted instanceof Number) {
+                isDeletedBool = ((Number) isDeleted).intValue() == 1;
+            }
+            Assertions.assertTrue(isDeletedBool, "Product should be soft-deleted");
         }
-
-        Assertions.assertTrue(isDeletedBool,
-                "Product should be soft-deleted in the database");
     }
 
     @Test
