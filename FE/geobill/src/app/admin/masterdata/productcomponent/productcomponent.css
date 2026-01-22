@@ -1,0 +1,13 @@
+.product-table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-table {
+  min-width: 1200px; /* adjust as needed so columns don't crush/overlap */
+}
+
+.product-table th,
+.product-table td {
+  white-space: nowrap; /* prevents text wrapping that makes rows huge/overlap-looking */
+}

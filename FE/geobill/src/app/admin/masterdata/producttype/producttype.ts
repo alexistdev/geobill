@@ -37,7 +37,7 @@ export class Producttype implements OnInit {
   @ViewChild('addButton', { static: false }) addButton?: ElementRef<HTMLButtonElement>;
 
   producttypes: Producttypemodel[] = [];
-  payload?: Payload<Producttypemodel>
+  payload?: Payload<Producttypemodel>;
   totalData: number = 0;
   pageNumber: number = 0;
   totalPages: number = 0;
