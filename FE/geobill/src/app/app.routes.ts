@@ -8,6 +8,7 @@ import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
 import {HostingService} from './users/hosting-service/hosting-service';
 import {Producttype} from './admin/masterdata/producttype/producttype';
+import {Productcomponent} from './admin/masterdata/productcomponent/productcomponent';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -24,6 +25,12 @@ export const routes: Routes = [
   {
     path: 'admin/product_type',
     component: Producttype,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'admin/product',
+    component: Productcomponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
