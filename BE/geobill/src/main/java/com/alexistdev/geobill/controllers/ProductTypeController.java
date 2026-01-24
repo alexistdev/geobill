@@ -42,7 +42,7 @@ public class ProductTypeController {
     @GetMapping
     public ResponseEntity<ResponseData<Page<ProductTypeDTO>>> getAllProductTypes(
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
-            @RequestParam(defaultValue = "10") @PositiveOrZero int size,
+            @RequestParam(required = false, defaultValue = "10") @PositiveOrZero int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction
     ){
@@ -50,6 +50,10 @@ public class ProductTypeController {
 
         Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ?
                 Sort.Direction.DESC : Sort.Direction.ASC;
+
+        if (size == 0) {
+            size = Integer.MAX_VALUE;
+        }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 

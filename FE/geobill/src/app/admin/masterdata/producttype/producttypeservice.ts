@@ -37,22 +37,22 @@ export class Producttypeservice {
     );
   }
 
-  saveProductType(producttype: Producttyperequest): Observable<Apiresponse<Producttype>> {
-    return this.http.post<Apiresponse<Producttype>>(
+  saveProductType(producttype: Producttyperequest): Observable<Apiresponse<Producttypemodel>> {
+    return this.http.post<Apiresponse<Producttypemodel>>(
         `${this.apiUrl}`, producttype,
             { headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       });
   }
 
-  updateProductType(request: Producttyperequest): Observable<Apiresponse<Producttype>> {
-    return this.http.patch<Apiresponse<Producttype>>(
+  updateProductType(request: Producttyperequest): Observable<Apiresponse<Producttypemodel>> {
+    return this.http.patch<Apiresponse<Producttypemodel>>(
       `${this.apiUrl}`, request,
         { headers: new HttpHeaders({ 'Content-Type': 'application/json' })
       });
   }
 
-  deleteProductType(id: string): Observable<Apiresponse<Producttype>> {
-    return this.http.delete<Apiresponse<Producttype>>(
+  deleteProductType(id: string): Observable<Apiresponse<Producttypemodel>> {
+    return this.http.delete<Apiresponse<Producttypemodel>>(
       `${this.apiUrl}/${id}`,
     )
   }

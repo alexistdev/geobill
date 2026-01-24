@@ -7,12 +7,18 @@ import {Productmodel} from './productmodel.model';
 import {Payload} from '../../../share/response/payload';
 import {Productservice} from './productservice';
 import {Apiresponse} from '../../../share/response/apiresponse';
+import {Productmodal} from './productmodal/productmodal';
+import {Producttypemodel} from '../producttype/producttypemodel.model';
+import {Producttypeservice} from '../producttype/producttypeservice';
+import {Productrequest} from './productrequest.model';
+declare var Lobibox: any;
 
 @Component({
   selector: 'app-productcomponent',
   imports: [
     CommonModule,
-    Menutop
+    Menutop,
+    Productmodal
   ],
   templateUrl: './productcomponent.html',
   styleUrl: './productcomponent.css',
@@ -20,6 +26,7 @@ import {Apiresponse} from '../../../share/response/apiresponse';
 })
 export class Productcomponent implements OnInit{
   products: Productmodel[] = [];
+  productTypes: Producttypemodel[] = [];
   payload?: Payload<Productmodel>;
   totalData: number = 0;
   pageNumber: number = 0;
@@ -70,6 +77,21 @@ export class Productcomponent implements OnInit{
     this.currentFormData = data || {};
   }
 
+  openEditModal(product: any) {
+    this.showModal = true;
+    this.currentModalType = 'form';
+    this.currentFormData = {...product};
+    this.currentEditMode = true;
+    this.currentConfirmationText = '';
+  }
+
+  openDeleteModal(productType: any) {
+    this.showModal = true;
+    this.currentModalType = 'confirm';
+    this.currentConfirmationText = 'Are you sure you want to delete this product type?';
+    this.selectedProductTypeId = productType.id;
+  }
+
   loadData(page: number, size: number = 10): void {
     this.pageNumber = page;
     this.pageSize = size;
@@ -89,10 +111,13 @@ export class Productcomponent implements OnInit{
           console.warn('User session ended. Redirecting...');
           this.router.navigate(['/login']);
         }  else {
-          console.error(err);
+          // console.error("wakanda");
+          // console.error(err);
         }
       }
     });
+
+
   }
 
   private updateProductPageData(data: Apiresponse<Productmodel>) {
@@ -126,6 +151,66 @@ export class Productcomponent implements OnInit{
       this.pageNumber = 0;
     }
     this.searchSubject.next(searchTerm);
+  }
+
+  onDeleteConfirm(){
+
+  }
+
+  doSaveData(formValue: Productrequest & { id?: number }){
+    const isUpdate = !!formValue.id;
+
+    const apiCall = formValue.id
+      ? this.productservice.updateProduct(formValue)
+      : this.productservice.saveProduct(formValue);
+
+    apiCall.subscribe({
+      next: () => {
+        if(isPlatformBrowser(this.platformId)){
+          this.LobiboxMessage(isUpdate ? 'warning' : 'success', isUpdate ? 'Data berhasil diubah' : 'Data berhasil disimpan',
+            isUpdate ? 'bx bx-check-circle' : 'bx bx-check-circle');
+        }
+        this.closeModal();
+        this.loadData(this.pageNumber, this.pageSize);
+      },
+      error: (err) => {
+        let errorMessage = 'An unexpected error occurred.';
+
+        try {
+          console.error(err);
+          errorMessage = err.error?.messages?.[0] || errorMessage;
+        } catch (e){
+          console.error('Error while processing error:', e);
+        }
+        this.LobiboxMessage('error', errorMessage,'bx bx-x-circle');
+        this.ngZone.run(() => {
+          this.closeModal();
+        });
+      }
+    })
+  }
+
+  closeModal(){
+    this.el.nativeElement.blur();
+    this.showModal = false;
+    this.cdr.detectChanges();
+  }
+
+  LobiboxMessage(type: string, msg: string, icon: string):void {
+    if (typeof Lobibox !== 'undefined') {
+      Lobibox.notify(type, {
+        pauseDelayOnHover: true,
+        size: 'mini',
+        rounded: true,
+        delayIndicator: false,
+        icon: icon,
+        continueDelayOnInactiveTab: false,
+        position: 'top right',
+        msg: msg
+      });
+    } else {
+      console.warn('Lobibox is not defined.Ensure it is loaded correctly.');
+    }
   }
 
 }

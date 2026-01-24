@@ -687,7 +687,7 @@
               <div class="d-flex align-items-center">
                 <div class="d-flex justify-content-start">
                   <div class="btn-group m-2" role="group" aria-label="Button group with nested dropdown">
-                    <button #addButton type="button" class="btn btn-dark" ><i
+                    <button #addButtonProduct type="button" class="btn btn-dark" (click)="openModal('form')"><i
                       class="bx bx-add-to-queue"></i></button>
                   </div>
                 </div>
@@ -760,10 +760,10 @@
                           <td>{{ product.info5 }}</td>
 
                           <td class="text-center">
-                            <!--                            <button class="btn btn-primary m-1" (click)="openEditModal(producttype)"><i class='bx bxs-pencil me-0'></i></button>-->
-                            <!--                            <button class="btn btn-danger m-1"-->
-                            <!--                                    (click)="openDeleteModal(producttype)">-->
-                            <!--                              <i class='bx bxs-trash me-0'></i></button>-->
+                                                        <button class="btn btn-primary m-1" (click)="openEditModal(product)"><i class='bx bxs-pencil me-0'></i></button>
+                                                        <button class="btn btn-danger m-1"
+                                                                (click)="openDeleteModal(product)">
+                                                          <i class='bx bxs-trash me-0'></i></button>
                           </td>
                         </tr>
                       } @empty {
@@ -789,14 +789,14 @@
   <!--end page wrapper -->
 
   <!-- search modal -->
-<!--  <app-producttypemodal #producttypemodal-->
-<!--                        [show]="showModal"-->
-<!--                        [modalType]="currentModalType"-->
-<!--                        [formData]="currentFormData"-->
-<!--                        [confirmationText]="currentConfirmationText"-->
-<!--                        (confirmDelete)="onDeleteConfirm()"-->
-<!--                        (formSubmit)="doSaveData($event)"-->
-<!--                        (close)="closeModal()"></app-producttypemodal>-->
+  <app-productmodal #productmodal
+                        [show]="showModal"
+                        [modalType]="currentModalType"
+                        [formData]="currentFormData"
+                        [confirmationText]="currentConfirmationText"
+                        (confirmDelete)="onDeleteConfirm()"
+                        (formSubmit)="doSaveData($event)"
+                        (close)="closeModal()"></app-productmodal>
   <!-- end search modal -->
 
   <!--start overlay-->
