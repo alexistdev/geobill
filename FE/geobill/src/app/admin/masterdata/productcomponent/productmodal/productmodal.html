@@ -7,176 +7,171 @@
   -->
 
 <div #modalContainer class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" inert>
-  <div class="modal-dialog" [class.modal-fullscreen]="modalType === 'form'" [class.modal-dialog-centered]="modalType !== 'form'">
+  <div class="modal-dialog" [class.modal-fullscreen]="modalType === 'form'"
+    [class.modal-dialog-centered]="modalType !== 'form'">
     <div class="modal-content">
       <div class="modal-header">
-        <h5
-          class="modal-title">{{ modalType === 'form' ? (formData?.id ? 'Edit Product Type' : 'Add New Product Type') : 'Confirmation' }}</h5>
+        <h5 class="modal-title">{{ modalType === 'form' ? (formData?.id ? 'Edit Product Type' : 'Add New Product Type')
+          : 'Confirmation' }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         @if (modalType === 'form') {
-          <form [formGroup]="productForm">
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="code" formControlName="name" placeholder="Name Package">
-                @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
-                  <div class="text-danger">Name is required and must be at most 100 characters.</div>
-                }
-              </div>
-
-              <div class="mb-3 col-6">
-                <label for="ftp_account" class="form-label">FTP Account</label>
-                <input type="text" class="form-control" id="ftp_account" formControlName="ftp_account"
-                       placeholder="FTP Account">
-                @if (productForm.get('ftp_account')?.invalid && productForm.get('ftp_account')?.touched) {
-                  <div class="text-danger">FTP Account is required and must be at most 100 characters.</div>
-                }
-              </div>
+        <form [formGroup]="productForm">
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="code" formControlName="name" placeholder="Name Package">
+              @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+              <div class="text-danger">Name is required and must be at most 100 characters.</div>
+              }
             </div>
 
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="productTypeId" class="form-label">Type</label>
-                <select class="form-select" formControlName="productTypeId">
-                  <option value="">SELECT</option>
-                  @for (productType of productTypes; track productType.id) {
-                    <option [value]="productType.id">{{ productType.name }}</option>
-                  }
-                </select>
-                @if (productForm.get('productTypeId')?.invalid && productForm.get('productTypeId')?.touched) {
-                  <div class="text-danger">Product Type is required</div>
-                }
-              </div>
+            <div class="mb-3 col-6">
+              <label for="ftp_account" class="form-label">FTP Account</label>
+              <input type="text" class="form-control" id="ftp_account" formControlName="ftp_account"
+                placeholder="FTP Account">
+              @if (productForm.get('ftp_account')?.invalid && productForm.get('ftp_account')?.touched) {
+              <div class="text-danger">FTP Account is required and must be at most 100 characters.</div>
+              }
+            </div>
+          </div>
 
-              <div class="mb-3 col-6">
-                <label for="info1" class="form-label">Optional 1</label>
-                <input type="text" class="form-control" id="info1" formControlName="info1"
-                       placeholder="Optional 1">
-                @if (productForm.get('info1')?.invalid && productForm.get('info1')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="productTypeId" class="form-label">Type</label>
+              <select class="form-select" formControlName="productTypeId">
+                <option [ngValue]="null">SELECT</option>
+                @for (productType of productTypes; track productType.id) {
+                <option [ngValue]="productType.id">{{ productType.name }}</option>
                 }
-              </div>
+              </select>
+              @if (productForm.get('productTypeId')?.invalid && productForm.get('productTypeId')?.touched) {
+              <div class="text-danger">Product Type is required</div>
+              }
             </div>
 
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="price" class="form-label">Price</label>
-                <input type="number" class="form-control" id="price" formControlName="price" placeholder="0">
-                @if (productForm.get('price')?.invalid && productForm.get('price')?.touched) {
-                  <div class="text-danger">Price is required</div>
-                }
-              </div>
-              <div class="mb-3 col-6">
-                <label for="info2" class="form-label">Optional 2</label>
-                <input type="text" class="form-control" id="info2" formControlName="info2" placeholder="Optional 2">
-                @if (productForm.get('info2')?.invalid && productForm.get('info2')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
+            <div class="mb-3 col-6">
+              <label for="info1" class="form-label">Optional 1</label>
+              <input type="text" class="form-control" id="info1" formControlName="info1" placeholder="Optional 1">
+              @if (productForm.get('info1')?.invalid && productForm.get('info1')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
             </div>
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="capacity" class="form-label">Capacity</label>
-                <input type="text" class="form-control" id="capacity" formControlName="capacity"
-                       placeholder="Unlimited">
-                @if (productForm.get('capacity')?.invalid && productForm.get('capacity')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
-              <div class="mb-3 col-6">
-                <label for="info3" class="form-label">Optional 3</label>
-                <input type="text" class="form-control" id="info3" formControlName="info3" placeholder="Optional 3">
-                @if (productForm.get('info3')?.invalid && productForm.get('info3')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
+          </div>
+
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="price" class="form-label">Price</label>
+              <input type="number" class="form-control" id="price" formControlName="price" placeholder="0">
+              @if (productForm.get('price')?.invalid && productForm.get('price')?.touched) {
+              <div class="text-danger">Price is required</div>
+              }
             </div>
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="bandwith" class="form-label">Bandwith</label>
-                <input type="text" class="form-control" id="bandwith" formControlName="bandwith"
-                       placeholder="Unlimited">
-                @if (productForm.get('bandwith')?.invalid && productForm.get('bandwith')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
-              <div class="mb-3 col-6">
-                <label for="info4" class="form-label">Optional 4</label>
-                <input type="text" class="form-control" id="info4" formControlName="info4" placeholder="Optional 4">
-                @if (productForm.get('info4')?.invalid && productForm.get('info4')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
+            <div class="mb-3 col-6">
+              <label for="info2" class="form-label">Optional 2</label>
+              <input type="text" class="form-control" id="info2" formControlName="info2" placeholder="Optional 2">
+              @if (productForm.get('info2')?.invalid && productForm.get('info2')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="capacity" class="form-label">Capacity</label>
+              <input type="text" class="form-control" id="capacity" formControlName="capacity" placeholder="Unlimited">
+              @if (productForm.get('capacity')?.invalid && productForm.get('capacity')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+            <div class="mb-3 col-6">
+              <label for="info3" class="form-label">Optional 3</label>
+              <input type="text" class="form-control" id="info3" formControlName="info3" placeholder="Optional 3">
+              @if (productForm.get('info3')?.invalid && productForm.get('info3')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="bandwith" class="form-label">Bandwith</label>
+              <input type="text" class="form-control" id="bandwith" formControlName="bandwith" placeholder="Unlimited">
+              @if (productForm.get('bandwith')?.invalid && productForm.get('bandwith')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+            <div class="mb-3 col-6">
+              <label for="info4" class="form-label">Optional 4</label>
+              <input type="text" class="form-control" id="info4" formControlName="info4" placeholder="Optional 4">
+              @if (productForm.get('info4')?.invalid && productForm.get('info4')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="addon_domain" class="form-label">Addon Domain</label>
+              <input type="text" class="form-control" id="addon_domain" formControlName="addon_domain"
+                placeholder="Unlimited">
+              @if (productForm.get('addon_domain')?.invalid && productForm.get('addon_domain')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+            <div class="mb-3 col-6">
+              <label for="info4" class="form-label">Optional 3</label>
+              <input type="text" class="form-control" id="info4" formControlName="info4" placeholder="Optional 4">
+              @if (productForm.get('info4')?.invalid && productForm.get('info4')?.touched) {
+              <div class="text-danger"> must be at most 10 characters.</div>
+              }
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="database_account" class="form-label">Database Account</label>
+              <input type="text" class="form-control" id="database_account" formControlName="database_account"
+                placeholder="Unlimited">
+              @if (productForm.get('database_account')?.invalid && productForm.get('database_account')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+            <div class="mb-3 col-6">
+              <label for="info5" class="form-label">Optional 5</label>
+              <input type="text" class="form-control" id="info5" formControlName="info5" placeholder="Optional 5">
+              @if (productForm.get('info5')?.invalid && productForm.get('info5')?.touched) {
+              <div class="text-danger">Must be at most 100 characters.</div>
+              }
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label for="cycle" class="form-label">Cycles</label>
+              <input type="number" class="form-control" id="cycle" formControlName="cycle" placeholder="12" required>
+              @if (productForm.get('cycle')?.invalid && productForm.get('cycle')?.touched) {
+              <div class="text-danger">Cycle is required</div>
+              }
             </div>
 
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="addon_domain" class="form-label">Addon Domain</label>
-                <input type="text" class="form-control" id="addon_domain" formControlName="addon_domain"
-                       placeholder="Unlimited">
-                @if (productForm.get('addon_domain')?.invalid && productForm.get('addon_domain')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
-              <div class="mb-3 col-6">
-                <label for="info4" class="form-label">Optional 3</label>
-                <input type="text" class="form-control" id="info4" formControlName="info4" placeholder="Optional 4">
-                @if (productForm.get('info4')?.invalid && productForm.get('info4')?.touched) {
-                  <div class="text-danger"> must be at most 10 characters.</div>
-                }
-              </div>
-            </div>
+          </div>
 
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="database_account" class="form-label">Database Account</label>
-                <input type="text" class="form-control" id="database_account" formControlName="database_account"
-                       placeholder="Unlimited">
-                @if (productForm.get('database_account')?.invalid && productForm.get('database_account')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
-              <div class="mb-3 col-6">
-                <label for="info5" class="form-label">Optional 5</label>
-                <input type="text" class="form-control" id="info5" formControlName="info5" placeholder="Optional 5">
-                @if (productForm.get('info5')?.invalid && productForm.get('info5')?.touched) {
-                  <div class="text-danger">Must be at most 100 characters.</div>
-                }
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="mb-3 col-6">
-                <label for="cycle" class="form-label">Cycles</label>
-                <input type="number" class="form-control" id="cycle" formControlName="cycle"
-                       placeholder="12" required>
-                @if (productForm.get('cycle')?.invalid && productForm.get('cycle')?.touched) {
-                  <div class="text-danger">Cycle is required</div>
-                }
-              </div>
-
-            </div>
-
-          </form>
+        </form>
         } @else {
-          <p>{{ confirmationText }}</p>
+        <p>{{ confirmationText }}</p>
         }
       </div>
       <div class="modal-footer">
         @if (modalType === 'form') {
-          <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
-          <button type="button" class="btn btn-primary"
-                  (click)="validateAndConfirm()">{{ formData?.id ? 'Update' : 'Save' }}
-          </button>
+        <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="validateAndConfirm()">{{ formData?.id ? 'Update' : 'Save'
+          }}
+        </button>
         } @else {
-          <button type="button" class="btn btn-primary" (click)="onClose()">Cancel</button>
-          <button type="button" class="btn btn-danger" (click)="deleteConfirm()">Delete</button>
+        <button type="button" class="btn btn-primary" (click)="onClose()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteConfirm()">Delete</button>
         }
       </div>
     </div>
   </div>
 </div>
-
-

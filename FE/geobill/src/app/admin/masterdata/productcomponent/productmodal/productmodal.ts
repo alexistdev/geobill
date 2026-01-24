@@ -2,16 +2,19 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnInit,
   Output,
+  PLATFORM_ID,
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Producttypeservice} from '../../producttype/producttypeservice';
-import {Producttypemodel} from '../../producttype/producttypemodel.model';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Producttypeservice } from '../../producttype/producttypeservice';
+import { Producttypemodel } from '../../producttype/producttypemodel.model';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-productmodal',
@@ -59,39 +62,48 @@ export class Productmodal implements OnInit, OnChanges {
 
   productForm !: FormGroup;
   protected productTypes: Producttypemodel[] = [];
+  private platformId = inject(PLATFORM_ID);
+  private productTypesLoaded = false;
 
   constructor(private fb: FormBuilder,
-              private el: ElementRef,
-              private producttypeservice: Producttypeservice) {
+    private el: ElementRef,
+    private producttypeservice: Producttypeservice) {
   }
 
   ngOnInit(): void {
-    this.loadProductType();
     this.productForm = this.fb.group({
       id: this.formData?.id || null,
-      name: [this.formData.name || '', [Validators.required, Validators.maxLength(100)]],
-      productTypeId: [this.formData?.productTypeId?.id || '', [Validators.required, Validators.maxLength(100)]],
-      price: [this.formData.price || 0, [Validators.required, Validators.min(0)]],
-      cycle: [this.formData.cycle || 0, [Validators.required, Validators.min(1), Validators.max(12), Validators.pattern('^[0-9]*$')]],
-      capacity: [this.formData.database_account || '', [Validators.maxLength(100)]],
-      bandwith: [this.formData.bandwith || '', [Validators.maxLength(100)]],
-      addon_domain: [this.formData.addon_domain || '', [Validators.maxLength(100)]],
-      database_account: [this.formData.database_account || '', [Validators.maxLength(100)]],
-      ftp_account: [this.formData.ftp_account || '', [Validators.maxLength(100)]],
-      info1: [this.formData.info1 || '', [Validators.maxLength(100)]],
-      info2: [this.formData.info2 || '', [Validators.maxLength(100)]],
-      info3: [this.formData.info3 || '', [Validators.maxLength(100)]],
-      info4: [this.formData.info4 || '', [Validators.maxLength(100)]],
-      info5: [this.formData.info5 || '', [Validators.maxLength(100)]],
+      name: [this.formData?.name || '', [Validators.required, Validators.maxLength(100)]],
+      productTypeId: [this.formData?.productTypeDTO?.id || null, [Validators.required, Validators.maxLength(100)]],
+      price: [this.formData?.price || 0, [Validators.required, Validators.min(0)]],
+      cycle: [this.formData?.cycle || 0, [Validators.required, Validators.min(1), Validators.max(12), Validators.pattern('^[0-9]*$')]],
+      capacity: [this.formData?.capacity || '', [Validators.maxLength(100)]],
+      bandwith: [this.formData?.bandwith || '', [Validators.maxLength(100)]],
+      addon_domain: [this.formData?.addon_domain || '', [Validators.maxLength(100)]],
+      database_account: [this.formData?.database_account || '', [Validators.maxLength(100)]],
+      ftp_account: [this.formData?.ftp_account || '', [Validators.maxLength(100)]],
+      info1: [this.formData?.info1 || '', [Validators.maxLength(100)]],
+      info2: [this.formData?.info2 || '', [Validators.maxLength(100)]],
+      info3: [this.formData?.info3 || '', [Validators.maxLength(100)]],
+      info4: [this.formData?.info4 || '', [Validators.maxLength(100)]],
+      info5: [this.formData?.info5 || '', [Validators.maxLength(100)]],
     });
   }
 
-  loadProductType():void {
-    this.producttypeservice.getProductType(0,0,"id","asc").
-    subscribe({
-      next:(data) => this.productTypes = data.payload.content,
-      error:(err) => console.log(err)
-    });
+  loadProductType(): void {
+    // Only load if in browser and not already loaded
+    if (!isPlatformBrowser(this.platformId) || this.productTypesLoaded) {
+      return;
+    }
+
+    this.producttypeservice.getProductType(0, 0, "id", "asc").
+      subscribe({
+        next: (data) => {
+          this.productTypes = data.payload.content;
+          this.productTypesLoaded = true;
+        },
+        error: (err) => console.log(err)
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -99,7 +111,7 @@ export class Productmodal implements OnInit, OnChanges {
       this.productForm.patchValue({
         id: this.formData?.id || null,
         name: this.formData?.name || '',
-        productTypeId: this.formData?.productTypeId?.id || null,
+        productTypeId: this.formData?.productTypeDTO?.id || null,
         price: this.formData?.price || '',
         cycle: this.formData?.cycle || '',
         capacity: this.formData?.capacity || '',
@@ -119,6 +131,9 @@ export class Productmodal implements OnInit, OnChanges {
       const modalElement = this.modalContainer?.nativeElement;
       if (modalElement) {
         if (this.show) {
+          // Load product types when modal is shown
+          this.loadProductType();
+
           // Show modal
           modalElement.removeAttribute('aria-hidden');
           modalElement.removeAttribute('inert');
@@ -193,11 +208,11 @@ export class Productmodal implements OnInit, OnChanges {
 
   clearForm() {
     this.productForm.reset({
-      id: '',
+      id: null,
       name: '',
-      productTypeId: '',
-      price: '',
-      cycle: '',
+      productTypeId: null,
+      price: 0,
+      cycle: 0,
       capacity: '',
       bandwith: '',
       addon_domain: '',

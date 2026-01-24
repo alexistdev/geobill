@@ -141,6 +141,37 @@ public class ProductController {
         }
     }
 
+    @PatchMapping
+    public ResponseEntity<ResponseData<ProductDTO>> updateProduct(@Valid @RequestBody ProductRequest request, Errors errors) {
+        ResponseData<ProductDTO> responseData = new ResponseData<>();
+        responseData.setStatus(false);
+        responseData.setPayload(null);
+        if(request.getId() == null){
+            responseData.getMessages().add("Product ID is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        }
+
+        if(errors.hasErrors()) {
+            processErrors(errors, responseData);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        }
+
+        try {
+            Product result = productService.update(request.getId(), request);
+            responseData.setStatus(true);
+            responseData.getMessages().add("Product updated successfully");
+            responseData.setPayload(modelMapper.map(result, ProductDTO.class));
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        } catch (DuplicateException d) {
+            log.error("Error updating Product", d);
+            responseData.getMessages().add(d.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
+        } catch (Exception e) {
+            log.error("Error updating Product", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+        }
+    }
+
     private void processErrors(Errors errors, ResponseData<?> responseData) {
         for (ObjectError error : errors.getAllErrors()) {
             responseData.getMessages().add(error.getDefaultMessage());
