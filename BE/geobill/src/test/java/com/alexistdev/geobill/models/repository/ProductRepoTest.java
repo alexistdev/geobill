@@ -38,6 +38,7 @@ public class ProductRepoTest {
     private static final String SYSTEM_USER = "System";
 
     private ProductType productType;
+    private ProductType deletedProductType;
 
     @BeforeEach
     void setUp() {
@@ -56,6 +57,16 @@ public class ProductRepoTest {
         productType.setModifiedDate(new java.util.Date());
         productType.setIsDeleted(false);
         entityManager.persist(productType);
+
+        deletedProductType = new ProductType();
+        deletedProductType.setName("Deleted Product Type");
+        deletedProductType.setCreatedBy(SYSTEM_USER);
+        deletedProductType.setCreatedDate(new java.util.Date());
+        deletedProductType.setModifiedBy(SYSTEM_USER);
+        deletedProductType.setModifiedDate(new java.util.Date());
+        deletedProductType.setIsDeleted(true);
+        entityManager.persist(deletedProductType);
+
         entityManager.flush();
     }
 
@@ -272,5 +283,32 @@ public class ProductRepoTest {
         Assertions.assertTrue(result.stream().anyMatch(
                 product -> product.getName().equals("Basic Shared Hosting")));
         Assertions.assertFalse(result.stream().anyMatch(BaseEntity::getIsDeleted));
+    }
+
+    @Test
+    @DisplayName("Test FindByIsDeletedFalse only returns products with non-deleted ProductTypes")
+    void testFindByIsDeletedFalse() {
+        // Create a product with a deleted product type
+        Product productWithDeletedType = createProduct("Product with Deleted Type",
+                deletedProductType, 20.0, 1, "20GB",
+                "2000 Mbps", "2", "2", "2");
+        entityManager.persist(productWithDeletedType);
+
+        // Create a product with a non-deleted product type
+        Product productWithActiveType = createProduct("Product with Active Type",
+                productType, 30.0, 1, "30GB",
+                "3000 Mbps", "3", "3", "3");
+        entityManager.persist(productWithActiveType);
+        entityManager.flush();
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Product> result = productRepo.findByIsDeletedFalse(pageable);
+
+        // Assert that only the product with the non-deleted product type is returned
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertTrue(result.stream().anyMatch(
+                product -> product.getName().equals("Product with Active Type")));
+        Assertions.assertFalse(result.stream().anyMatch(
+                product -> product.getName().equals("Product with Deleted Type")));
     }
 }
