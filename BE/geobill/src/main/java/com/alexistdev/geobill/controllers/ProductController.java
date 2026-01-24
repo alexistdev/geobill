@@ -32,13 +32,11 @@ public class ProductController {
     private static final String NO_PRODUCT_FOUND = "No product found";
 
     private final ProductService productService;
-    private final ProductTypeService productTypeService;
     private final ModelMapper modelMapper;
 
-    public ProductController(ProductService productService, ModelMapper modelMapper,ProductTypeService productTypeService) {
+    public ProductController(ProductService productService, ModelMapper modelMapper) {
         this.productService = productService;
         this.modelMapper = modelMapper;
-        this.productTypeService = productTypeService;
     }
 
     @GetMapping
@@ -66,13 +64,8 @@ public class ProductController {
         responseData.getMessages().add(NO_PRODUCT_FOUND);
         responseData.setStatus(false);
 
-        if (!productPage.isEmpty()) {
-            responseData.setStatus(true);
-            if (!responseData.getMessages().isEmpty()) {
-                responseData.getMessages().removeFirst();
-            }
-            responseData.getMessages().add("Retrieved page " + page + " of products");
-        }
+        handleNonEmptyPage(responseData,productPage,page);
+
         Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
         responseData.setPayload(productDTOPage);
 
@@ -172,9 +165,34 @@ public class ProductController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable("id") UUID uuid){
+        ResponseData<Void> responseData = new ResponseData<>();
+        responseData.setStatus(false);
+        try {
+            productService.delete(uuid);
+            responseData.setStatus(true);
+            responseData.getMessages().add("Product deleted successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        } catch (Exception e) {
+            log.error("Error deleting Product", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+        }
+    }
+
     private void processErrors(Errors errors, ResponseData<?> responseData) {
         for (ObjectError error : errors.getAllErrors()) {
             responseData.getMessages().add(error.getDefaultMessage());
+        }
+    }
+
+    private <T> void handleNonEmptyPage(ResponseData<Page<T>> responseData, Page<?> pageResult, int pageNumber){
+        if(!pageResult.isEmpty()){
+            responseData.setStatus(true);
+            if(!responseData.getMessages().isEmpty()){
+                responseData.getMessages().removeFirst();
+            }
+            responseData.getMessages().add("Retrieved page " + pageNumber + " of products");
         }
     }
 
