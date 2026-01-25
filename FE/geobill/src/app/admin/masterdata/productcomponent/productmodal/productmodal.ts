@@ -88,6 +88,7 @@ export class Productmodal implements OnInit, OnChanges {
       info4: [this.formData?.info4 || '', [Validators.maxLength(100)]],
       info5: [this.formData?.info5 || '', [Validators.maxLength(100)]],
     });
+    this.loadProductType();
   }
 
   loadProductType(): void {
@@ -131,8 +132,6 @@ export class Productmodal implements OnInit, OnChanges {
       const modalElement = this.modalContainer?.nativeElement;
       if (modalElement) {
         if (this.show) {
-          // Load product types when modal is shown
-          this.loadProductType();
 
           // Show modal
           modalElement.removeAttribute('aria-hidden');

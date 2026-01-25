@@ -20,8 +20,8 @@
         <form [formGroup]="productForm">
           <div class="row">
             <div class="mb-3 col-6">
-              <label for="name" class="form-label">Name</label>
-              <input type="text" class="form-control" id="code" formControlName="name" placeholder="Name Package">
+              <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="code" formControlName="name" placeholder="Name Package" required>
               @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
               <div class="text-danger">Name is required and must be at most 100 characters.</div>
               }
@@ -39,8 +39,8 @@
 
           <div class="row">
             <div class="mb-3 col-6">
-              <label for="productTypeId" class="form-label">Type</label>
-              <select class="form-select" formControlName="productTypeId">
+              <label for="productTypeId" class="form-label">Type <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="productTypeId" required>
                 <option [ngValue]="null">SELECT</option>
                 @for (productType of productTypes; track productType.id) {
                 <option [ngValue]="productType.id">{{ productType.name }}</option>
@@ -62,8 +62,8 @@
 
           <div class="row">
             <div class="mb-3 col-6">
-              <label for="price" class="form-label">Price</label>
-              <input type="number" class="form-control" id="price" formControlName="price" placeholder="0">
+              <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="price" formControlName="price" placeholder="0" required>
               @if (productForm.get('price')?.invalid && productForm.get('price')?.touched) {
               <div class="text-danger">Price is required</div>
               }
@@ -78,10 +78,10 @@
           </div>
           <div class="row">
             <div class="mb-3 col-6">
-              <label for="capacity" class="form-label">Capacity</label>
-              <input type="text" class="form-control" id="capacity" formControlName="capacity" placeholder="Unlimited">
-              @if (productForm.get('capacity')?.invalid && productForm.get('capacity')?.touched) {
-              <div class="text-danger">Must be at most 100 characters.</div>
+              <label for="cycle" class="form-label">Cycles <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" id="cycle" formControlName="cycle" placeholder="12" required>
+              @if (productForm.get('cycle')?.invalid && productForm.get('cycle')?.touched) {
+                <div class="text-danger">Cycle is required</div>
               }
             </div>
             <div class="mb-3 col-6">
@@ -147,12 +147,13 @@
 
           <div class="row">
             <div class="mb-3 col-6">
-              <label for="cycle" class="form-label">Cycles</label>
-              <input type="number" class="form-control" id="cycle" formControlName="cycle" placeholder="12" required>
-              @if (productForm.get('cycle')?.invalid && productForm.get('cycle')?.touched) {
-              <div class="text-danger">Cycle is required</div>
+              <label for="capacity" class="form-label">Capacity</label>
+              <input type="text" class="form-control" id="capacity" formControlName="capacity" placeholder="Unlimited">
+              @if (productForm.get('capacity')?.invalid && productForm.get('capacity')?.touched) {
+                <div class="text-danger">Must be at most 100 characters.</div>
               }
             </div>
+
 
           </div>
 
