@@ -8,5 +8,6 @@ public class DatabaseTableNames {
     public static final String TB_ROLE_MENUS = "tb_role_menus";
     public static final String TB_PRODUCT_TYPES = "tb_product_types";
     public static final String TB_PRODUCTS = "tb_products";
+    public static final String TB_CUSTOMERS = "tb_customers";
 
 }
