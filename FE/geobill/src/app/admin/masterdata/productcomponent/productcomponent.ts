@@ -1,16 +1,15 @@
-import {ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnInit, PLATFORM_ID} from '@angular/core';
-import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
-import {Menutop} from '../../../share/menutop/menutop';
-import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
-import {Router} from '@angular/router';
-import {Productmodel} from './productmodel.model';
-import {Payload} from '../../../share/response/payload';
-import {Productservice} from './productservice';
-import {Apiresponse} from '../../../share/response/apiresponse';
-import {Productmodal} from './productmodal/productmodal';
-import {Producttypemodel} from '../producttype/producttypemodel.model';
-import {Producttypeservice} from '../producttype/producttypeservice';
-import {Productrequest} from './productrequest.model';
+import { ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, DatePipe, isPlatformBrowser } from '@angular/common';
+import { Menutop } from '../../../share/menutop/menutop';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { Router } from '@angular/router';
+import { Productmodel } from './productmodel.model';
+import { Payload } from '../../../share/response/payload';
+import { Productservice } from './productservice';
+import { Apiresponse } from '../../../share/response/apiresponse';
+import { Productmodal } from './productmodal/productmodal';
+import { Productrequest } from './productrequest.model';
+import { Pagination } from '../../../share/pagination/pagination';
 declare var Lobibox: any;
 
 @Component({
@@ -18,15 +17,15 @@ declare var Lobibox: any;
   imports: [
     CommonModule,
     Menutop,
-    Productmodal
+    Productmodal,
+    Pagination
   ],
   templateUrl: './productcomponent.html',
   styleUrl: './productcomponent.css',
   providers: [DatePipe]
 })
-export class Productcomponent implements OnInit{
+export class Productcomponent implements OnInit {
   products: Productmodel[] = [];
-  productTypes: Producttypemodel[] = [];
   payload?: Payload<Productmodel>;
   totalData: number = 0;
   pageNumber: number = 0;
@@ -41,7 +40,7 @@ export class Productcomponent implements OnInit{
   public currentConfirmationText = '';
   private searchSubject = new Subject<string>();
   currentEditMode: boolean = false;
-  selectedProductTypeId: string | undefined = '';
+  selectedProductId: string | undefined = '';
   private platformId = inject(PLATFORM_ID);
   protected readonly Number = Number;
 
@@ -52,7 +51,7 @@ export class Productcomponent implements OnInit{
     private datePipe: DatePipe,
     private el: ElementRef,
     private ngZone: NgZone
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -62,16 +61,16 @@ export class Productcomponent implements OnInit{
     this.searchSubject.pipe(
       debounceTime(500),
       distinctUntilChanged()
-    ).subscribe((searchTerm:string) => {
+    ).subscribe((searchTerm: string) => {
 
       this.searchQuery = searchTerm.toLowerCase();
-      console.log( this.searchQuery);
-      this.loadData(this.pageNumber,this.pageSize);
+      console.log(this.searchQuery);
+      this.loadData(this.pageNumber, this.pageSize);
     });
   }
 
-  openModal(type: 'form' | 'confirm', data?: any, productTypeId?: string) {
-    this.selectedProductTypeId = productTypeId;
+  openModal(type: 'form' | 'confirm', data?: any, productId?: string) {
+    this.selectedProductId = productId;
     this.currentModalType = type;
     this.showModal = true;
     this.currentFormData = data || {};
@@ -80,16 +79,16 @@ export class Productcomponent implements OnInit{
   openEditModal(product: any) {
     this.showModal = true;
     this.currentModalType = 'form';
-    this.currentFormData = {...product};
+    this.currentFormData = { ...product };
     this.currentEditMode = true;
     this.currentConfirmationText = '';
   }
 
-  openDeleteModal(productType: any) {
+  openDeleteModal(product: any) {
     this.showModal = true;
     this.currentModalType = 'confirm';
-    this.currentConfirmationText = 'Are you sure you want to delete this product type?';
-    this.selectedProductTypeId = productType.id;
+    this.currentConfirmationText = 'Are you sure you want to delete this product?';
+    this.selectedProductId = product.id;
   }
 
   loadData(page: number, size: number = 10): void {
@@ -110,9 +109,8 @@ export class Productcomponent implements OnInit{
         if (err.message === 'Session expired') {
           console.warn('User session ended. Redirecting...');
           this.router.navigate(['/login']);
-        }  else {
-          // console.error("wakanda");
-          // console.error(err);
+        } else {
+          console.error(err);
         }
       }
     });
@@ -146,18 +144,48 @@ export class Productcomponent implements OnInit{
   }
 
   onSearchChange(searchTerm: string) {
-    console.log('input event:', searchTerm);
     if (this.pageNumber > 0) {
       this.pageNumber = 0;
     }
     this.searchSubject.next(searchTerm);
   }
 
-  onDeleteConfirm(){
-
+  onPageSizeChange(value: string) {
+    console.log("test");
+    console.log(value);
+    this.pageSize = parseInt(value, 10);
+    this.loadData(0, this.pageSize);
   }
 
-  doSaveData(formValue: Productrequest & { id?: number }){
+  onPageChanged(page: number) {
+    this.pageNumber = page;
+    this.loadData(this.pageNumber, this.pageSize);
+  }
+
+  onDeleteConfirm() {
+    if (this.selectedProductId) {
+      this.productservice.deleteProduct(this.selectedProductId).subscribe({
+        next: () => {
+          this.LobiboxMessage('error', 'Data berhasil dihapus', 'bx bx-check-circle');
+          this.closeModal();
+          this.loadData(this.pageNumber, this.pageSize);
+        },
+        error: (err) => {
+          let errorMessage = 'An unexpected error occurred.';
+          try {
+            console.error(err);
+            errorMessage = err.error?.messages?.[0] || errorMessage;
+          } catch (e) {
+            console.error('Error while processing error:', e);
+          }
+          this.LobiboxMessage('error', errorMessage, 'bx bx-x-circle');
+        }
+      });
+    }
+    this.closeModal();
+  }
+
+  doSaveData(formValue: Productrequest & { id?: number }) {
     const isUpdate = !!formValue.id;
 
     const apiCall = formValue.id
@@ -166,7 +194,7 @@ export class Productcomponent implements OnInit{
 
     apiCall.subscribe({
       next: () => {
-        if(isPlatformBrowser(this.platformId)){
+        if (isPlatformBrowser(this.platformId)) {
           this.LobiboxMessage(isUpdate ? 'warning' : 'success', isUpdate ? 'Data berhasil diubah' : 'Data berhasil disimpan',
             isUpdate ? 'bx bx-check-circle' : 'bx bx-check-circle');
         }
@@ -179,10 +207,10 @@ export class Productcomponent implements OnInit{
         try {
           console.error(err);
           errorMessage = err.error?.messages?.[0] || errorMessage;
-        } catch (e){
+        } catch (e) {
           console.error('Error while processing error:', e);
         }
-        this.LobiboxMessage('error', errorMessage,'bx bx-x-circle');
+        this.LobiboxMessage('error', errorMessage, 'bx bx-x-circle');
         this.ngZone.run(() => {
           this.closeModal();
         });
@@ -190,13 +218,13 @@ export class Productcomponent implements OnInit{
     })
   }
 
-  closeModal(){
+  closeModal() {
     this.el.nativeElement.blur();
     this.showModal = false;
     this.cdr.detectChanges();
   }
 
-  LobiboxMessage(type: string, msg: string, icon: string):void {
+  LobiboxMessage(type: string, msg: string, icon: string): void {
     if (typeof Lobibox !== 'undefined') {
       Lobibox.notify(type, {
         pauseDelayOnHover: true,

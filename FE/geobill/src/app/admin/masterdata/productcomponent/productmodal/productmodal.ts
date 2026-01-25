@@ -188,6 +188,7 @@ export class Productmodal implements OnInit, OnChanges {
 
   onClose() {
     this.removeBackdrop();
+    this.clearForm();
     document.body.classList.remove('modal-open');
     this.close.emit();
   }

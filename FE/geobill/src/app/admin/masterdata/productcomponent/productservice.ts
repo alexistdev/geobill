@@ -45,4 +45,10 @@ export class Productservice {
       { headers: new HttpHeaders({'Content-Type': 'application/json'}) }
     );
   }
+
+  deleteProduct(id: string): Observable<Apiresponse<Productmodel>> {
+    return this.http.delete<Apiresponse<Productmodel>>(
+      `${this.apiUrl}/${id}`,
+    )
+  }
 }

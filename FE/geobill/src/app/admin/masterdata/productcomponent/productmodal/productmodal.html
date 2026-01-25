@@ -11,7 +11,7 @@
     [class.modal-dialog-centered]="modalType !== 'form'">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ modalType === 'form' ? (formData?.id ? 'Edit Product Type' : 'Add New Product Type')
+        <h5 class="modal-title">{{ modalType === 'form' ? (formData?.id ? 'Edit Product' : 'Add New Product')
           : 'Confirmation' }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
@@ -78,10 +78,10 @@
           </div>
           <div class="row">
             <div class="mb-3 col-6">
-              <label for="cycle" class="form-label">Cycles <span class="text-danger">*</span></label>
+              <label for="cycle" class="form-label">Cycles (month)<span class="text-danger">*</span></label>
               <input type="number" class="form-control" id="cycle" formControlName="cycle" placeholder="12" required>
               @if (productForm.get('cycle')?.invalid && productForm.get('cycle')?.touched) {
-                <div class="text-danger">Cycle is required</div>
+                <div class="text-danger">Cycle is required and must be at most 12 month</div>
               }
             </div>
             <div class="mb-3 col-6">

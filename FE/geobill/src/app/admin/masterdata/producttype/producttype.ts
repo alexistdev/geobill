@@ -150,6 +150,7 @@ export class Producttype implements OnInit {
   onPageSizeChange(event: any) {
     this.pageSize = parseInt(event.target.value, 10);
     this.loadData(0, this.pageSize);
+    console.log(this.pageSize);
   }
 
   onPageChanged(page: number) {
