@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,9 @@ public class UserServiceTest {
 
     @Mock
     private CustomerService customerService;
+
+    @Mock
+    private MessageSource messageSource;
 
     private User user;
     private LoginRequest loginRequest;
@@ -116,7 +120,10 @@ public class UserServiceTest {
     @DisplayName("4. Test Register User with Existing User")
     void registerUser_ExistingUser_ThrowsRuntimeException() {
         when(userRepo.findByEmail(registerRequest.getEmail())).thenReturn(Optional.of(user));
-        Assertions.assertThrows(RuntimeException.class, () -> userService.registerUser(registerRequest));
+        when(messageSource.getMessage(eq("userservice.user.exist"), any(), any())).thenReturn("User %s already exist");
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> userService.registerUser(registerRequest));
+        System.out.println("[DEBUG_LOG] Exception message: " + exception.getMessage());
+        Assertions.assertEquals("User " + registerRequest.getEmail() + " already exist", exception.getMessage());
     }
 
     @Test
@@ -155,6 +162,7 @@ public class UserServiceTest {
     void authenticate_InvalidPassword_ReturnsNull() {
         when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(false);
+        when(messageSource.getMessage(eq("userservice.user.authfailed"), any(), any())).thenReturn("Authentication failed, password is invalid");
 
         User authenticatedUser = userService.authenticate(loginRequest);
         Assertions.assertNull(authenticatedUser);

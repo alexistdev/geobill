@@ -8,6 +8,8 @@ import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +36,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private MessageSource messageSource;
+
     private static final Logger logger = Logger.getLogger(UserService.class.getName());
 
     @Override
@@ -44,10 +49,9 @@ public class UserService implements UserDetailsService {
     public User registerUser(RegisterRequest request) {
         boolean userExist = userRepo.findByEmail(request.getEmail()).isPresent();
         if (userExist) {
-            logger.info(String.format("{userservice.user.exist}", request.getEmail()));
-            throw new RuntimeException(
-                    String.format("{userservice.user.exist}", request.getEmail())
-            );
+            String message = String.format(messageSource.getMessage("userservice.user.exist", null, LocaleContextHolder.getLocale()), request.getEmail());
+            logger.info(message);
+            throw new RuntimeException(message);
         }
         Date now = new Date();
         User userSaved = new User();
@@ -78,7 +82,7 @@ public class UserService implements UserDetailsService {
         if (userExist.isPresent()) {
             boolean authCheck = bCryptPasswordEncoder.matches(loginRequest.getPassword(), userExist.get().getPassword());
             if (!authCheck) {
-                logger.info("{userservice.user.authfailed}");
+                logger.info(messageSource.getMessage("userservice.user.authfailed", null, LocaleContextHolder.getLocale()));
                 return null;
             }
             return userExist.get();
@@ -87,6 +91,6 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByUUID(UUID id){
-        return userRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("{userservice.user.notfound}" + id));
+        return userRepo.findById(id).orElseThrow(()-> new IllegalArgumentException(messageSource.getMessage("userservice.user.notfound", null, LocaleContextHolder.getLocale()) + " " + id));
     }
 }
