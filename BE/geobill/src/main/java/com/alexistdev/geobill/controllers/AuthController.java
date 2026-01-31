@@ -1,8 +1,8 @@
 package com.alexistdev.geobill.controllers;
 
+import com.alexistdev.geobill.dto.AuthDTO;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
-import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
@@ -67,14 +67,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseData<UserDTO>> login(@Valid @RequestBody LoginRequest loginRequest, Errors errors) {
-        ResponseData<UserDTO> responseData = new ResponseData<>();
+    public ResponseEntity<ResponseData<AuthDTO>> login(@Valid @RequestBody LoginRequest loginRequest, Errors errors) {
+        ResponseData<AuthDTO> responseData = new ResponseData<>();
         handleErrors(errors, responseData);
 
         User user = userService.authenticate(loginRequest);
 
         if (user != null) {
-            UserDTO result =  modelMapper.map(user, UserDTO.class);
+            AuthDTO result =  modelMapper.map(user, AuthDTO.class);
             String role = result.getRole();
 
             String homeUser = "/users/dashboard";
