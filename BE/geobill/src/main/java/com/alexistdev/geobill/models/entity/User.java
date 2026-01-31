@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Entity
-@Table(name= DatabaseTableNames.TB_USERS)
+@Table(name = DatabaseTableNames.TB_USERS)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,17 +30,20 @@ public class User extends BaseEntity<String> implements UserDetails {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(length=150, nullable=false)
+    @Column(length = 150, nullable = false)
     private String fullName;
 
-    @Column(length=150, nullable=false , unique = true)
+    @Column(length = 150, nullable = false, unique = true)
     private String email;
 
-    @Column(length=200)
+    @Column(length = 200)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(nullable = false)
+    private boolean isSuspended = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -59,7 +62,7 @@ public class User extends BaseEntity<String> implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !isSuspended();
     }
 
     @Override
@@ -69,7 +72,7 @@ public class User extends BaseEntity<String> implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !isSuspended();
     }
 
     @Override
