@@ -3,6 +3,7 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.dto.AuthDTO;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
@@ -71,9 +72,10 @@ public class AuthController {
         ResponseData<AuthDTO> responseData = new ResponseData<>();
         handleErrors(errors, responseData);
 
-        User user = userService.authenticate(loginRequest);
-
-        if (user != null) {
+        try {
+            String msgSuccess = this.messageLocale( "authcontroller.login.success");
+            responseData.getMessages().add(msgSuccess);
+            User user = userService.authenticate(loginRequest);
             AuthDTO result =  modelMapper.map(user, AuthDTO.class);
             String role = result.getRole();
 
@@ -89,24 +91,26 @@ public class AuthController {
                 String homeStaff = "/staff/dashboard";
                 result.setHomeURL(homeStaff);
             }
-
-            List<MenuDTO> menus = menuService.getMenusByRole(user.getRole())
-                     .stream()
-                     .map(menu-> modelMapper.map(menu, MenuDTO.class))
-                     .collect(Collectors.toList());
-            String validMsg = String.format(this.messageLocale("authcontroller.login.valid"), result.getEmail());
-            logger.info(validMsg);
-            result.setMenus(menus);
             responseData.setPayload(result);
-            responseData.getMessages().add(this.messageLocale("authcontroller.login.success"));
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        } catch (SuspendedException s) {
+            logger.info(s.getMessage());
+            responseData.getMessages().removeFirst();
+            String invalidMsg = s.getMessage();
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add(invalidMsg);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseData);
+        } catch (Exception e){
+            logger.info(e.getMessage());
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().removeFirst();
+            responseData.getMessages().add(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
-        String invalidMsg = String.format(this.messageLocale("authcontroller.login.invalid"), loginRequest.getEmail());
-        logger.info(invalidMsg);
-        responseData.setStatus(false);
-        responseData.getMessages().add(invalidMsg);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+
     }
 
     private void handleErrors(Errors errors, ResponseData<?> responseData){

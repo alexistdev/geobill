@@ -32,7 +32,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
-                                "/api/v1/users/get_all_users").hasAuthority(Role.ADMIN.toString())
+                                "/api/v1/users").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.POST,

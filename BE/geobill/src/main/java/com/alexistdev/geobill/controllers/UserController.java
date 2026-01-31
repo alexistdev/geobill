@@ -32,7 +32,7 @@ public class UserController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("/get_all_users")
+    @GetMapping()
     public ResponseEntity<ResponseData<Page<UserDTO>>> getAllUserData(
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @PositiveOrZero int size,

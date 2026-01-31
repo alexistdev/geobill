@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
@@ -82,11 +83,17 @@ public class UserService implements UserDetailsService {
             boolean authCheck = bCryptPasswordEncoder.matches(loginRequest.getPassword(), userExist.get().getPassword());
             if (!authCheck) {
                 logger.info(messageSource.getMessage("userservice.user.authfailed", null, LocaleContextHolder.getLocale()));
-                return null;
+                throw new RuntimeException(messageSource.getMessage("userservice.user.authfailed", null, LocaleContextHolder.getLocale()));
             }
+
+            if (userExist.get().isSuspended()) {
+                logger.info(messageSource.getMessage("userservice.user.suspended", null, LocaleContextHolder.getLocale()));
+                throw new SuspendedException(messageSource.getMessage("userservice.user.suspended", null, LocaleContextHolder.getLocale()));
+            }
+
             return userExist.get();
         }
-        return null;
+        throw new RuntimeException(messageSource.getMessage("userservice.user.authfailed", null, LocaleContextHolder.getLocale()));
     }
 
     public User findUserByUUID(UUID id){
