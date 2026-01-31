@@ -3,7 +3,6 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.dto.UserDTO;
-import com.alexistdev.geobill.models.entity.Menu;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
@@ -13,7 +12,8 @@ import com.alexistdev.geobill.services.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -30,21 +30,19 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private MenuService menuService;
-
-    private final String homeAdmin = "/admin/dashboard";
-    private final String homeStaff = "/staff/dashboard";
-    private final String homeUser = "/users/dashboard";
-
+    private final UserService userService;
+    private final ModelMapper modelMapper;
+    private final MessageSource messageSource;
+    private final MenuService menuService;
 
     private static final Logger logger = Logger.getLogger(AuthController.class.getName());
+
+    public AuthController(UserService userService, ModelMapper modelMapper, MessageSource messageSource, MenuService menuService) {
+        this.userService = userService;
+        this.modelMapper = modelMapper;
+        this.messageSource = messageSource;
+        this.menuService = menuService;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
@@ -56,8 +54,9 @@ public class AuthController {
         }
 
         try {
-            User user = modelMapper.map(userRequest, User.class);
-            responseData.setPayload(userService.registerUser(user));
+            String msgSuccess = this.messageLocale( "authcontroller.register.success");
+            responseData.setPayload(userService.registerUser(userRequest));
+            responseData.getMessages().add(msgSuccess);
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
         }catch (Exception e) {
@@ -78,13 +77,16 @@ public class AuthController {
             UserDTO result =  modelMapper.map(user, UserDTO.class);
             String role = result.getRole();
 
+            String homeUser = "/users/dashboard";
             result.setHomeURL(homeUser);
 
             if(role.equals(Role.ADMIN.toString())){
+                String homeAdmin = "/admin/dashboard";
                 result.setHomeURL(homeAdmin);
             }
 
             if(role.equals(Role.STAFF.toString())){
+                String homeStaff = "/staff/dashboard";
                 result.setHomeURL(homeStaff);
             }
 
@@ -92,17 +94,18 @@ public class AuthController {
                      .stream()
                      .map(menu-> modelMapper.map(menu, MenuDTO.class))
                      .collect(Collectors.toList());
-
-            logger.info("User is valid :" + result.getEmail());
+            String validMsg = String.format(this.messageLocale("authcontroller.login.valid"), result.getEmail());
+            logger.info(validMsg);
             result.setMenus(menus);
             responseData.setPayload(result);
-            responseData.getMessages().add("User is valid");
+            responseData.getMessages().add(this.messageLocale("authcontroller.login.success"));
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         }
-        logger.info("Invalid username or password :" + loginRequest.getEmail());
+        String invalidMsg = String.format(this.messageLocale("authcontroller.login.invalid"), loginRequest.getEmail());
+        logger.info(invalidMsg);
         responseData.setStatus(false);
-        responseData.getMessages().add("Invalid username or password");
+        responseData.getMessages().add(invalidMsg);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
     }
 
@@ -116,5 +119,9 @@ public class AuthController {
         } else {
             responseData.setStatus(true);
         }
+    }
+
+    private String messageLocale(String key){
+        return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
     }
 }

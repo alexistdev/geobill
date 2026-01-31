@@ -7,7 +7,6 @@ import com.alexistdev.geobill.models.repository.UserRepo;
 import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -27,17 +26,17 @@ import java.util.logging.Logger;
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
+    private final CustomerService customerService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final MessageSource messageSource;
 
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private MessageSource messageSource;
+    public UserService(UserRepo userRepo, CustomerService customerService, BCryptPasswordEncoder bCryptPasswordEncoder, MessageSource messageSource) {
+        this.userRepo = userRepo;
+        this.customerService = customerService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.messageSource = messageSource;
+    }
 
     private static final Logger logger = Logger.getLogger(UserService.class.getName());
 
