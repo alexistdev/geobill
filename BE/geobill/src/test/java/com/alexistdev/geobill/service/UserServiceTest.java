@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.service;
 
+import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
@@ -20,11 +21,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -36,7 +40,7 @@ public class UserServiceTest {
     private UserRepo userRepo;
 
     @Mock
-    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -59,11 +63,14 @@ public class UserServiceTest {
         String password = "password";
         String fullName = "Test User";
         Role role = Role.USER;
+        UUID id = UUID.randomUUID();
 
         user = new User();
+        user.setId(id);
         user.setEmail(email);
         user.setPassword(password);
         user.setRole(role);
+        user.setSuspended(false);
 
         loginRequest = new LoginRequest();
         loginRequest.setEmail(email);
@@ -94,7 +101,7 @@ public class UserServiceTest {
     @DisplayName("2. Test load User by Username and then throw UsernameNotFoundException")
     void loadUserByUsername_UserNotFound_ThrowsUsernameNotFoundException() {
         when(userRepo.findByEmail(registerRequest.getEmail())).thenReturn(Optional.empty());
-        Assertions.assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(registerRequest.getEmail()));
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(registerRequest.getEmail()));
     }
 
     @Test
@@ -121,7 +128,7 @@ public class UserServiceTest {
     void registerUser_ExistingUser_ThrowsRuntimeException() {
         when(userRepo.findByEmail(registerRequest.getEmail())).thenReturn(Optional.of(user));
         when(messageSource.getMessage(eq("userservice.user.exist"), any(), any())).thenReturn("User %s already exist");
-        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> userService.registerUser(registerRequest));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.registerUser(registerRequest));
         System.out.println("[DEBUG_LOG] Exception message: " + exception.getMessage());
         Assertions.assertEquals("User " + registerRequest.getEmail() + " already exist", exception.getMessage());
     }
@@ -158,23 +165,84 @@ public class UserServiceTest {
 
     @Test
     @Order(7)
-    @DisplayName("7. Test Authenticate User when Invalid then Return Null")
-    void authenticate_InvalidPassword_ReturnsNull() {
+    @DisplayName("7. Test Authenticate User when Invalid then Throw RuntimeException")
+    void authenticate_InvalidPassword_ThrowsRuntimeException() {
         when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(false);
         when(messageSource.getMessage(eq("userservice.user.authfailed"), any(), any())).thenReturn("Authentication failed, password is invalid");
 
-        User authenticatedUser = userService.authenticate(loginRequest);
-        Assertions.assertNull(authenticatedUser);
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> userService.authenticate(loginRequest));
+        Assertions.assertEquals("Authentication failed, password is invalid", exception.getMessage());
     }
 
     @Test
     @Order(8)
-    @DisplayName("8. Test Authenticate User when User Not Found then Return Null")
-    void authenticate_UserNotFound_ReturnsNull() {
+    @DisplayName("8. Test Authenticate User when User Not Found then Throw RuntimeException")
+    void authenticate_UserNotFound_ThrowsRuntimeException() {
         when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.empty());
+        when(messageSource.getMessage(eq("userservice.user.authfailed"), any(), any())).thenReturn("Authentication failed, user not found");
 
-        User authenticatedUser = userService.authenticate(loginRequest);
-        Assertions.assertNull(authenticatedUser);
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> userService.authenticate(loginRequest));
+
+        Assertions.assertEquals("Authentication failed, user not found", exception.getMessage());
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("9. Test Authenticate User when User Suspended then Throw SuspendedException")
+    void authenticate_UserSuspended_ThrowsSuspendedException() {
+        user.setSuspended(true);
+        when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
+        when(bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
+        when(messageSource.getMessage(eq("userservice.user.suspended"), any(), any())).thenReturn("User is suspended");
+
+        Assertions.assertThrows(SuspendedException.class,
+                () -> userService.authenticate(loginRequest));
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("10. Test Get All Users By Filter and then Return Page of Users")
+    void getAllUsersByFilter_ReturnsPageOfUsers() {
+        List<User> users = new ArrayList<>();
+        users.add(user);
+        Page<User> pageOfUsers = new PageImpl<>(users);
+        String keyword = "test";
+
+        when(userRepo.findByFilter(keyword.toLowerCase(), Pageable.unpaged())).thenReturn(pageOfUsers);
+
+        Page<User> allUsers = userService.getAllUsersByFilter(Pageable.unpaged(), keyword);
+
+        Assertions.assertNotNull(allUsers);
+        Assertions.assertEquals(1, allUsers.getContent().size());
+        Assertions.assertEquals(user, allUsers.getContent().getFirst());
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("11. Test Find User By UUID when User Exists then Return User")
+    void findUserByUUID_UserExists_ReturnsUser() {
+        UUID userId = user.getId();
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+
+        User foundUser = userService.findUserByUUID(userId);
+
+        Assertions.assertNotNull(foundUser);
+        Assertions.assertEquals(user, foundUser);
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("12. Test Find User By UUID when User Not Found then Throw IllegalArgumentException")
+    void findUserByUUID_UserNotFound_ThrowsIllegalArgumentException() {
+        UUID userId = UUID.randomUUID();
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+        when(messageSource.getMessage(eq("userservice.user.notfound"),
+                any(), any())).thenReturn("User not found");
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> userService.findUserByUUID(userId));
     }
 }
