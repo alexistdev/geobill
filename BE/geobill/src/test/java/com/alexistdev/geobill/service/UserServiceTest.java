@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.service;
 
+import com.alexistdev.geobill.dto.UserDetailDTO;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
 import com.alexistdev.geobill.models.entity.Role;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -244,5 +244,29 @@ public class UserServiceTest {
 
         Assertions.assertThrows(IllegalArgumentException.class,
                 () -> userService.findUserByUUID(userId));
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("13. Test Get User Detail and then Return UserDetailDTO")
+    void getUserDetail_shouldReturnUserDetailDTO() {
+        UUID userId = UUID.randomUUID();
+        user.setId(userId);
+        Customer customer = new Customer();
+        customer.setId(UUID.randomUUID());
+
+        when(userRepo.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(customerService.findCustomerByUserId(user)).thenReturn(customer);
+
+        UserDetailDTO userDetailDTO = userService.getUserDetail(userId);
+
+        Assertions.assertNotNull(userDetailDTO);
+        Assertions.assertEquals(userId.toString(), userDetailDTO.getId());
+        Assertions.assertEquals(user.getFullName(), userDetailDTO.getFullName());
+        Assertions.assertEquals(user.getEmail(), userDetailDTO.getEmail());
+        Assertions.assertEquals(user.getRole().toString(), userDetailDTO.getRole());
+        Assertions.assertEquals(user.getCreatedDate(), userDetailDTO.getCreatedDate());
+        Assertions.assertEquals(user.getModifiedDate(), userDetailDTO.getModifiedDate());
+        Assertions.assertEquals(customer, userDetailDTO.getCustomer());
     }
 }

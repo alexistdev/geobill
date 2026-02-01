@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.dto.UserDetailDTO;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
 import com.alexistdev.geobill.models.entity.Role;
@@ -102,5 +103,21 @@ public class UserService implements UserDetailsService {
 
     public User findUserByUUID(UUID id){
         return userRepo.findById(id).orElseThrow(()-> new IllegalArgumentException(messageSource.getMessage("userservice.user.notfound", null, LocaleContextHolder.getLocale()) + " " + id));
+    }
+
+    public UserDetailDTO getUserDetail(UUID userId) {
+        User userResult = this.findUserByUUID(userId);
+        Customer customerResult = customerService.findCustomerByUserId(userResult);
+        UserDetailDTO userDetailDTO = new UserDetailDTO();
+
+        userDetailDTO.setId(userResult.getId().toString());
+        userDetailDTO.setFullName(userResult.getFullName());
+        userDetailDTO.setEmail(userResult.getEmail());
+        userDetailDTO.setRole(userResult.getRole().toString());
+        userDetailDTO.setCreatedDate(userResult.getCreatedDate());
+        userDetailDTO.setModifiedDate(userResult.getModifiedDate());
+        userDetailDTO.setCustomer(customerResult);
+
+        return userDetailDTO;
     }
 }
