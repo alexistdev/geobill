@@ -228,12 +228,14 @@ public class UserRepoTest {
 
         Pageable pageable = Pageable.ofSize(10);
 
-        // Test keyword filter
-        Page<User> result = userRepo.findByFilter("Alex", pageable);
+        // Test keyword filter - searching for "alex" should find user1
+        Page<User> result = userRepo.findByFilter("alex", pageable);
         Assertions.assertEquals(1, result.getTotalElements());
         Assertions.assertEquals("Alexsander", result.getContent().getFirst().getFullName());
 
         // Test exclusion of ADMIN and Deleted
+        // admin matches "admin@gmail.com" but has ADMIN role, so it should be excluded.
+        // deletedUser matches "deleted@gmail.com" but isDeleted=true and @Where filters it out.
         result = userRepo.findByFilter("", pageable);
         Assertions.assertEquals(2, result.getTotalElements());
         Assertions.assertTrue(result.stream().noneMatch(u -> u.getRole() == Role.ADMIN));
