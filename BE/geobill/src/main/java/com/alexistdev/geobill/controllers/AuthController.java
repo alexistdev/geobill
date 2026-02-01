@@ -4,6 +4,7 @@ import com.alexistdev.geobill.dto.AuthDTO;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.exceptions.SuspendedException;
+import com.alexistdev.geobill.models.entity.Menu;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
@@ -79,6 +80,13 @@ public class AuthController {
             AuthDTO result =  modelMapper.map(user, AuthDTO.class);
             String role = result.getRole();
 
+            List<MenuDTO> menus = menuService.getMenusByRole(user.getRole())
+                    .stream()
+                    .map(menu-> modelMapper.map(menu, MenuDTO.class))
+                    .collect(Collectors.toList());
+
+            result.setMenus(menus);
+
             String homeUser = "/users/dashboard";
             result.setHomeURL(homeUser);
 
@@ -127,5 +135,17 @@ public class AuthController {
 
     private String messageLocale(String key){
         return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
+    }
+
+    private MenuDTO convertToMenuDTO(Menu menu){
+        MenuDTO menuDTO = new MenuDTO();
+        menuDTO.setId(menu.getId().toString());
+        menuDTO.setName(menu.getName());
+        menuDTO.setUrlink(menu.getUrlink());
+        menuDTO.setClasslink(menu.getClasslink());
+        menuDTO.setIcon(menu.getIcon());
+        menuDTO.setTypeMenu(menu.getTypeMenu());
+        menuDTO.setSortOrder(String.valueOf(menu.getSortOrder()));
+        return menuDTO;
     }
 }

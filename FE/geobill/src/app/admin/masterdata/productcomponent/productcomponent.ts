@@ -48,7 +48,6 @@ export class Productcomponent implements OnInit {
     private productservice: Productservice,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private datePipe: DatePipe,
     private el: ElementRef,
     private ngZone: NgZone
   ) { }

@@ -7,19 +7,21 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnInit, PLATFORM_ID} from '@angular/core';
-import {DecimalPipe} from '@angular/common';
+import {DatePipe, DecimalPipe, isPlatformBrowser} from '@angular/common';
 import {Menutop} from '../../../share/menutop/menutop';
 import {Pagination} from '../../../share/pagination/pagination';
 import {Usermodel} from './usermodel.model';
 import {Payload} from '../../../share/response/payload';
-import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 import {Userservice} from './userservice';
 import {Router} from '@angular/router';
+import {Apiresponse} from '../../../share/response/apiresponse';
 
 @Component({
   selector: 'app-usercomponent',
   imports: [
     Menutop,
+    DatePipe,
   ],
   templateUrl: './usercomponent.html',
   styleUrl: './usercomponent.css',
@@ -54,6 +56,16 @@ export class Usercomponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadData(this.pageNumber, this.pageSize);
+    }
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe((searchTerm: string) => {
+      this.searchQuery = searchTerm.toLowerCase();
+      this.loadData(this.pageNumber, this.pageSize);
+    });
   }
 
 
@@ -64,6 +76,39 @@ export class Usercomponent implements OnInit {
     const sortBy = 'createdDate';
     const direction = 'desc';
     const isFiltering = this.keyword !== "";
+
+    const request$ = isFiltering ?
+      this.userService.getUsersByFilter(this.keyword, this.pageNumber, this.pageSize, sortBy, direction) :
+      this.userService.getUsers(this.pageNumber, this.pageSize, sortBy, direction);
+
+    request$.subscribe({
+      next:(data) => this.updateUserPageData(data),
+      error:(err) => {
+        if (err.message === 'Session expired') {
+          console.warn('User session ended. Redirecting...');
+          this.router.navigate(['/login']);
+        }  else {
+          console.error(err);
+        }
+      }
+    })
+  }
+
+  private updateUserPageData(data: Apiresponse<Usermodel>) {
+    this.payload = data.payload;
+    this.totalData = this.payload?.totalElements ?? 0;
+    this.pageNumber = this.payload.pageable.pageNumber;
+    this.totalPages = this.payload.totalPages;
+    this.pageSize = this.payload.pageable.pageSize;
+
+    const newItems = this.payload.content.map(usermodel => {
+      return {
+        ...usermodel,
+      };
+    });
+    this.users = [...newItems];
+    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
 }

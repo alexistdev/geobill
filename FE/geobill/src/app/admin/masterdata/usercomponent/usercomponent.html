@@ -723,43 +723,37 @@
                       <thead class="table-dark">
                       <tr>
                         <th class="text-center" scope="col" style="width: 5%">No.</th>
-                        <th class="text-center" scope="col" style="width: 10%">Email</th>
-                        <th class="text-center" scope="col">Created At</th>
-                        <th class="text-center" scope="col">Status</th>
+                        <th class="text-center" scope="col">Email</th>
+                        <th class="text-center" scope="col" style="width: 10%">Created At</th>
+                        <th class="text-center" scope="col" style="width: 10%">Status</th>
+                        <th class="text-center" scope="col" style="width: 10%">View Detail</th>
                         <th class="text-center" scope="col" style="width: 10%">Action</th>
                       </tr>
                       </thead>
                       <tbody>
-<!--                        @for (product of products; track $index) {-->
-<!--                          <tr>-->
-<!--                            <td class="text-center">{{ ((pageNumber) * pageSize) + ($index + 1) }}</td>-->
-<!--                            <td>{{ product.name }}</td>-->
-<!--                            <td>{{ product.productTypeDTO.name }}</td>-->
-<!--                            <td>{{ product.price | number:'1.2-2'}}</td>-->
-<!--                            <td>{{ product.cycle }}</td>-->
-<!--                            <td>{{ product.capacity }}</td>-->
-<!--                            <td>{{ product.bandwith }}</td>-->
-<!--                            <td>{{ product.addon_domain }}</td>-->
-<!--                            <td>{{ product.database_account }}</td>-->
-<!--                            <td>{{ product.ftp_account }}</td>-->
-<!--                            <td>{{ product.info1 }}</td>-->
-<!--                            <td>{{ product.info2 }}</td>-->
-<!--                            <td>{{ product.info3 }}</td>-->
-<!--                            <td>{{ product.info4 }}</td>-->
-<!--                            <td>{{ product.info5 }}</td>-->
-
-<!--                            <td class="text-center">-->
-<!--                              <button class="btn btn-primary m-1" (click)="openEditModal(product)"><i-->
-<!--                                class='bx bxs-pencil me-0'></i></button>-->
-<!--                              <button class="btn btn-danger m-1" (click)="openDeleteModal(product)">-->
-<!--                                <i class='bx bxs-trash me-0'></i></button>-->
-<!--                            </td>-->
-<!--                          </tr>-->
-<!--                        } @empty {-->
-<!--                          <tr>-->
-<!--                            <td colspan="16" class="text-center">No Data</td>-->
-<!--                          </tr>-->
-<!--                        }-->
+                           @for(user of users; track $index) {
+                              <tr>
+                                <td class="text-center">{{ ((pageNumber) * pageSize) + ($index + 1) }}</td>
+                                <td class="text-center">{{user.email}}</td>
+                                <td class="text-center" >{{user.createdDate | date:'dd/MM/yyyy HH:mm'}}</td>
+                                <td class="text-center">
+                                  @if(!user.suspended) {
+                                    <div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>Active</div>
+                                  } @else {
+                                    <div class="badge rounded-pill text-danger bg-light-danger p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>Suspended</div>
+                                  }
+                                </td>
+                                <td class="text-center">
+                                  <button type="button" class="btn btn-primary btn-sm radius-30 px-4">View Details</button>
+                                </td>
+                                <td class="justify-content-center">
+                                  <div class="d-flex order-actions">
+                                    <a href="javascript:;" class=""><i class='bx bxs-edit'></i></a>
+                                    <a href="javascript:;" class="ms-3"><i class='bx bxs-trash'></i></a>
+                                  </div>
+                                </td>
+                              </tr>
+                           }
                       </tbody>
                       <tfoot>
                       <tr>

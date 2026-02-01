@@ -65,6 +65,37 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ResponseData<Page<UserDTO>>> searchUser(
+            @RequestParam(defaultValue = "") String filter,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "10") @PositiveOrZero int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ){
+        ResponseData<Page<UserDTO>> responseData = new ResponseData<>();
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ?
+                Sort.Direction.DESC : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+
+        Page<User> usersPage;
+        try {
+            usersPage = userService.getAllUsersByFilter(pageable, filter);
+        } catch (RuntimeException e){
+            Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
+            usersPage = userService.getAllUsersByFilter(fallbackPageable, filter);
+        }
+        responseData.getMessages().add(NO_USER_FOUND);
+        responseData.setStatus(false);
+
+        handleNonEmptyPage(responseData,usersPage,page);
+        Page<UserDTO> userDTOS = usersPage
+                .map(user -> modelMapper.map(user, UserDTO.class));
+        responseData.setPayload(userDTOS);
+        return ResponseEntity.status(HttpStatus.OK).body(responseData);
+    }
+
 
     private <T> void handleNonEmptyPage(ResponseData<Page<T>> responseData, Page<?> pageResult, int pageNumber){
         if(!pageResult.isEmpty()){

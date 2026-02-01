@@ -9,6 +9,7 @@ import { roleGuard } from './guards/role.guard';
 import {HostingService} from './users/hosting-service/hosting-service';
 import {Producttype} from './admin/masterdata/producttype/producttype';
 import {Productcomponent} from './admin/masterdata/productcomponent/productcomponent';
+import {Usercomponent} from './admin/masterdata/usercomponent/usercomponent';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -31,6 +32,12 @@ export const routes: Routes = [
   {
     path: 'admin/product',
     component: Productcomponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] }
+  },
+  {
+    path: 'admin/users',
+    component: Usercomponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] }
   },
