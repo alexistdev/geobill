@@ -13,4 +13,6 @@ public interface CustomerRepo extends JpaRepository<Customer, UUID> {
 
 //    @Query("SELECT p FROM Customer p LEFT JOIN FETCH User pt WHERE  pt.isDeleted = false")
 //    Page<Product> findAllCustomers(Pageable pageable);
+
+    Customer findByUser_Id(UUID userId);
 }
