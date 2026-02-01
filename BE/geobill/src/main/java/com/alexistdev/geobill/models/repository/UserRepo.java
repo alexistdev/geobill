@@ -13,9 +13,12 @@ import java.util.UUID;
 
 public interface UserRepo extends JpaRepository<User, UUID> {
 
+
     Optional<User> findByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.role !=:role")
     Page<User> findByRoleNot(@Param("role") Role role, Pageable pageable);
 
+    @Query("SELECT u FROM User u WHERE u.fullName LIKE %:keyword% AND u.role != com.alexistdev.geobill.models.entity.Role.ADMIN AND u.isDeleted = false")
+    Page<User> findByFilter(@Param("keyword") String keyword, Pageable pageable);
 }

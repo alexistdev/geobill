@@ -35,6 +35,7 @@ public class BaseEntity<T> {
 
     protected Boolean isDeleted = Boolean.FALSE;
 
+    @Column(name = "is_deleted")
     public Boolean getDeleted() {
         return isDeleted;
     }

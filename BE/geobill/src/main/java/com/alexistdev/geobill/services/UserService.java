@@ -77,6 +77,10 @@ public class UserService implements UserDetailsService {
         return userRepo.findByRoleNot(Role.ADMIN, pageable);
     }
 
+    public Page<User> getAllUsersByFilter(Pageable pageable, String keyword) {
+        return userRepo.findByFilter(keyword.toLowerCase(), pageable);
+    }
+
     public User authenticate(LoginRequest loginRequest) {
         Optional<User> userExist = userRepo.findByEmail(loginRequest.getEmail());
         if (userExist.isPresent()) {
