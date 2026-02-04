@@ -1,6 +1,8 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.dto.UserDetailDTO;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
 import com.alexistdev.geobill.models.entity.Role;
@@ -102,7 +104,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByUUID(UUID id){
-        return userRepo.findById(id).orElseThrow(()-> new IllegalArgumentException(messageSource.getMessage("userservice.user.notfound", null, LocaleContextHolder.getLocale()) + " " + id));
+        return userRepo.findById(id).orElseThrow(()-> new NotFoundException(messageSource.getMessage("userservice.user.notfound", null, LocaleContextHolder.getLocale()) + " " + id));
     }
 
     public UserDetailDTO getUserDetail(UUID userId) {
@@ -116,8 +118,22 @@ public class UserService implements UserDetailsService {
         userDetailDTO.setRole(userResult.getRole().toString());
         userDetailDTO.setCreatedDate(userResult.getCreatedDate());
         userDetailDTO.setModifiedDate(userResult.getModifiedDate());
-        userDetailDTO.setCustomer(customerResult);
+        userDetailDTO.setCustomer(this.converToCustomerDTO(customerResult  ));
 
         return userDetailDTO;
+    }
+
+    private CustomerDTO converToCustomerDTO(Customer customer){
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setId(customer.getId().toString());
+        customerDTO.setBusinessName(customer.getBusinessName());
+        customerDTO.setAddress1(customer.getAddress1());
+        customerDTO.setAddress2(customer.getAddress2());
+        customerDTO.setCity(customer.getCity());
+        customerDTO.setState(customer.getState());
+        customerDTO.setCountry(customer.getCountry());
+        customerDTO.setPostCode(customer.getPostCode());
+        customerDTO.setPhone(customer.getPhone());
+        return customerDTO;
     }
 }

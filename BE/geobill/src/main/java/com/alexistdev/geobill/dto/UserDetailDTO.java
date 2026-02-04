@@ -14,5 +14,5 @@ public class UserDetailDTO {
     private String role;
     private Date createdDate;
     private Date modifiedDate;
-    private Customer customer;
+    private CustomerDTO customer;
 }

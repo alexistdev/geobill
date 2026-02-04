@@ -2,8 +2,11 @@ package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.dto.UserDTO;
+import com.alexistdev.geobill.dto.UserDetailDTO;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.services.UserService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -13,23 +16,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-    private static final String NO_USER_FOUND= "No product found";
+
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final MessagesUtils messagesUtils;
 
-    public UserController(UserService userService, ModelMapper modelMapper) {
+
+    public UserController(UserService userService, ModelMapper modelMapper, MessagesUtils messagesUtils) {
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.messagesUtils = messagesUtils;
     }
 
     @GetMapping()
@@ -54,7 +59,7 @@ public class UserController {
             usersPage = userService.getAllUsers(fallbackPageable);
         }
 
-        responseData.getMessages().add(NO_USER_FOUND);
+        responseData.getMessages().add(this.messagesUtils.getMessage("usercontroller.user.nouser"));
         responseData.setStatus(false);
 
         handleNonEmptyPage(responseData, usersPage, page + 1);
@@ -86,7 +91,7 @@ public class UserController {
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             usersPage = userService.getAllUsersByFilter(fallbackPageable, filter);
         }
-        responseData.getMessages().add(NO_USER_FOUND);
+        responseData.getMessages().add(this.messagesUtils.getMessage("usercontroller.user.nouser"));
         responseData.setStatus(false);
 
         handleNonEmptyPage(responseData,usersPage,page);
@@ -94,6 +99,27 @@ public class UserController {
                 .map(user -> modelMapper.map(user, UserDTO.class));
         responseData.setPayload(userDTOS);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseData<UserDetailDTO>> getUserDetail(@PathVariable("id") UUID uuid){
+        ResponseData<UserDetailDTO> responseData = new ResponseData<>();
+        responseData.setStatus(false);
+        try {
+            UserDetailDTO result = userService.getUserDetail(uuid);
+            responseData.getMessages().add("Retrieved user detail");
+            responseData.setStatus(true);
+            responseData.setPayload(result);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        } catch (NotFoundException n){
+            log.info("Error getting user detail", n);
+            responseData.getMessages().add(n.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }catch (Exception e){
+            log.error("Error getting user detail", e);
+            responseData.getMessages().add(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+        }
     }
 
 
