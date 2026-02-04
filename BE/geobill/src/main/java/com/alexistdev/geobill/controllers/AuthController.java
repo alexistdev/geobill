@@ -4,18 +4,16 @@ import com.alexistdev.geobill.dto.AuthDTO;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.exceptions.SuspendedException;
-import com.alexistdev.geobill.models.entity.Menu;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
 import com.alexistdev.geobill.services.MenuService;
 import com.alexistdev.geobill.services.UserService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -31,8 +29,6 @@ import java.util.stream.Collectors;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 @Slf4j
 @CrossOrigin(origins = "http://localhost:4200/login")
@@ -42,16 +38,16 @@ public class AuthController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private final MessageSource messageSource;
+    private final MessagesUtils messagesUtils;
     private final MenuService menuService;
     private final RateLimiter rateLimiter;
 
     private static final Logger logger = Logger.getLogger(AuthController.class.getName());
 
-    public AuthController(UserService userService, ModelMapper modelMapper, MessageSource messageSource, MenuService menuService) {
+    public AuthController(UserService userService, ModelMapper modelMapper, MessagesUtils messagesUtils, MenuService menuService) {
         this.userService = userService;
         this.modelMapper = modelMapper;
-        this.messageSource = messageSource;
+        this.messagesUtils = messagesUtils;
         this.menuService = menuService;
 
         RateLimiterConfig config = RateLimiterConfig.custom()
@@ -61,28 +57,40 @@ public class AuthController {
                 .build();
         RateLimiterRegistry registry = RateLimiterRegistry.of(config);
         this.rateLimiter = registry.rateLimiter("rateLimiter");
-
     }
 
     @PostMapping("/register")
     public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
-        ResponseData<User> responseData = new ResponseData<>();
-        handleErrors(errors, responseData);
+        Supplier<ResponseEntity<ResponseData<User>>> registerAttempt = () -> {
+            ResponseData<User> responseData = new ResponseData<>();
+            handleErrors(errors, responseData);
 
-        if (!responseData.isStatus()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-        }
+            if (!responseData.isStatus()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            }
 
+            try {
+                String msgSuccess = messagesUtils.getMessage("authcontroller.register.success");
+                responseData.setPayload(userService.registerUser(userRequest));
+                responseData.getMessages().add(msgSuccess);
+                responseData.setStatus(true);
+                return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+            } catch (Exception e) {
+                responseData.setStatus(false);
+                responseData.getMessages().add(e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            }
+        };
+
+        Supplier<ResponseEntity<ResponseData<User>>> restrictedRegisterAttempt = RateLimiter.decorateSupplier(rateLimiter, registerAttempt);
         try {
-            String msgSuccess = this.messageLocale("authcontroller.register.success");
-            responseData.setPayload(userService.registerUser(userRequest));
-            responseData.getMessages().add(msgSuccess);
-            responseData.setStatus(true);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
-        } catch (Exception e) {
+            return restrictedRegisterAttempt.get();
+        }catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {
+            String msgRatelimit = messagesUtils.getMessage("ratelimiter.restricted.message");
+            ResponseData<User> responseData = new ResponseData<>();
             responseData.setStatus(false);
-            responseData.getMessages().add(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            responseData.getMessages().add(msgRatelimit);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(responseData);
         }
     }
 
@@ -93,7 +101,7 @@ public class AuthController {
             handleErrors(errors, responseData);
 
             try {
-                String msgSuccess = this.messageLocale("authcontroller.login.success");
+                String msgSuccess = messagesUtils.getMessage("authcontroller.login.success");
                 responseData.getMessages().add(msgSuccess);
                 User user = userService.authenticate(loginRequest);
                 AuthDTO result = modelMapper.map(user, AuthDTO.class);
@@ -139,11 +147,12 @@ public class AuthController {
             }
         };
 
-        Supplier<ResponseEntity<ResponseData<AuthDTO>>> restrictedLoginAttempt = RateLimiter.decorateSupplier(rateLimiter, loginAttempt);
+        Supplier<ResponseEntity<ResponseData<AuthDTO>>> restrictedLoginAttempt =
+                RateLimiter.decorateSupplier(rateLimiter, loginAttempt);
         try {
             return restrictedLoginAttempt.get();
         } catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {
-            String msgRatelimit = this.messageLocale("ratelimiter.restricted.message");
+            String msgRatelimit = messagesUtils.getMessage("ratelimiter.restricted.message");
             ResponseData<AuthDTO> responseData = new ResponseData<>();
             responseData.setStatus(false);
             responseData.getMessages().add(msgRatelimit);
@@ -161,9 +170,5 @@ public class AuthController {
         } else {
             responseData.setStatus(true);
         }
-    }
-
-    private String messageLocale(String key) {
-        return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
     }
 }
