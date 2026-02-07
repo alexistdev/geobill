@@ -6,3 +6,12 @@
  * Email: alexistdev@gmail.com
  */
 
+
+import {Injectable} from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class Userdetailservice {
+  private apiUrl = '/api/v1/users';
+}

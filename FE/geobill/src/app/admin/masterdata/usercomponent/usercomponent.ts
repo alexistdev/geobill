@@ -7,21 +7,24 @@
  */
 
 import {ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnInit, PLATFORM_ID} from '@angular/core';
-import {DatePipe, DecimalPipe, isPlatformBrowser} from '@angular/common';
+import {DatePipe, isPlatformBrowser} from '@angular/common';
 import {Menutop} from '../../../share/menutop/menutop';
-import {Pagination} from '../../../share/pagination/pagination';
 import {Usermodel} from './usermodel.model';
 import {Payload} from '../../../share/response/payload';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 import {Userservice} from './userservice';
-import {Router} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {Apiresponse} from '../../../share/response/apiresponse';
+import {Footer} from '../../../share/footer/footer';
 
 @Component({
   selector: 'app-usercomponent',
+  standalone: true,
   imports: [
     Menutop,
     DatePipe,
+    RouterModule,
+    Footer
   ],
   templateUrl: './usercomponent.html',
   styleUrl: './usercomponent.css',
@@ -111,4 +114,7 @@ export class Usercomponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  goToDetail(user: Usermodel) {
+    this.router.navigate(['/admin/users', user.id]);
+  }
 }

@@ -32,7 +32,6 @@ export class Userservice {
       `${this.apiUrl}/search?filter=${keyword}&page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`,
       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
     );
-
   }
 
 }

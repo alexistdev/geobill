@@ -8,19 +8,19 @@
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Usercomponent } from './usercomponent';
+import { Userdetailcomponent } from './userdetailcomponent';
 
-describe('Usercomponent', () => {
-  let component: Usercomponent;
-  let fixture: ComponentFixture<Usercomponent>;
+describe('Userdetailcomponent', () => {
+  let component: Userdetailcomponent;
+  let fixture: ComponentFixture<Userdetailcomponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Usercomponent]
+      imports: [Userdetailcomponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Usercomponent);
+    fixture = TestBed.createComponent(Userdetailcomponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

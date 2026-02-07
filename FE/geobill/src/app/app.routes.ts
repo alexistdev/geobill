@@ -1,18 +1,27 @@
+/*
+ * Copyright (c) 2026.
+ * Project: GeoBill
+ * Author: Alexsander Hendra Wijaya
+ * Github: https://github.com/alexistdev
+ * Email: alexistdev@gmail.com
+ */
+
 import { Routes } from '@angular/router';
-import {Dashboard} from './admin/dashboard/dashboard';
-import {StaffDashboard} from './staff/dashboard/dashboard';
-import {UserDashboard} from './users/dashboard/dashboard';
-import {Notfoundcomponent} from './share/notfoundcomponent/notfoundcomponent';
-import {Login} from './login/login';
+import { Dashboard } from './admin/dashboard/dashboard';
+import { StaffDashboard } from './staff/dashboard/dashboard';
+import { UserDashboard } from './users/dashboard/dashboard';
+import { Notfoundcomponent } from './share/notfoundcomponent/notfoundcomponent';
+import { Login } from './login/login';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
-import {HostingService} from './users/hosting-service/hosting-service';
-import {Producttype} from './admin/masterdata/producttype/producttype';
-import {Productcomponent} from './admin/masterdata/productcomponent/productcomponent';
-import {Usercomponent} from './admin/masterdata/usercomponent/usercomponent';
+import { HostingService } from './users/hosting-service/hosting-service';
+import { Producttype } from './admin/masterdata/producttype/producttype';
+import { Productcomponent } from './admin/masterdata/productcomponent/productcomponent';
+import { Usercomponent } from './admin/masterdata/usercomponent/usercomponent';
+import { Userdetailcomponent } from './admin/masterdata/usercomponent/userdetailcomponent/userdetailcomponent';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full'},
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
     component: Login
@@ -37,9 +46,18 @@ export const routes: Routes = [
   },
   {
     path: 'admin/users',
-    component: Usercomponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] }
+    data: { roles: ['ADMIN'] },
+    children: [
+      {
+        path: '',
+        component: Usercomponent
+      },
+      {
+        path: ':uuid',
+        component: Userdetailcomponent
+      }
+    ]
   },
   {
     path: 'staff/dashboard',
