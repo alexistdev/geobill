@@ -41,21 +41,23 @@ public class CustomerServiceTest {
     void addCustomer() {
 
         Customer customer = new Customer();
-        customer.setFirstName("John");
-        customer.setLastName("Doe");
+        customer.setId(uuid);
+        customer.setPhone("0123456789");
+        customer.setCountry("Indonesia");
 
         Customer savedCustomer = new Customer();
         savedCustomer.setId(uuid);
-        savedCustomer.setFirstName("John");
-        savedCustomer.setLastName("Doe");
+        customer.setPhone("0123456789");
+        customer.setCountry("Indonesia");
+
 
         when(customerRepo.save(customer)).thenReturn(savedCustomer);
 
         Customer newCustomer = customerService.addCustomer(customer);
 
         assertEquals(savedCustomer.getId(), newCustomer.getId());
-        assertEquals(savedCustomer.getFirstName(), newCustomer.getFirstName());
-        assertEquals(savedCustomer.getLastName(), newCustomer.getLastName());
+        assertEquals(savedCustomer.getPhone(), newCustomer.getPhone());
+        assertEquals(savedCustomer.getCountry(), newCustomer.getCountry());
     }
 
     @Test
@@ -67,8 +69,8 @@ public class CustomerServiceTest {
 
         Customer customer = new Customer();
         customer.setId(uuid);
-        customer.setFirstName("John");
-        customer.setLastName("Doe");
+        customer.setPhone("0123456789");
+        customer.setCountry("Indonesia");
         customer.setUser(user);
 
         when(customerRepo.findByUser_Id(user.getId())).thenReturn(customer);
@@ -76,8 +78,8 @@ public class CustomerServiceTest {
         Customer foundCustomer = customerService.findCustomerByUserId(user);
 
         assertEquals(customer.getId(), foundCustomer.getId());
-        assertEquals(customer.getFirstName(), foundCustomer.getFirstName());
-        assertEquals(customer.getLastName(), foundCustomer.getLastName());
+        assertEquals(customer.getPhone(), foundCustomer.getPhone());
+        assertEquals(customer.getCountry(), foundCustomer.getCountry());
     }
 
     @Test

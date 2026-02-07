@@ -36,16 +36,6 @@ public class Customer implements Serializable {
     private User user;
 
     @Nullable
-    @Size(max = EntityConstant.tableLength255, message = "{customer.firstName.size}")
-    @Column(length = EntityConstant.tableLength255 , name = "first_name")
-    private String firstName;
-
-    @Nullable
-    @Size(max = EntityConstant.tableLength255, message = "{customer.lastName.size}")
-    @Column(length = EntityConstant.tableLength255 , name = "last_name")
-    private String lastName;
-
-    @Nullable
     @Size(max = EntityConstant.tableLength255, message = "{customer.businessName.size}")
     @Column(length = EntityConstant.tableLength255 , name = "business_name")
     private String businessName;

@@ -15,8 +15,6 @@ public class CustomerTest {
 
     private static Validator validator;
     private Customer customer;
-    private String first_name;
-    private String last_name;
     private String business_name;
     private String address1;
     private String address2;
@@ -34,8 +32,6 @@ public class CustomerTest {
 
     @BeforeEach
     void setUp() {
-        first_name = "first name";
-        last_name = "last name";
         business_name = "business name";
         address1 = "address1";
         address2 = "address2";
@@ -46,8 +42,6 @@ public class CustomerTest {
         phone = "08123456789";
 
         customer = new Customer();
-        customer.setFirstName(first_name);
-        customer.setLastName(last_name);
         customer.setBusinessName(business_name);
         customer.setAddress1(address1);
         customer.setAddress2(address2);
@@ -62,8 +56,6 @@ public class CustomerTest {
     @Order(1)
     @DisplayName( "1. Test Getter")
     void testGetter() {
-        Assertions.assertEquals(first_name,customer.getFirstName());
-        Assertions.assertEquals(last_name,customer.getLastName());
         Assertions.assertEquals(business_name,customer.getBusinessName());
         Assertions.assertEquals(address1,customer.getAddress1());
         Assertions.assertEquals(address2,customer.getAddress2());
@@ -89,8 +81,6 @@ public class CustomerTest {
         String newPostCode = "new post code";
         String newPhone = "021-1234567";
 
-        customer.setFirstName(newFirstName);
-        customer.setLastName(newLastName);
         customer.setBusinessName(newBusinessName);
         customer.setAddress1(newAddress1);
         customer.setAddress2(newAddress2);
@@ -100,8 +90,6 @@ public class CustomerTest {
         customer.setPostCode(newPostCode);
         customer.setPhone(newPhone);
 
-        Assertions.assertEquals(newFirstName,customer.getFirstName());
-        Assertions.assertEquals(newLastName,customer.getLastName());
         Assertions.assertEquals(newBusinessName,customer.getBusinessName());
         Assertions.assertEquals(newAddress1,customer.getAddress1());
         Assertions.assertEquals(newAddress2,customer.getAddress2());
