@@ -5,6 +5,8 @@ import com.alexistdev.geobill.models.repository.MenuRepo;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import com.alexistdev.geobill.models.repository.RoleMenuRepo;
 import com.alexistdev.geobill.models.repository.UserRepo;
+import com.alexistdev.geobill.request.RegisterRequest;
+import com.alexistdev.geobill.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -24,6 +26,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final UserRepo userRepo;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ProductTypeRepo productTypeRepo;
+    private final UserService userService;
 
     private static final String SYSTEM_USER = "System";
     private static final String DEFAULT_PASSWORD = "password";
@@ -126,10 +129,15 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private void seedUsers() {
         log.info("Seeding users");
-        User user = createUser("user", "user@gmail.com", Role.USER);
-        User admin = createUser("admin", "admin@gmail.com", Role.ADMIN);
-        List<User> users = List.of(user, admin);
-        userRepo.saveAll(users);
+        RegisterRequest user = createUser("user", "user@gmail.com");
+        userService.registerUser(user);
+        RegisterRequest staff = createUser("staff", "staff@gmail.com");
+        User staffUser = userService.registerUser(staff);
+        RegisterRequest admin = createUser("admin", "admin@gmail.com");
+        User adminUser = userService.registerUser(admin);
+        staffUser.setRole(Role.STAFF);
+        adminUser.setRole(Role.ADMIN);
+        userRepo.saveAll(List.of(staffUser, adminUser));
         log.info("Finished seeding users");
     }
 
@@ -163,17 +171,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         return roleMenu;
     }
 
-    private User createUser(String fullName, String email, Role role) {
-        User user = new User();
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setRole(role);
-        user.setPassword(bCryptPasswordEncoder.encode(DatabaseSeeder.DEFAULT_PASSWORD));
-        user.setDeleted(false);
-        user.setCreatedBy(SYSTEM_USER);
-        user.setModifiedBy(SYSTEM_USER);
-        user.setCreatedDate(new java.util.Date());
-        user.setModifiedDate(new java.util.Date());
-        return user;
+    private RegisterRequest createUser(String fullName, String email) {
+        RegisterRequest userRequest = new RegisterRequest();
+        userRequest.setFullName(fullName);
+        userRequest.setEmail(email);
+        userRequest.setPassword(DEFAULT_PASSWORD);
+        return userRequest;
     }
 }
