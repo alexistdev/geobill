@@ -1,0 +1,27 @@
+<div class="topbar d-flex align-items-center">
+  <nav class="navbar navbar-expand gap-3">
+    <div class="topbar-logo-header d-none d-lg-flex">
+      <div class="">
+        <img src="images/logo-icon.png" class="logo-icon" alt="logo icon">
+      </div>
+      <div class="">
+        <h4 class="logo-text">GeoBill</h4>
+      </div>
+    </div>
+    <div class="mobile-toggle-menu d-block d-lg-none" data-bs-toggle="offcanvas"
+         data-bs-target="#offcanvasNavbar"><i class='bx bx-menu'></i></div>
+    <div class="search-bar d-lg-block d-none" data-bs-toggle="modal" data-bs-target="#SearchModal">
+      <a href="javascript:;" class="btn d-flex align-items-center"><i class='bx bx-search'></i>Search</a>
+    </div>
+    <div class="top-menu ms-auto">
+      <ul class="navbar-nav align-items-center gap-1">
+        <li class="nav-item mobile-search-icon d-flex d-lg-none" data-bs-toggle="modal"
+            data-bs-target="#SearchModal">
+          <a class="nav-link" href="javascript:;"><i class='bx bx-search'></i> </a>
+        </li>
+        <app-notification></app-notification>
+      </ul>
+    </div>
+    <app-userprofile></app-userprofile>
+  </nav>
+</div>

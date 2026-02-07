@@ -10,6 +10,7 @@ import { Apiresponse } from '../../../share/response/apiresponse';
 import { Productmodal } from './productmodal/productmodal';
 import { Productrequest } from './productrequest.model';
 import { Pagination } from '../../../share/pagination/pagination';
+import {Topheader} from '../../../share/topheader/topheader';
 declare var Lobibox: any;
 
 @Component({
@@ -18,7 +19,8 @@ declare var Lobibox: any;
     CommonModule,
     Menutop,
     Productmodal,
-    Pagination
+    Pagination,
+    Topheader
   ],
   templateUrl: './productcomponent.html',
   styleUrl: './productcomponent.css',

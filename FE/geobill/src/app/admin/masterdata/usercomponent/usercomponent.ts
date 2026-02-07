@@ -16,6 +16,7 @@ import {Userservice} from './userservice';
 import {Router, RouterModule} from '@angular/router';
 import {Apiresponse} from '../../../share/response/apiresponse';
 import {Footer} from '../../../share/footer/footer';
+import {Topheader} from '../../../share/topheader/topheader';
 
 @Component({
   selector: 'app-usercomponent',
@@ -24,7 +25,8 @@ import {Footer} from '../../../share/footer/footer';
     Menutop,
     DatePipe,
     RouterModule,
-    Footer
+    Footer,
+    Topheader
   ],
   templateUrl: './usercomponent.html',
   styleUrl: './usercomponent.css',

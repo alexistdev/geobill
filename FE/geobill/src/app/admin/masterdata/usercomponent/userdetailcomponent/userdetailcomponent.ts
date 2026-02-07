@@ -12,11 +12,12 @@ import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {Menutop} from '../../../../share/menutop/menutop';
 import {Footer} from '../../../../share/footer/footer';
 import {Userdetailservice} from './userdetailservice';
+import {Topheader} from '../../../../share/topheader/topheader';
 
 @Component({
   selector: 'app-userdetailcomponent',
   standalone: true,
-  imports: [CommonModule, RouterModule, Menutop, Footer],
+  imports: [CommonModule, RouterModule, Menutop, Footer, Topheader],
   templateUrl: './userdetailcomponent.html',
   styleUrl: './userdetailcomponent.css',
 })

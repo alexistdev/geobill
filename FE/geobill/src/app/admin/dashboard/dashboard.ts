@@ -9,12 +9,14 @@
 import { Component } from '@angular/core';
 import {Menutop} from "../../share/menutop/menutop";
 import {Localstorageservice} from '../../utils/localstorage/localstorageservice';
+import {Topheader} from '../../share/topheader/topheader';
 
 @Component({
   selector: 'app-dashboard',
-    imports: [
-        Menutop
-    ],
+  imports: [
+    Menutop,
+    Topheader
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

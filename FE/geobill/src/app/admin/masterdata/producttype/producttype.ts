@@ -18,6 +18,7 @@ import {Pagination} from '../../../share/pagination/pagination';
 import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 import {Producttypemodal} from './producttypemodal/producttypemodal';
 import {Producttyperequest} from './producttyperequest.model';
+import {Topheader} from '../../../share/topheader/topheader';
 declare var Lobibox: any;
 
 @Component({
@@ -26,7 +27,8 @@ declare var Lobibox: any;
     CommonModule,
     Menutop,
     Pagination,
-    Producttypemodal
+    Producttypemodal,
+    Topheader
   ],
   templateUrl: './producttype.html',
   styleUrl: './producttype.css',
