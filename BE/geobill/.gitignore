@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /D:MYLOG/spring.log
+/D:MYLOG/
