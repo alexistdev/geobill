@@ -1,5 +1,5 @@
-import {Injectable, PLATFORM_ID, inject} from '@angular/core';
-import {isPlatformBrowser} from '@angular/common';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import * as CryptoJS from 'crypto-js';
 
 /**
@@ -121,16 +121,20 @@ export class CredentialEncryptedService {
 
     const encryptedData = sessionStorage.getItem(this.CREDENTIALS_KEY);
     if (!encryptedData) {
+      console.warn('CredentialEncryptedService: No encrypted data in sessionStorage');
       return null;
     }
 
     const decryptedData = this.decrypt(encryptedData);
     if (!decryptedData) {
+      console.error('CredentialEncryptedService: Decryption incorrect or failed');
       return null;
     }
 
     try {
-      return JSON.parse(decryptedData);
+      const creds = JSON.parse(decryptedData);
+      // console.log('CredentialEncryptedService: Credentials retrieved success'); // valid to uncomment for debug
+      return creds;
     } catch (e) {
       console.error('Failed to parse credentials:', e);
       return null;

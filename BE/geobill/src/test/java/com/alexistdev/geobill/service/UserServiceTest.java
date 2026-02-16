@@ -26,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,9 +71,12 @@ public class UserServiceTest {
         user = new User();
         user.setId(id);
         user.setEmail(email);
+        user.setFullName(fullName);
         user.setPassword(password);
         user.setRole(role);
         user.setSuspended(false);
+        user.setCreatedDate(new Date());
+        user.setModifiedDate(new Date());
 
         loginRequest = new LoginRequest();
         loginRequest.setEmail(email);
@@ -252,24 +256,44 @@ public class UserServiceTest {
     void getUserDetail_shouldReturnUserDetailDTO() {
         UUID userId = UUID.randomUUID();
         user.setId(userId);
+
         Customer customer = new Customer();
         customer.setId(UUID.randomUUID());
+        customer.setBusinessName("Test Business");
+        customer.setAddress1("123 Main St");
+        customer.setAddress2("Suite 100");
+        customer.setCity("Test City");
+        customer.setState("Test State");
+        customer.setCountry("Test Country");
+        customer.setPostCode("12345");
+        customer.setPhone("123-456-7890");
 
-        when(userRepo.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(customerService.findCustomerByUserId(user)).thenReturn(customer);
 
         UserDetailDTO userDetailDTO = userService.getUserDetail(userId);
 
         Assertions.assertNotNull(userDetailDTO);
         Assertions.assertEquals(userId.toString(), userDetailDTO.getId());
-        Assertions.assertEquals(user.getFullName(), userDetailDTO.getFullName());
+        Assertions.assertEquals("Test User", userDetailDTO.getFullName());
         Assertions.assertEquals(user.getEmail(), userDetailDTO.getEmail());
         Assertions.assertEquals(user.getRole().toString(), userDetailDTO.getRole());
         Assertions.assertEquals(user.getCreatedDate(), userDetailDTO.getCreatedDate());
         Assertions.assertEquals(user.getModifiedDate(), userDetailDTO.getModifiedDate());
 
-        // Check fields of the CustomerDTO instead of the entity directly if it is mapped
         Assertions.assertNotNull(userDetailDTO.getCustomer());
-        //Assertions.assertEquals(customer.getId(), userDetailDTO.getCustomer().getId());
+        CustomerDTO customerDTO = userDetailDTO.getCustomer();
+        Assertions.assertEquals(customer.getId().toString(), customerDTO.getId());
+        Assertions.assertEquals(customer.getBusinessName(), customerDTO.getBusinessName());
+        Assertions.assertEquals(customer.getAddress1(), customerDTO.getAddress1());
+        Assertions.assertEquals(customer.getAddress2(), customerDTO.getAddress2());
+        Assertions.assertEquals(customer.getCity(), customerDTO.getCity());
+        Assertions.assertEquals(customer.getState(), customerDTO.getState());
+        Assertions.assertEquals(customer.getCountry(), customerDTO.getCountry());
+        Assertions.assertEquals(customer.getPostCode(), customerDTO.getPostCode());
+        Assertions.assertEquals(customer.getPhone(), customerDTO.getPhone());
+
+        verify(userRepo, times(1)).findById(userId);
+        verify(customerService, times(1)).findCustomerByUserId(user);
     }
 }

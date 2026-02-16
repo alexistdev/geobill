@@ -22,7 +22,6 @@ export class Userdetailservice {
   constructor(private http:HttpClient) { }
 
   getUsersDetail(id: string): Observable<Apiresponse<UserDetailModel>> {
-    console.log(`${this.apiUrl}/${id}`);
     return this.http.get<Apiresponse<UserDetailModel>>(`${this.apiUrl}/${id}` ,
       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
     );
