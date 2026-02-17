@@ -329,18 +329,23 @@ public class UserServiceTest {
         when(customerRepo.save(any(Customer.class))).thenAnswer(invocation ->
                 invocation.getArgument(0));
 
-        User updatedUser = userService.updateUser(userId, updateUserRequest);
+        UserDetailDTO updatedUser = userService.updateUser(userId, updateUserRequest);
 
         Assertions.assertNotNull(updatedUser);
         Assertions.assertEquals(updateUserRequest.getFullName(), updatedUser.getFullName());
-        Assertions.assertEquals(updateUserRequest.getBusinessName(), customer.getBusinessName());
-        Assertions.assertEquals(updateUserRequest.getAddress1(), customer.getAddress1());
-        Assertions.assertEquals(updateUserRequest.getAddress2(), customer.getAddress2());
-        Assertions.assertEquals(updateUserRequest.getCity(), customer.getCity());
-        Assertions.assertEquals(updateUserRequest.getState(), customer.getState());
-        Assertions.assertEquals(updateUserRequest.getCountry(), customer.getCountry());
-        Assertions.assertEquals(updateUserRequest.getPostCode(), customer.getPostCode());
-        Assertions.assertEquals(updateUserRequest.getPhoneNumber(), customer.getPhone());
+
+        Assertions.assertNotNull(updatedUser.getCustomer());
+        CustomerDTO updatedCustomerDTO = updatedUser.getCustomer();
+
+
+        Assertions.assertEquals(updateUserRequest.getBusinessName(), updatedCustomerDTO.getBusinessName());
+        Assertions.assertEquals(updateUserRequest.getAddress1(), updatedCustomerDTO.getAddress1());
+        Assertions.assertEquals(updateUserRequest.getAddress2(), updatedCustomerDTO.getAddress2());
+        Assertions.assertEquals(updateUserRequest.getCity(), updatedCustomerDTO.getCity());
+        Assertions.assertEquals(updateUserRequest.getState(), updatedCustomerDTO.getState());
+        Assertions.assertEquals(updateUserRequest.getCountry(), updatedCustomerDTO.getCountry());
+        Assertions.assertEquals(updateUserRequest.getPostCode(), updatedCustomerDTO.getPostCode());
+        Assertions.assertEquals(updateUserRequest.getPhoneNumber(), updatedCustomerDTO.getPhone());
 
         verify(userRepo, times(1)).findById(userId);
         verify(userRepo, times(1)).save(any(User.class));

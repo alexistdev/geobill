@@ -60,7 +60,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public User updateUser(UUID id, UpdateUserRequest request) {
+    public UserDetailDTO updateUser(UUID id, UpdateUserRequest request) {
         User user = this.findUserByUUID(id);
 
         if (user == null) {
@@ -89,9 +89,11 @@ public class UserService implements UserDetailsService {
 
         user.setFullName(request.getFullName());
         User updatedUser = userRepo.save(user);
+        CustomerDTO customerDTO;
 
         try {
-            this.updateCustomer(user, request);
+            Customer updatedCustomer = this.updateCustomer(user, request);
+            customerDTO = this.converToCustomerDTO(updatedCustomer);
         } catch (Exception e) {
             String failedToUpdateCustomer = messageSource.getMessage("userservice.user.customer_update_failed",
                     null, LocaleContextHolder.getLocale());
@@ -99,11 +101,23 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException(failedToUpdateCustomer, e);
         }
 
-        return updatedUser;
+        return this.convertToUserDetailDTO(updatedUser,customerDTO);
+    }
+
+    private UserDetailDTO convertToUserDetailDTO(User user, CustomerDTO customerDTO) {
+        UserDetailDTO userDetailDTO = new UserDetailDTO();
+        userDetailDTO.setId(user.getId() != null ? user.getId().toString() : null);
+        userDetailDTO.setFullName(user.getFullName());
+        userDetailDTO.setEmail(user.getEmail());
+        userDetailDTO.setRole(user.getRole().toString());
+        userDetailDTO.setCreatedDate(user.getCreatedDate());
+        userDetailDTO.setModifiedDate(user.getModifiedDate());
+        userDetailDTO.setCustomer(customerDTO);
+        return userDetailDTO;
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
-    public void updateCustomer(User user, UpdateUserRequest request) {
+    public Customer updateCustomer(User user, UpdateUserRequest request) {
         Customer customer = customerService.findCustomerByUserId(user);
         customer.setBusinessName(request.getBusinessName());
         customer.setAddress1(request.getAddress1());
@@ -113,7 +127,7 @@ public class UserService implements UserDetailsService {
         customer.setCountry(request.getCountry());
         customer.setPostCode(request.getPostCode());
         customer.setPhone(request.getPhoneNumber());
-        customerRepo.save(customer);
+        return customerRepo.save(customer);
     }
 
     public User registerUser(RegisterRequest request) {
@@ -205,7 +219,7 @@ public class UserService implements UserDetailsService {
 
     private CustomerDTO converToCustomerDTO(Customer customer) {
         CustomerDTO customerDTO = new CustomerDTO();
-        customerDTO.setId(customer.getId().toString());
+        customerDTO.setId(customer.getId() != null ? customer.getId().toString() : null);
         customerDTO.setBusinessName(customer.getBusinessName());
         customerDTO.setAddress1(customer.getAddress1());
         customerDTO.setAddress2(customer.getAddress2());
