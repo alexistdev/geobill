@@ -7,9 +7,11 @@ import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.models.repository.CustomerRepo;
 import com.alexistdev.geobill.models.repository.UserRepo;
 import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
+import com.alexistdev.geobill.request.UpdateUserRequest;
 import com.alexistdev.geobill.services.CustomerService;
 import com.alexistdev.geobill.services.UserService;
 import org.junit.jupiter.api.*;
@@ -54,10 +56,14 @@ public class UserServiceTest {
     @Mock
     private MessageSource messageSource;
 
+    @Mock
+    private CustomerRepo customerRepo;
+
     private User user;
     private LoginRequest loginRequest;
     private RegisterRequest registerRequest;
     private Customer customer;
+    private UpdateUserRequest updateUserRequest;
 
 
     @BeforeEach
@@ -72,7 +78,7 @@ public class UserServiceTest {
         user.setId(id);
         user.setEmail(email);
         user.setFullName(fullName);
-        user.setPassword(password);
+        user.setPassword(bCryptPasswordEncoder.encode(password));
         user.setRole(role);
         user.setSuspended(false);
         user.setCreatedDate(new Date());
@@ -88,6 +94,19 @@ public class UserServiceTest {
         registerRequest.setPassword(password);
 
         customer = new Customer();
+
+        updateUserRequest = new UpdateUserRequest();
+        updateUserRequest.setFullName("Updated User");
+        updateUserRequest.setBusinessName("Updated Business");
+        updateUserRequest.setAddress1("Updated Address 1");
+        updateUserRequest.setAddress2("Updated Address 2");
+        updateUserRequest.setCity("Updated City");
+        updateUserRequest.setState("Updated State");
+        updateUserRequest.setCountry("Updated Country");
+        updateUserRequest.setPostCode("Updated PostCode");
+        updateUserRequest.setPhoneNumber("Updated Phone Number");
+
+
     }
 
     @Test
@@ -296,4 +315,140 @@ public class UserServiceTest {
         verify(userRepo, times(1)).findById(userId);
         verify(customerService, times(1)).findCustomerByUserId(user);
     }
+
+    @Test
+    @Order(14)
+    @DisplayName("14. Test Update User when User Exists and is not Admin or Deleted")
+    void updateUser_UserExistsNotAdminNotDeleted_ReturnsUpdatedUser() {
+        UUID userId = user.getId();
+
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepo.save(any(User.class))).thenAnswer(invocation ->
+                invocation.getArgument(0));
+        when(customerService.findCustomerByUserId(user)).thenReturn(customer);
+        when(customerRepo.save(any(Customer.class))).thenAnswer(invocation ->
+                invocation.getArgument(0));
+
+        User updatedUser = userService.updateUser(userId, updateUserRequest);
+
+        Assertions.assertNotNull(updatedUser);
+        Assertions.assertEquals(updateUserRequest.getFullName(), updatedUser.getFullName());
+        Assertions.assertEquals(updateUserRequest.getBusinessName(), customer.getBusinessName());
+        Assertions.assertEquals(updateUserRequest.getAddress1(), customer.getAddress1());
+        Assertions.assertEquals(updateUserRequest.getAddress2(), customer.getAddress2());
+        Assertions.assertEquals(updateUserRequest.getCity(), customer.getCity());
+        Assertions.assertEquals(updateUserRequest.getState(), customer.getState());
+        Assertions.assertEquals(updateUserRequest.getCountry(), customer.getCountry());
+        Assertions.assertEquals(updateUserRequest.getPostCode(), customer.getPostCode());
+        Assertions.assertEquals(updateUserRequest.getPhoneNumber(), customer.getPhone());
+
+        verify(userRepo, times(1)).findById(userId);
+        verify(userRepo, times(1)).save(any(User.class));
+        verify(customerService, times(1)).findCustomerByUserId(user);
+        verify(customerRepo, times(1)).save(any(Customer.class));
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("15. Test Update User when User Not Found then Throw RuntimeException")
+    void updateUser_UserNotFound_ThrowsRuntimeException() {
+        UUID userId = UUID.randomUUID();
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+        when(messageSource.getMessage(eq("userservice.user.not_found"), any(), any()))
+                .thenReturn("User not found");
+
+        Assertions.assertThrows(RuntimeException.class, ()
+                -> userService.updateUser(userId, updateUserRequest));
+
+        verify(userRepo, times(1)).findById(userId);
+        verify(userRepo, never()).save(any(User.class));
+        verify(customerService, never()).findCustomerByUserId(user);
+        verify(customerRepo, never()).save(any(Customer.class));
+    }
+
+    @Test
+    @Order(16)
+    @DisplayName("16. Test Update User when User is Admin then Throw RuntimeException")
+    void updateUser_UserIsAdmin_ThrowsRuntimeException() {
+        user.setRole(Role.ADMIN);
+        UUID userId = user.getId();
+
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        when(messageSource.getMessage(eq("userservice.user.admin_update_not_allowed"), any(), any()))
+                .thenReturn("Admin User update not allowed");
+
+        Assertions.assertThrows(RuntimeException.class, ()
+                -> userService.updateUser(userId, updateUserRequest));
+
+        verify(userRepo, times(1)).findById(userId);
+        verify(userRepo, never()).save(any(User.class));
+        verify(customerService, never()).findCustomerByUserId(user);
+        verify(customerRepo, never()).save(any(Customer.class));
+    }
+
+    @Test
+    @Order(17)
+    @DisplayName("17. Test Update User when User is Deleted then Throw RuntimeException")
+    void updateUser_UserIsDeleted_ThrowsRuntimeException() {
+        user.setIsDeleted(true);
+        UUID userId = user.getId();
+
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        when(messageSource.getMessage(eq("userservice.user.deleted_user_update_failed"), any(), any()))
+                .thenReturn("Deleted user update not allowed");
+
+        Assertions.assertThrows(RuntimeException.class, ()
+                -> userService.updateUser(userId, updateUserRequest));
+
+        verify(userRepo, times(1)).findById(userId);
+        verify(userRepo, never()).save(any(User.class));
+        verify(customerService, never()).findCustomerByUserId(user);
+        verify(customerRepo, never()).save(any(Customer.class));
+    }
+
+    @Test
+    @Order(18)
+    @DisplayName("18. Test Update Customer")
+    void updateCustomer_UpdatesCustomerSuccessfully() {
+        UpdateUserRequest request = new UpdateUserRequest();
+        String newBusinessName = "New Business Name";
+        String newAddress1 = "New Address 1";
+        String newAddress2 = "New Address 2";
+        String newCity = "New City";
+        String newState = "New State";
+        String newCountry = "New Country";
+        String newPostCode = "New PostCode";
+        String newPhone = "New Phone";
+
+        request.setBusinessName(newBusinessName);
+        request.setAddress1(newAddress1);
+        request.setAddress2(newAddress2);
+        request.setCity(newCity);
+        request.setState(newState);
+        request.setCountry(newCountry);
+        request.setPostCode(newPostCode);
+        request.setPhoneNumber(newPhone);
+
+        Customer customer = new Customer();
+
+        when(customerService.findCustomerByUserId(user)).thenReturn(customer);
+        when(customerRepo.save(any(Customer.class))).thenReturn(customer);
+
+        userService.updateCustomer(user, request);
+
+        Assertions.assertEquals(newBusinessName, customer.getBusinessName());
+        Assertions.assertEquals(newAddress1, customer.getAddress1());
+        Assertions.assertEquals(newAddress2, customer.getAddress2());
+        Assertions.assertEquals(newCity, customer.getCity());
+        Assertions.assertEquals(newState, customer.getState());
+        Assertions.assertEquals(newCountry, customer.getCountry());
+        Assertions.assertEquals(newPostCode, customer.getPostCode());
+        Assertions.assertEquals(newPhone, customer.getPhone());
+
+        verify(customerService, times(1)).findCustomerByUserId(user);
+        verify(customerRepo, times(1)).save(any(Customer.class));
+    }
+
+
 }
+
