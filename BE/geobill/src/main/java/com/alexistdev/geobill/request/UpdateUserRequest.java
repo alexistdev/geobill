@@ -1,7 +1,6 @@
 package com.alexistdev.geobill.request;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -14,11 +13,6 @@ public class UpdateUserRequest {
     @NotBlank(message = "Full Name is required")
     @Size(max = 150, message = "Full Name must be less than 150 characters")
     private String fullName;
-
-    @NotBlank(message = "Email is required")
-    @Size(max = 150, message = "Email must be less than 150 characters")
-    @Email(message = "Email is not valid")
-    private String email;
 
     @Nullable
     @Size(max = 16, message = "Phone Number must be 16 digits")

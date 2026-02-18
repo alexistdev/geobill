@@ -5,6 +5,7 @@ import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.dto.UserDetailDTO;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.request.UpdateUserRequest;
 import com.alexistdev.geobill.services.UserService;
 import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -25,11 +26,9 @@ import java.util.UUID;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final MessagesUtils messagesUtils;
-
 
     public UserController(UserService userService, ModelMapper modelMapper, MessagesUtils messagesUtils) {
         this.userService = userService;
@@ -42,11 +41,9 @@ public class UserController {
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @PositiveOrZero int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ){
+            @RequestParam(defaultValue = "asc") String direction) {
         ResponseData<Page<UserDTO>> responseData = new ResponseData<>();
-        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ?
-                Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 
@@ -54,7 +51,7 @@ public class UserController {
 
         try {
             usersPage = userService.getAllUsers(pageable);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             usersPage = userService.getAllUsers(fallbackPageable);
         }
@@ -76,25 +73,23 @@ public class UserController {
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "10") @PositiveOrZero int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ){
+            @RequestParam(defaultValue = "asc") String direction) {
         ResponseData<Page<UserDTO>> responseData = new ResponseData<>();
-        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ?
-                Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 
         Page<User> usersPage;
         try {
             usersPage = userService.getAllUsersByFilter(pageable, filter);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             usersPage = userService.getAllUsersByFilter(fallbackPageable, filter);
         }
         responseData.getMessages().add(this.messagesUtils.getMessage("usercontroller.user.nouser"));
         responseData.setStatus(false);
 
-        handleNonEmptyPage(responseData,usersPage,page);
+        handleNonEmptyPage(responseData, usersPage, page);
         Page<UserDTO> userDTOS = usersPage
                 .map(user -> modelMapper.map(user, UserDTO.class));
         responseData.setPayload(userDTOS);
@@ -102,7 +97,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseData<UserDetailDTO>> getUserDetail(@PathVariable("id") UUID uuid){
+    public ResponseEntity<ResponseData<UserDetailDTO>> getUserDetail(@PathVariable("id") UUID uuid) {
         ResponseData<UserDetailDTO> responseData = new ResponseData<>();
         responseData.setStatus(false);
         try {
@@ -111,22 +106,39 @@ public class UserController {
             responseData.setStatus(true);
             responseData.setPayload(result);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
-        } catch (NotFoundException n){
+        } catch (NotFoundException n) {
             log.info("Error getting user detail", n);
             responseData.getMessages().add(n.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error getting user detail", e);
             responseData.getMessages().add(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
         }
     }
 
-
-    private <T> void handleNonEmptyPage(ResponseData<Page<T>> responseData, Page<?> pageResult, int pageNumber){
-        if(!pageResult.isEmpty()){
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResponseData<UserDetailDTO>> updateUserDetail(@PathVariable("id") UUID uuid,
+            @RequestBody UpdateUserRequest request) {
+        ResponseData<UserDetailDTO> responseData = new ResponseData<>();
+        responseData.setStatus(false);
+        try {
+            UserDetailDTO result = userService.updateUser(uuid, request);
+            responseData.getMessages().add("Updated user detail");
             responseData.setStatus(true);
-            if(!responseData.getMessages().isEmpty()){
+            responseData.setPayload(result);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        } catch (Exception e) {
+            log.error("Error updating user detail", e);
+            responseData.getMessages().add(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+        }
+    }
+
+    private <T> void handleNonEmptyPage(ResponseData<Page<T>> responseData, Page<?> pageResult, int pageNumber) {
+        if (!pageResult.isEmpty()) {
+            responseData.setStatus(true);
+            if (!responseData.getMessages().isEmpty()) {
                 responseData.getMessages().removeFirst();
             }
             responseData.getMessages().add("Retrieved page " + pageNumber + " of products");

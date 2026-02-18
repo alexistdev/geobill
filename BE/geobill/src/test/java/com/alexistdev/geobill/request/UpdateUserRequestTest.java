@@ -7,7 +7,6 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.Set;
-import java.util.UUID;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UpdateUserRequestTest {
@@ -25,9 +24,8 @@ public class UpdateUserRequestTest {
         @DisplayName("1. Test Getter And Setter")
         void testGetterAndSetter() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
-                String testId = UUID.randomUUID().toString();
+
                 String testFullName = "test fullname";
-                String testEmail = "test@gmail.com";
                 String testPhoneNumber = "08123456789";
                 String testBussinessName = "test business name";
                 String testAddress1 = "test address 1";
@@ -37,9 +35,7 @@ public class UpdateUserRequestTest {
                 String testCountry = "test country";
                 String testPostCode = "12345";
 
-                // updateUserRequest.setId(testId);
                 updateUserRequest.setFullName(testFullName);
-                updateUserRequest.setEmail(testEmail);
                 updateUserRequest.setPhoneNumber(testPhoneNumber);
                 updateUserRequest.setBusinessName(testBussinessName);
                 updateUserRequest.setAddress1(testAddress1);
@@ -49,9 +45,7 @@ public class UpdateUserRequestTest {
                 updateUserRequest.setCountry(testCountry);
                 updateUserRequest.setPostCode(testPostCode);
 
-                // Assertions.assertEquals(testId, updateUserRequest.getId());
                 Assertions.assertEquals(testFullName, updateUserRequest.getFullName());
-                Assertions.assertEquals(testEmail, updateUserRequest.getEmail());
                 Assertions.assertEquals(testPhoneNumber, updateUserRequest.getPhoneNumber());
                 Assertions.assertEquals(testBussinessName, updateUserRequest.getBusinessName());
                 Assertions.assertEquals(testAddress1, updateUserRequest.getAddress1());
@@ -68,7 +62,6 @@ public class UpdateUserRequestTest {
         void testDefaultConstructor() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 Assertions.assertNull(updateUserRequest.getFullName());
-                Assertions.assertNull(updateUserRequest.getEmail());
                 Assertions.assertNull(updateUserRequest.getPhoneNumber());
                 Assertions.assertNull(updateUserRequest.getBusinessName());
                 Assertions.assertNull(updateUserRequest.getAddress1());
@@ -85,7 +78,7 @@ public class UpdateUserRequestTest {
         void testValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(updateUserRequest);
-                Assertions.assertEquals(2, violations.size());
+                Assertions.assertEquals(1, violations.size());
         }
 
         @Test
@@ -103,33 +96,7 @@ public class UpdateUserRequestTest {
 
         @Test
         @Order(5)
-        @DisplayName("5. Test Email Size Validation")
-        void testEmailSizeValidation() {
-                UpdateUserRequest updateUserRequest = new UpdateUserRequest();
-                String maxEmail = "a".repeat(141);
-                maxEmail += "@gmail.com";
-                updateUserRequest.setEmail(maxEmail);
-                Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(updateUserRequest);
-                Assertions.assertTrue(violations.stream()
-                                .anyMatch(violation -> violation.getPropertyPath().toString().equals("email")));
-
-        }
-
-        @Test
-        @Order(6)
-        @DisplayName("6. Test Email Format Validation")
-        void testEmailFormatValidation() {
-                UpdateUserRequest updateUserRequest = new UpdateUserRequest();
-                updateUserRequest.setEmail("invalid-email");
-                Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(updateUserRequest);
-                Assertions.assertTrue(violations.stream()
-                                .anyMatch(violation -> violation.getPropertyPath().toString().equals("email")
-                                                && violation.getMessage().equals("Email is not valid")));
-        }
-
-        @Test
-        @Order(7)
-        @DisplayName("7. Test Phone Number Size Validation")
+        @DisplayName("5. Test Phone Number Size Validation")
         void testPhoneNumberSizeValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 String maxPhoneNumber = "0".repeat(17);
@@ -140,8 +107,8 @@ public class UpdateUserRequestTest {
         }
 
         @Test
-        @Order(8)
-        @DisplayName("8. Test Business Name Size Validation")
+        @Order(6)
+        @DisplayName("6. Test Business Name Size Validation")
         void testBusinessNameSizeValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 String maxBusinessName = "a".repeat(151);
@@ -152,8 +119,8 @@ public class UpdateUserRequestTest {
         }
 
         @Test
-        @Order(9)
-        @DisplayName("9. Test Address1 and Address2 Size Validation")
+        @Order(7)
+        @DisplayName("7. Test Address1 and Address2 Size Validation")
         void testAddressSizeValidation() {
                 UpdateUserRequest updateUserRequest1 = new UpdateUserRequest();
                 UpdateUserRequest updateUserRequest2 = new UpdateUserRequest();
@@ -170,8 +137,8 @@ public class UpdateUserRequestTest {
         }
 
         @Test
-        @Order(10)
-        @DisplayName("10. Test City Size Validation")
+        @Order(8)
+        @DisplayName("8. Test City Size Validation")
         void testCitySizeValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 String maxCity = "a".repeat(51);
@@ -182,8 +149,8 @@ public class UpdateUserRequestTest {
         }
 
         @Test
-        @Order(11)
-        @DisplayName("11. Test State Size Validation")
+        @Order(9)
+        @DisplayName("9. Test State Size Validation")
         void testStateSizeValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 String maxState = "a".repeat(51);
@@ -194,8 +161,8 @@ public class UpdateUserRequestTest {
         }
 
         @Test
-        @Order(12)
-        @DisplayName("12. Test Country Size Validation")
+        @Order(10)
+        @DisplayName("10. Test Country Size Validation")
         void testCountrySizeValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 String maxCountry = "a".repeat(51);
@@ -206,8 +173,8 @@ public class UpdateUserRequestTest {
         }
 
         @Test
-        @Order(13)
-        @DisplayName("13. Test Post Code Size Validation")
+        @Order(11)
+        @DisplayName("11. Test Post Code Size Validation")
         void testPostCodeSizeValidation() {
                 UpdateUserRequest updateUserRequest = new UpdateUserRequest();
                 String maxPostCode = "a".repeat(11);
