@@ -12,6 +12,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Apiresponse} from '../../../../share/response/apiresponse';
 import {UserDetailModel} from './userdetailmodel.model';
+import {Userdetailrequest} from './userdetailrequest.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,12 @@ export class Userdetailservice {
 
   getUsersDetail(id: string): Observable<Apiresponse<UserDetailModel>> {
     return this.http.get<Apiresponse<UserDetailModel>>(`${this.apiUrl}/${id}` ,
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    );
+  }
+
+  updateUsersDetail(id: string, user: Userdetailrequest): Observable<Apiresponse<UserDetailModel>> {
+    return this.http.patch<Apiresponse<UserDetailModel>>(`${this.apiUrl}/${id}`, user,
       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
     );
   }

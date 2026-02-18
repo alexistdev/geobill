@@ -14,10 +14,8 @@ import { Menutop } from '../../../../share/menutop/menutop';
 import { Footer } from '../../../../share/footer/footer';
 import { Userdetailservice } from './userdetailservice';
 import { Topheader } from '../../../../share/topheader/topheader';
-
-import { UserDetailModel } from './userdetailmodel.model';
-import { Customer } from './customer.model';
-import { Payload } from '../../../../share/response/payload';
+import {Userdetailrequest} from './userdetailrequest.model';
+declare var Lobibox: any;
 
 @Component({
   selector: 'app-userdetailcomponent',
@@ -29,7 +27,7 @@ import { Payload } from '../../../../share/response/payload';
 export class Userdetailcomponent implements OnInit {
   homeLink = '/admin/dashboard';
   userEmail: string = 'User Profile';
-  userDetail: WritableSignal<UserDetailModel | undefined> = signal(undefined);
+  userIdentity: string = '';
   isEditMode: boolean = false;
 
   Email: string = '';
@@ -70,22 +68,21 @@ export class Userdetailcomponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.route.paramMap.subscribe(params => {
         const userId = params.get('uuid');
-        // console.log('UserDetailComponent: OnInit - UUID from route:', userId);
+        this.userIdentity = userId? userId : '';
         if (userId) {
           this.loadUserDetails(userId);
         } else {
-          // console.warn('UserDetailComponent: No UUID found in route paramMap');
+          this.LobiboxMessage('error', 'Please try again later...', 'bx bx-error');
+          console.warn('UserDetailComponent: No UUID found in route paramMap');
         }
       })
     }
   }
 
   loadUserDetails(userId: string): void {
-    // console.log('UserDetailComponent: Loading user details for ID:', userId);
     const request$ = this.userDetailService.getUsersDetail(userId);
     request$.subscribe({
       next: (data) => {
-        // console.log('UserDetailComponent: API Response:', data);
         if (data.payload) {
           const userDetail: any = data.payload;
           const customer: any = userDetail.customer;
@@ -112,23 +109,13 @@ export class Userdetailcomponent implements OnInit {
           this.originalState = this.State;
           this.originalPostalCode = this.PostalCode;
           this.originalCountry = this.Country;
-
-          console.log(this.Email);
-          console.log(this.FullName);
-          console.log(this.PhoneNumber);
-          console.log(this.Address1);
-          console.log(this.Address2);
-          console.log(this.City);
-          console.log(this.State);
-          console.log(this.PostalCode);
-          console.log(this.Country);
           this.cdr.detectChanges();
         } else {
-          // console.warn('UserDetailComponent: Payload is empty', data);
+          this.LobiboxMessage('error', 'Please try again later...', 'bx bx-error');
+          console.warn('UserDetailComponent: Payload is empty', data);
         }
       },
       error: (err) => {
-        // console.error('UserDetailComponent: API Error:', err);
         if (err.message === 'Session expired' || err.status === 401) {
           console.warn('User session ended. Redirecting...');
           this.router.navigate(['/login']);
@@ -145,8 +132,6 @@ export class Userdetailcomponent implements OnInit {
 
   cancelEdit(): void {
     this.isEditMode = false;
-
-    //restore the original values
     this.Email = this.originalEmail;
     this.FullName = this.originalFullName;
     this.PhoneNumber = this.originalPhoneNumber;
@@ -160,11 +145,68 @@ export class Userdetailcomponent implements OnInit {
   }
 
   saveEdit(): void {
-    console.log('UserDetailComponent: Save edit');
-    this.isEditMode = false;
+    if (!this.FullName) {
+      if (isPlatformBrowser(this.platformId)) {
+        this.LobiboxMessage('warning', 'Full Name cannot be empty', 'bx bx-error');
+      }
+      return;
+    }
 
+    const userDetailRequest: Userdetailrequest = {
+      fullName: this.FullName,
+      businessName: this.BusinessName,
+      phoneNumber: this.PhoneNumber,
+      address1: this.Address1,
+      address2: this.Address2,
+      city: this.City,
+      state: this.State,
+      country: this.Country,
+      postCode: this.PostalCode
+    }
+    if(this.userIdentity === ''){
+      this.LobiboxMessage('warning', 'User identity cannot be empty', 'bx bx-error');
+      console.warn('UserDetailComponent: User identity is empty');
+      return;
+    }
+
+    this.userDetailService.updateUsersDetail(this.userIdentity, userDetailRequest)
+      .subscribe({
+        next: (data) => {
+          if (isPlatformBrowser(this.platformId)) {
+            this.LobiboxMessage('warning', 'Data berhasil diperbaharui', 'bx bx-check-circle');
+          }
+          this.isEditMode = false;
+          this.originalEmail = this.Email;
+          this.originalFullName = this.FullName;
+          this.originalBusinessName = this.BusinessName;
+          this.originalPhoneNumber = this.PhoneNumber;
+          this.originalAddress1 = this.Address1;
+          this.originalAddress2 = this.Address2;
+          this.originalBusinessName = this.BusinessName;
+          this.originalCity = this.City;
+        },
+        error: (error) => {
+          console.error('UserDetailComponent: Update user detail failed', error);
+        }
+      });
+    this.isEditMode = false;
+    this.cdr.detectChanges();
   }
 
-
-
+  LobiboxMessage(type: string, msg: string, icon: string): void {
+    if (typeof Lobibox !== 'undefined') {
+      Lobibox.notify(type, {
+        pauseDelayOnHover: true,
+        size: 'mini',
+        rounded: true,
+        delayIndicator: false,
+        icon: icon,
+        continueDelayOnInactiveTab: false,
+        position: 'top right',
+        msg: msg
+      });
+    } else {
+      console.warn('Lobibox is not defined.Ensure it is loaded correctly.');
+    }
+  }
 }
