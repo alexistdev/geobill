@@ -33,6 +33,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/users").hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/v1/users").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.POST,

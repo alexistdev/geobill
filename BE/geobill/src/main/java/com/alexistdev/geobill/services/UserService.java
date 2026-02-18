@@ -87,7 +87,16 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException(userDeletedNotAllowedMessage);
         }
 
-        user.setFullName(request.getFullName());
+        String requestedFullName = request.getFullName();
+        if(requestedFullName != null && !requestedFullName.isEmpty() && !requestedFullName.isBlank()){
+            user.setFullName(requestedFullName);
+        }
+
+        if(user.getFullName() == null || user.getFullName().isBlank()){
+            String msg = "Full name cannot be empty or blank.";
+            logger.warning(msg);
+            throw new RuntimeException(msg);
+        }
         User updatedUser = userRepo.save(user);
         CustomerDTO customerDTO;
 
