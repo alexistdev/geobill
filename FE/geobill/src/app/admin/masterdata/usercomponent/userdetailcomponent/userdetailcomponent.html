@@ -83,12 +83,10 @@
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex flex-column align-items-center text-center">
-                    <img src="assets/images/avatars/avatar-2.png" alt="Admin" class="rounded-circle p-1 bg-primary"
+                    <img src="public/images/profile.png" alt="Admin" class="rounded-circle p-1 bg-primary"
                       width="110">
                     <div class="mt-3">
-                      <h4>{{ userDetail()?.fullName }}</h4>
-                      <p class="text-secondary mb-1">{{ userDetail()?.email }}</p>
-                      <p class="text-muted font-size-sm">{{ userDetail()?.customer?.address1 }}</p>
+                      <h4>{{ originalFullName }}</h4>
                       <button class="btn btn-primary">Follow</button>
                       <button class="btn btn-outline-primary">Message</button>
                     </div>
@@ -106,9 +104,9 @@
                             d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                           </path>
                         </svg>
-                        Website
+                        Created
                       </h6>
-                      <span class="text-secondary">https://codervent.com</span>
+                      <span class="text-secondary">{{createdDate | date:'dd/MM/yyyy HH:mm'}}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                       <h6 class="mb-0">
@@ -172,7 +170,7 @@
                       <h6 class="mb-0">Full Name</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="FullName" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="FullName" [readonly]="!isEditMode" />
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -180,7 +178,7 @@
                       <h6 class="mb-0">Email</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="Email" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control bg-gradient-bloody" [(ngModel)]="Email" readonly/>
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -188,7 +186,7 @@
                       <h6 class="mb-0">Phone</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="PhoneNumber" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="PhoneNumber" [readonly]="!isEditMode" />
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -196,7 +194,7 @@
                       <h6 class="mb-0">Business Name</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="BusinessName" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="BusinessName" [readonly]="!isEditMode" />
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -204,7 +202,7 @@
                       <h6 class="mb-0">Address 1</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="Address1" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="Address1" [readonly]="!isEditMode" />
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -212,7 +210,15 @@
                       <h6 class="mb-0">Address 2</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="Address2" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="Address2" [readonly]="!isEditMode" />
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">City</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}"  [(ngModel)]="City" [readonly]="!isEditMode" />
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -220,7 +226,23 @@
                       <h6 class="mb-0">State</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      <input type="text" class="form-control" [(ngModel)]="State" [readonly]="!isEditMode" />
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="State" [readonly]="!isEditMode" />
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Country</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="Country" [readonly]="!isEditMode" />
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Post Code</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                      <input type="text" class="form-control" [ngClass]="{'bg-gradient-scooter':!isEditMode}" [(ngModel)]="PostalCode" [readonly]="!isEditMode" />
                     </div>
                   </div>
                   <div class="row">

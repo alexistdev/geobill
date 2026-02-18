@@ -7,7 +7,7 @@
  */
 
 import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef, signal, WritableSignal } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Menutop } from '../../../../share/menutop/menutop';
@@ -22,7 +22,7 @@ import { Payload } from '../../../../share/response/payload';
 @Component({
   selector: 'app-userdetailcomponent',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, Menutop, Footer, Topheader],
+  imports: [CommonModule, RouterModule, FormsModule, Menutop, Footer, Topheader,DatePipe],
   templateUrl: './userdetailcomponent.html',
   styleUrl: './userdetailcomponent.css',
 })
@@ -42,6 +42,7 @@ export class Userdetailcomponent implements OnInit {
   State: string = '';
   PostalCode: string = '';
   Country: string = '';
+  createdDate: string = '';
 
   originalEmail: string = '';
   originalFullName: string = '';
@@ -98,6 +99,7 @@ export class Userdetailcomponent implements OnInit {
           this.PostalCode = customer.postCode;
           this.Country = customer.country;
           this.BusinessName = customer.businessName;
+          this.createdDate = userDetail.createdDate;
 
           //restore original values
           this.originalEmail = this.Email;
