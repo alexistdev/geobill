@@ -1,23 +1,29 @@
 package com.alexistdev.geobill.request;
 
+import com.alexistdev.geobill.config.TestLocaleConfig;
+import com.alexistdev.geobill.config.TestMessageSourceConfig;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Locale;
 import java.util.Set;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = { TestMessageSourceConfig.class, TestLocaleConfig.class })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UpdateUserRequestTest {
 
-        private static Validator validator;
+        @Autowired
+        private Validator validator;
 
-        @BeforeAll
-        static void setUpValidator() {
-                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-                validator = factory.getValidator();
-        }
+        @Autowired
+        private MessageSource messageSource;
 
         @Test
         @Order(1)
@@ -91,7 +97,14 @@ public class UpdateUserRequestTest {
 
                 Set<ConstraintViolation<UpdateUserRequest>> violations = validator.validate(updateUserRequest);
                 Assertions.assertTrue(violations.stream()
-                                .anyMatch(violation -> violation.getPropertyPath().toString().equals("fullName")));
+                                .anyMatch(violation -> {
+                                        System.out.println("Violation message: " + violation.getMessage());
+                                        String expectedMessage = messageSource.getMessage(
+                                                        "updateUserRequest.fullName.size",
+                                                        null, Locale.US);
+                                        return violation.getPropertyPath().toString().equals("fullName")
+                                                        && violation.getMessage().equals(expectedMessage);
+                                }));
         }
 
         @Test
