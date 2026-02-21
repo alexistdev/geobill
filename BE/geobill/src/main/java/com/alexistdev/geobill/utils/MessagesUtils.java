@@ -16,4 +16,9 @@ public class MessagesUtils {
     public String getMessage(String key) {
         return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
     }
+
+    public String getMessage(String key, String param) {
+        return String.format(messageSource.getMessage(key, null,
+                LocaleContextHolder.getLocale()), param);
+    }
 }

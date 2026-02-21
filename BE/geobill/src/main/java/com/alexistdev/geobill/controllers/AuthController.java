@@ -6,6 +6,7 @@ import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.request.EmailRequest;
 import com.alexistdev.geobill.request.LoginRequest;
 import com.alexistdev.geobill.request.RegisterRequest;
 import com.alexistdev.geobill.services.MenuService;
@@ -44,7 +45,8 @@ public class AuthController {
 
     private static final Logger logger = Logger.getLogger(AuthController.class.getName());
 
-    public AuthController(UserService userService, ModelMapper modelMapper, MessagesUtils messagesUtils, MenuService menuService) {
+    public AuthController(UserService userService, ModelMapper modelMapper, MessagesUtils messagesUtils,
+            MenuService menuService) {
         this.userService = userService;
         this.modelMapper = modelMapper;
         this.messagesUtils = messagesUtils;
@@ -82,12 +84,43 @@ public class AuthController {
             }
         };
 
-        Supplier<ResponseEntity<ResponseData<User>>> restrictedRegisterAttempt = RateLimiter.decorateSupplier(rateLimiter, registerAttempt);
+        Supplier<ResponseEntity<ResponseData<User>>> restrictedRegisterAttempt = RateLimiter
+                .decorateSupplier(rateLimiter, registerAttempt);
         try {
             return restrictedRegisterAttempt.get();
-        }catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {
+        } catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {
             String msgRatelimit = messagesUtils.getMessage("ratelimiter.restricted.message");
             ResponseData<User> responseData = new ResponseData<>();
+            responseData.setStatus(false);
+            responseData.getMessages().add(msgRatelimit);
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(responseData);
+        }
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<ResponseData<String>> emailValidation(@RequestBody EmailRequest request) {
+        Supplier<ResponseEntity<ResponseData<String>>> validateAttempt = () -> {
+            ResponseData<String> responseData = new ResponseData<>();
+            try {
+                userService.isEmailAvailable(request.getEmail());
+                String msgSuccess = messagesUtils.getMessage("authcontroller.register.email_available");
+                responseData.getMessages().add(msgSuccess);
+                responseData.setStatus(true);
+                return ResponseEntity.status(HttpStatus.OK).body(responseData);
+            } catch (Exception e) {
+                responseData.setStatus(false);
+                responseData.getMessages().add(e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            }
+        };
+
+        Supplier<ResponseEntity<ResponseData<String>>> restrictedValidateAttempt = RateLimiter
+                .decorateSupplier(rateLimiter, validateAttempt);
+        try {
+            return restrictedValidateAttempt.get();
+        } catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {
+            String msgRatelimit = messagesUtils.getMessage("ratelimiter.restricted.message");
+            ResponseData<String> responseData = new ResponseData<>();
             responseData.setStatus(false);
             responseData.getMessages().add(msgRatelimit);
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(responseData);
@@ -147,8 +180,8 @@ public class AuthController {
             }
         };
 
-        Supplier<ResponseEntity<ResponseData<AuthDTO>>> restrictedLoginAttempt =
-                RateLimiter.decorateSupplier(rateLimiter, loginAttempt);
+        Supplier<ResponseEntity<ResponseData<AuthDTO>>> restrictedLoginAttempt = RateLimiter
+                .decorateSupplier(rateLimiter, loginAttempt);
         try {
             return restrictedLoginAttempt.get();
         } catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {

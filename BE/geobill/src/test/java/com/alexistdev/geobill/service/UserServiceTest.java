@@ -14,12 +14,12 @@ import com.alexistdev.geobill.request.RegisterRequest;
 import com.alexistdev.geobill.request.UpdateUserRequest;
 import com.alexistdev.geobill.services.CustomerService;
 import com.alexistdev.geobill.services.UserService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,17 +54,16 @@ public class UserServiceTest {
     private CustomerService customerService;
 
     @Mock
-    private MessageSource messageSource;
+    private CustomerRepo customerRepo;
 
     @Mock
-    private CustomerRepo customerRepo;
+    private MessagesUtils messagesUtils;
 
     private User user;
     private LoginRequest loginRequest;
     private RegisterRequest registerRequest;
     private Customer customer;
     private UpdateUserRequest updateUserRequest;
-
 
     @BeforeEach
     void setUp() {
@@ -105,8 +104,6 @@ public class UserServiceTest {
         updateUserRequest.setCountry("Updated Country");
         updateUserRequest.setPostCode("Updated PostCode");
         updateUserRequest.setPhoneNumber("Updated Phone Number");
-
-
     }
 
     @Test
@@ -152,9 +149,8 @@ public class UserServiceTest {
     @DisplayName("4. Test Register User with Existing User")
     void registerUser_ExistingUser_ThrowsRuntimeException() {
         when(userRepo.findByEmail(registerRequest.getEmail())).thenReturn(Optional.of(user));
-        when(messageSource.getMessage(eq("userservice.user.exist"), any(), any())).thenReturn("User %s already exist");
+        when(messagesUtils.getMessage(eq("userservice.user.exist"),  any())).thenReturn("User test@example.com already exist");
         RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.registerUser(registerRequest));
-        System.out.println("[DEBUG_LOG] Exception message: " + exception.getMessage());
         Assertions.assertEquals("User " + registerRequest.getEmail() + " already exist", exception.getMessage());
     }
 
@@ -194,7 +190,7 @@ public class UserServiceTest {
     void authenticate_InvalidPassword_ThrowsRuntimeException() {
         when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(false);
-        when(messageSource.getMessage(eq("userservice.user.authfailed"), any(), any())).thenReturn("Authentication failed, password is invalid");
+        when(messagesUtils.getMessage(eq("userservice.user.authfailed"), eq(loginRequest.getEmail()))).thenReturn("Authentication failed, password is invalid");
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> userService.authenticate(loginRequest));
@@ -206,7 +202,7 @@ public class UserServiceTest {
     @DisplayName("8. Test Authenticate User when User Not Found then Throw RuntimeException")
     void authenticate_UserNotFound_ThrowsRuntimeException() {
         when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.empty());
-        when(messageSource.getMessage(eq("userservice.user.authfailed"), any(), any())).thenReturn("Authentication failed, user not found");
+        when(messagesUtils.getMessage(eq("userservice.user.authfailed"), eq(loginRequest.getEmail()))).thenReturn("Authentication failed, user not found");
 
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> userService.authenticate(loginRequest));
@@ -221,7 +217,7 @@ public class UserServiceTest {
         user.setSuspended(true);
         when(userRepo.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
-        when(messageSource.getMessage(eq("userservice.user.suspended"), any(), any())).thenReturn("User is suspended");
+        when(messagesUtils.getMessage(eq("userservice.user.suspended"))).thenReturn("User is suspended");
 
         Assertions.assertThrows(SuspendedException.class,
                 () -> userService.authenticate(loginRequest));
@@ -250,6 +246,7 @@ public class UserServiceTest {
     @DisplayName("11. Test Find User By UUID when User Exists then Return User")
     void findUserByUUID_UserExists_ReturnsUser() {
         UUID userId = user.getId();
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), anyString())).thenReturn("User not found");
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
 
         User foundUser = userService.findUserByUUID(userId);
@@ -263,6 +260,7 @@ public class UserServiceTest {
     @DisplayName("12. Test Find User By UUID when User Not Found then Throw NotFoundException")
     void findUserByUUID_UserNotFound_ThrowsNotFoundException() {
         UUID userId = UUID.randomUUID();
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), anyString())).thenReturn("User not found");
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(NotFoundException.class,
@@ -285,8 +283,9 @@ public class UserServiceTest {
         customer.setState("Test State");
         customer.setCountry("Test Country");
         customer.setPostCode("12345");
+        customer.setCustomerNumber(1L);
         customer.setPhone("123-456-7890");
-
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), anyString())).thenReturn("User not found");
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(customerService.findCustomerByUserId(user)).thenReturn(customer);
 
@@ -322,6 +321,7 @@ public class UserServiceTest {
     void updateUser_UserExistsNotAdminNotDeleted_ReturnsUpdatedUser() {
         UUID userId = user.getId();
 
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), anyString())).thenReturn("User not found");
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(userRepo.save(any(User.class))).thenAnswer(invocation ->
                 invocation.getArgument(0));
@@ -336,7 +336,6 @@ public class UserServiceTest {
 
         Assertions.assertNotNull(updatedUser.getCustomer());
         CustomerDTO updatedCustomerDTO = updatedUser.getCustomer();
-
 
         Assertions.assertEquals(updateUserRequest.getBusinessName(), updatedCustomerDTO.getBusinessName());
         Assertions.assertEquals(updateUserRequest.getAddress1(), updatedCustomerDTO.getAddress1());
@@ -359,7 +358,7 @@ public class UserServiceTest {
     void updateUser_UserNotFound_ThrowsRuntimeException() {
         UUID userId = UUID.randomUUID();
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
-        when(messageSource.getMessage(eq("userservice.user.not_found"), any(), any()))
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), eq(String.valueOf(userId))))
                 .thenReturn("User not found");
 
         Assertions.assertThrows(RuntimeException.class, ()
@@ -378,8 +377,9 @@ public class UserServiceTest {
         user.setRole(Role.ADMIN);
         UUID userId = user.getId();
 
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), anyString())).thenReturn("User not found");
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(messageSource.getMessage(eq("userservice.user.admin_update_not_allowed"), any(), any()))
+        when(messagesUtils.getMessage(eq("userservice.user.admin_update_not_allowed")))
                 .thenReturn("Admin User update not allowed");
 
         Assertions.assertThrows(RuntimeException.class, ()
@@ -398,8 +398,9 @@ public class UserServiceTest {
         user.setIsDeleted(true);
         UUID userId = user.getId();
 
+        when(messagesUtils.getMessage(eq("userservice.user.notfound"), anyString())).thenReturn("User not found");
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(messageSource.getMessage(eq("userservice.user.deleted_user_update_failed"), any(), any()))
+        when(messagesUtils.getMessage(eq("userservice.user.deleted_user_update_failed")))
                 .thenReturn("Deleted user update not allowed");
 
         Assertions.assertThrows(RuntimeException.class, ()
@@ -435,6 +436,7 @@ public class UserServiceTest {
         request.setPhoneNumber(newPhone);
 
         Customer customer = new Customer();
+        customer.setCustomerNumber(1L);
 
         when(customerService.findCustomerByUserId(user)).thenReturn(customer);
         when(customerRepo.save(any(Customer.class))).thenReturn(customer);
