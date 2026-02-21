@@ -15,4 +15,5 @@ public class CustomerDTO {
     public String country;
     public String postCode;
     public String phone;
+    public String customerNumber;
 }

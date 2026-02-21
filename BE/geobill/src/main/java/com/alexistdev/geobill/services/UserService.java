@@ -237,6 +237,7 @@ public class UserService implements UserDetailsService {
         customerDTO.setCountry(customer.getCountry());
         customerDTO.setPostCode(customer.getPostCode());
         customerDTO.setPhone(customer.getPhone());
+        customerDTO.setCustomerNumber(customer.getCustomerNumber().toString());
         return customerDTO;
     }
 }

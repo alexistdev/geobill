@@ -32,6 +32,7 @@ public class CustomerDTOTest {
         String testCountry = "testCountry";
         String testPostCode = "testPostCode";
         String testPhone = "testPhone";
+        Long testCustomerNumber = 1L;
 
         customerDTO.setBusinessName(testBusinessName);
         customerDTO.setAddress1(testAddress1);
@@ -41,6 +42,7 @@ public class CustomerDTOTest {
         customerDTO.setCountry(testCountry);
         customerDTO.setPostCode(testPostCode);
         customerDTO.setPhone(testPhone);
+        customerDTO.setCustomerNumber(testCustomerNumber.toString());
 
         Assertions.assertEquals(testBusinessName, customerDTO.getBusinessName());
         Assertions.assertEquals(testAddress1, customerDTO.getAddress1());
@@ -50,6 +52,7 @@ public class CustomerDTOTest {
         Assertions.assertEquals(testCountry, customerDTO.getCountry());
         Assertions.assertEquals(testPostCode, customerDTO.getPostCode());
         Assertions.assertEquals(testPhone, customerDTO.getPhone());
+        Assertions.assertEquals(testCustomerNumber.toString(), customerDTO.getCustomerNumber());
 
     }
 
