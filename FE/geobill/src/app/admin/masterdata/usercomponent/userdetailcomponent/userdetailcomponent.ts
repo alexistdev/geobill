@@ -49,6 +49,7 @@ export class Userdetailcomponent implements OnInit, OnDestroy {
   PostalCode: string = '';
   Country: string = '';
   createdDate: string = '';
+  customerNumber: string = '';
 
   originalEmail: string = '';
   originalFullName: string = '';
@@ -107,6 +108,7 @@ export class Userdetailcomponent implements OnInit, OnDestroy {
           this.Country = customer.country;
           this.BusinessName = customer.businessName;
           this.createdDate = userDetail.createdDate;
+          this.customerNumber = customer.customerNumber;
 
           //restore original values
           this.originalEmail = this.Email;

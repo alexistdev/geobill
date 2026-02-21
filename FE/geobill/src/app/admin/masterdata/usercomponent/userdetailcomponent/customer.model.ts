@@ -16,4 +16,5 @@ export interface Customer {
   country: string | null;
   postCode: string | null;
   phone: string | null;
+  customerNumber: string | null;
 }
