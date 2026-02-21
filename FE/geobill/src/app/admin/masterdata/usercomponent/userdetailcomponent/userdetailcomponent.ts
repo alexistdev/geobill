@@ -6,7 +6,14 @@
  * Email: alexistdev@gmail.com
  */
 
-import { Component, OnInit, PLATFORM_ID, Inject, ChangeDetectorRef, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  PLATFORM_ID,
+  Inject,
+  ChangeDetectorRef,
+  OnDestroy
+} from '@angular/core';
 import {CommonModule, DatePipe, isPlatformBrowser} from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +22,7 @@ import { Footer } from '../../../../share/footer/footer';
 import { Userdetailservice } from './userdetailservice';
 import { Topheader } from '../../../../share/topheader/topheader';
 import {Userdetailrequest} from './userdetailrequest.model';
+import {Subject, takeUntil} from 'rxjs';
 declare var Lobibox: any;
 
 @Component({
@@ -24,7 +32,7 @@ declare var Lobibox: any;
   templateUrl: './userdetailcomponent.html',
   styleUrl: './userdetailcomponent.css',
 })
-export class Userdetailcomponent implements OnInit {
+export class Userdetailcomponent implements OnInit, OnDestroy {
   homeLink = '/admin/dashboard';
   userEmail: string = 'User Profile';
   userIdentity: string = '';
@@ -53,6 +61,8 @@ export class Userdetailcomponent implements OnInit {
   originalPostalCode: string = '';
   originalCountry: string = '';
 
+  private readonly destroy$ = new Subject<void>();
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -66,7 +76,7 @@ export class Userdetailcomponent implements OnInit {
     this.userEmail = this.router.getCurrentNavigation()?.extras.state?.['userEmail'] || 'User Profile';
 
     if (isPlatformBrowser(this.platformId)) {
-      this.route.paramMap.subscribe(params => {
+      this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
         const userId = params.get('uuid');
         this.userIdentity = userId? userId : '';
         if (userId) {
@@ -81,7 +91,7 @@ export class Userdetailcomponent implements OnInit {
 
   loadUserDetails(userId: string): void {
     const request$ = this.userDetailService.getUsersDetail(userId);
-    request$.subscribe({
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         if (data.payload) {
           const userDetail: any = data.payload;
@@ -170,6 +180,7 @@ export class Userdetailcomponent implements OnInit {
     }
 
     this.userDetailService.updateUsersDetail(this.userIdentity, userDetailRequest)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
           if (isPlatformBrowser(this.platformId)) {
@@ -208,5 +219,10 @@ export class Userdetailcomponent implements OnInit {
     } else {
       console.warn('Lobibox is not defined.Ensure it is loaded correctly.');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
