@@ -7,6 +7,7 @@
  */
 export interface Usermodel {
   id: string;
+  fullName: string;
   email: string;
   createdDate?: string | null;
   suspended?: boolean | null;

@@ -6,7 +6,7 @@
  * Email: alexistdev@gmail.com
  */
 
-import {ChangeDetectorRef, Component, ElementRef, inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnInit, PLATFORM_ID} from '@angular/core';
 import {DatePipe, isPlatformBrowser} from '@angular/common';
 import {Menutop} from '../../../share/menutop/menutop';
 import {Usermodel} from './usermodel.model';
@@ -18,6 +18,8 @@ import {Apiresponse} from '../../../share/response/apiresponse';
 import {Footer} from '../../../share/footer/footer';
 import {Topheader} from '../../../share/topheader/topheader';
 import {Usermodal} from './usermodal/usermodal';
+import {Userregisterrequest} from './request/userregisterrequest.model';
+declare var Lobibox: any;
 
 @Component({
   selector: 'app-usercomponent',
@@ -52,7 +54,8 @@ export class Usercomponent implements OnInit {
     private userService: Userservice,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private el: ElementRef
+    private el: ElementRef,
+    private ngZone: NgZone
   ) {
   }
 
@@ -124,5 +127,52 @@ export class Usercomponent implements OnInit {
 
   goToDetail(user: Usermodel) {
     this.router.navigate(['/admin/users', user.id]);
+  }
+
+  doSaveData(formValue:any){
+    const request : Userregisterrequest = {
+      fullName: formValue.name,
+      email: formValue.email,
+      password: formValue.password
+    }
+    this.userService.saveUser(request).subscribe({
+      next: () => {
+        if(isPlatformBrowser(this.platformId)){
+          this.LobiboxMessage('success', 'Data berhasil disimpan','bx bx-check-circle');
+        }
+        this.closeModal();
+        this.loadData(this.pageNumber, this.pageSize);
+      },
+      error: (err) => {
+        let errorMessage = 'An unexpected error occurred.';
+        try {
+          console.error(err);
+          errorMessage = err.error?.messages?.[0] || errorMessage;
+        } catch (e){
+          console.error('Error while processing error:', e);
+        }
+        this.LobiboxMessage('error', errorMessage,'bx bx-x-circle');
+        this.ngZone.run(() => {
+          this.closeModal();
+        });
+      }
+    })
+  }
+
+  LobiboxMessage(type: string, msg: string, icon: string):void {
+    if (typeof Lobibox !== 'undefined') {
+      Lobibox.notify(type, {
+        pauseDelayOnHover: true,
+        size: 'mini',
+        rounded: true,
+        delayIndicator: false,
+        icon: icon,
+        continueDelayOnInactiveTab: false,
+        position: 'top right',
+        msg: msg
+      });
+    } else {
+      console.warn('Lobibox is not defined.Ensure it is loaded correctly.');
+    }
   }
 }

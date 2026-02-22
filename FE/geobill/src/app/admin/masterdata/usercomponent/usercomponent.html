@@ -153,6 +153,7 @@
   <app-usermodal
     #usermodal
     [show]="showModal"
+    (formSubmit)="doSaveData($event)"
     (close)="closeModal()"></app-usermodal>
   <!-- end search modal -->
 

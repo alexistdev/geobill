@@ -3,6 +3,7 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.dto.AuthDTO;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.exceptions.EmailExistException;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Role;
@@ -63,9 +64,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseData<User>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
-        Supplier<ResponseEntity<ResponseData<User>>> registerAttempt = () -> {
-            ResponseData<User> responseData = new ResponseData<>();
+    public ResponseEntity<ResponseData<UserDTO>> register(@Valid @RequestBody RegisterRequest userRequest, Errors errors) {
+        Supplier<ResponseEntity<ResponseData<UserDTO>>> registerAttempt = () -> {
+            ResponseData<UserDTO> responseData = new ResponseData<>();
             handleErrors(errors, responseData);
 
             if (!responseData.isStatus()) {
@@ -85,13 +86,13 @@ public class AuthController {
             }
         };
 
-        Supplier<ResponseEntity<ResponseData<User>>> restrictedRegisterAttempt = RateLimiter
+        Supplier<ResponseEntity<ResponseData<UserDTO>>> restrictedRegisterAttempt = RateLimiter
                 .decorateSupplier(rateLimiter, registerAttempt);
         try {
             return restrictedRegisterAttempt.get();
         } catch (io.github.resilience4j.ratelimiter.RequestNotPermitted e) {
             String msgRatelimit = messagesUtils.getMessage("ratelimiter.restricted.message");
-            ResponseData<User> responseData = new ResponseData<>();
+            ResponseData<UserDTO> responseData = new ResponseData<>();
             responseData.setStatus(false);
             responseData.getMessages().add(msgRatelimit);
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(responseData);

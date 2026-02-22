@@ -11,6 +11,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Apiresponse} from '../../../share/response/apiresponse';
 import {Usermodel} from './usermodel.model';
+import {Userregisterrequest} from './request/userregisterrequest.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ import {Usermodel} from './usermodel.model';
 export class Userservice {
   private apiUrl = '/api/v1/users';
   private apiValidateEmail = '/api/v1/auth/validate';
+  private apiAuth = '/api/v1/auth';
 
   constructor(private http: HttpClient) { }
 
@@ -36,7 +38,11 @@ export class Userservice {
   }
 
   validateEmail(email: string): Observable<Apiresponse<any>> {
-    return this.http.post<Apiresponse<any>>(`${this.apiValidateEmail}`, { email }, { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) });
+    return this.http.post<Apiresponse<any>>(`${this.apiAuth}/validate`, { email }, { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) });
+  }
+
+  saveUser(userRequest:Userregisterrequest): Observable<Apiresponse<Usermodel>>{
+    return this.http.post<Apiresponse<Usermodel>>(`${this.apiAuth}/register`, userRequest, { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) });
   }
 
 
