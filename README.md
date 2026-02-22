@@ -61,3 +61,4 @@ With these steps, you'll have the GeoBill application up and running, ready for 
 
 #### Administrator Page:
 ![Administrator Page](https://github.com/alexistdev/geobill/blob/main/gambar/gambar1.png?raw=true)
+![Administrator Page](https://github.com/alexistdev/geobill/blob/main/gambar/gambar2.png?raw=true)
