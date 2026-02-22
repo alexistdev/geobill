@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.utils;
 
+import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.models.entity.*;
 import com.alexistdev.geobill.models.repository.MenuRepo;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
@@ -132,12 +133,19 @@ public class DatabaseSeeder implements CommandLineRunner {
         RegisterRequest user = createUser("user", "user@gmail.com");
         userService.registerUser(user);
         RegisterRequest staff = createUser("staff", "staff@gmail.com");
-        User staffUser = userService.registerUser(staff);
+        UserDTO staffUser = userService.registerUser(staff);
         RegisterRequest admin = createUser("admin", "admin@gmail.com");
-        User adminUser = userService.registerUser(admin);
-        staffUser.setRole(Role.STAFF);
-        adminUser.setRole(Role.ADMIN);
-        userRepo.saveAll(List.of(staffUser, adminUser));
+        UserDTO adminUser = userService.registerUser(admin);
+
+        String emailAdmin = adminUser.getEmail();
+        Optional<User> user1 = userRepo.findByEmail(emailAdmin);
+        user1.ifPresent(user11 -> user11.setRole(Role.ADMIN));
+        user1.ifPresent(userRepo::save);
+
+        String emailStaff = staffUser.getEmail();
+        Optional<User> user2 = userRepo.findByEmail(emailStaff);
+        user2.ifPresent(user22 -> user22.setRole(Role.STAFF));
+        user2.ifPresent(userRepo::save);
         log.info("Finished seeding users");
     }
 

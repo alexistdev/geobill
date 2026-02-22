@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.service;
 
+import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.dto.UserDetailDTO;
 import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.exceptions.NotFoundException;
@@ -135,11 +136,10 @@ public class UserServiceTest {
         when(customerService.addCustomer(any(Customer.class))).thenReturn(customer);
         when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User registeredUser = userService.registerUser(registerRequest);
+        UserDTO registeredUser = userService.registerUser(registerRequest);
 
         Assertions.assertNotNull(registeredUser);
-        Assertions.assertEquals(Role.USER, registeredUser.getRole());
-        Assertions.assertEquals("hashedPassword", registeredUser.getPassword());
+        Assertions.assertEquals(Role.USER.toString(), registeredUser.getRole());
         verify(userRepo, times(1)).save(any(User.class));
         verify(customerService, times(1)).addCustomer(any(Customer.class));
     }

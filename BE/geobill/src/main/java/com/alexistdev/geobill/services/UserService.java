@@ -1,6 +1,7 @@
 package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.dto.CustomerDTO;
+import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.dto.UserDetailDTO;
 import com.alexistdev.geobill.exceptions.EmailExistException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
@@ -126,7 +127,7 @@ public class UserService implements UserDetailsService {
         return customerRepo.save(customer);
     }
 
-    public User registerUser(RegisterRequest request) {
+    public UserDTO registerUser(RegisterRequest request) {
         boolean userExist = userRepo.findByEmail(request.getEmail()).isPresent();
         if (userExist) {
             String message = messagesUtils.getMessage("userservice.user.exist",
@@ -147,11 +148,12 @@ public class UserService implements UserDetailsService {
 
         User userResult = userRepo.save(userSaved);
 
+
         Customer customerSaved = new Customer();
         customerSaved.setUser(userResult);
         customerService.addCustomer(customerSaved);
 
-        return userResult;
+        return this.converToUserDTO(userResult);
     }
 
     public Page<User> getAllUsers(Pageable pageable) {
@@ -239,5 +241,14 @@ public class UserService implements UserDetailsService {
         customerDTO.setCustomerNumber(
                 customer.getCustomerNumber() != null ? customer.getCustomerNumber().toString() : null);
         return customerDTO;
+    }
+
+    private UserDTO converToUserDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId() != null ? user.getId().toString() : null);
+        userDTO.setFullName(user.getFullName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setRole(user.getRole().toString());
+        return userDTO;
     }
 }
