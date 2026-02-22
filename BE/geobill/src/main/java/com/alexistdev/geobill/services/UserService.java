@@ -2,6 +2,7 @@ package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.dto.UserDetailDTO;
+import com.alexistdev.geobill.exceptions.EmailExistException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Customer;
@@ -219,7 +220,7 @@ public class UserService implements UserDetailsService {
         boolean result = user.isPresent();
         if (result) {
             String msg = messagesUtils.getMessage("userservice.email.exist", trimmedEmail);
-            throw new RuntimeException(msg);
+            throw new EmailExistException(msg);
         }
         return true;
     }

@@ -51,7 +51,7 @@
               <div class="d-flex align-items-center">
                 <div class="d-flex justify-content-start">
                   <div class="btn-group m-2" role="group" aria-label="Button group with nested dropdown">
-                    <button #addButtonProduct type="button" class="btn btn-dark" ><i
+                    <button #addButtonProduct type="button" class="btn btn-dark" (click)="openModal()"><i
                       class="bx bx-add-to-queue"></i></button>
                   </div>
                 </div>
@@ -150,9 +150,10 @@
   <!--end page wrapper -->
 
   <!-- search modal -->
-<!--  <app-productmodal #productmodal [show]="showModal" [modalType]="currentModalType" [formData]="currentFormData"-->
-<!--                    [confirmationText]="currentConfirmationText" (confirmDelete)="onDeleteConfirm()" (formSubmit)="doSaveData($event)"-->
-<!--                    (close)="closeModal()"></app-productmodal>-->
+  <app-usermodal
+    #usermodal
+    [show]="showModal"
+    (close)="closeModal()"></app-usermodal>
   <!-- end search modal -->
 
   <!--start overlay-->

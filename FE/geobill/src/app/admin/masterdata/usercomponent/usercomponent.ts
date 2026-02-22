@@ -6,7 +6,7 @@
  * Email: alexistdev@gmail.com
  */
 
-import {ChangeDetectorRef, Component, ElementRef, inject, NgZone, OnInit, PLATFORM_ID} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, inject, OnInit, PLATFORM_ID} from '@angular/core';
 import {DatePipe, isPlatformBrowser} from '@angular/common';
 import {Menutop} from '../../../share/menutop/menutop';
 import {Usermodel} from './usermodel.model';
@@ -17,6 +17,7 @@ import {Router, RouterModule} from '@angular/router';
 import {Apiresponse} from '../../../share/response/apiresponse';
 import {Footer} from '../../../share/footer/footer';
 import {Topheader} from '../../../share/topheader/topheader';
+import {Usermodal} from './usermodal/usermodal';
 
 @Component({
   selector: 'app-usercomponent',
@@ -26,7 +27,8 @@ import {Topheader} from '../../../share/topheader/topheader';
     DatePipe,
     RouterModule,
     Footer,
-    Topheader
+    Topheader,
+    Usermodal
   ],
   templateUrl: './usercomponent.html',
   styleUrl: './usercomponent.css',
@@ -42,12 +44,7 @@ export class Usercomponent implements OnInit {
   searchQuery: string = '';
 
   public showModal = false;
-  public currentModalType: 'form' | 'confirm' = 'confirm';
-  public currentFormData: any = {};
-  public currentConfirmationText = '';
   private searchSubject = new Subject<string>();
-  currentEditMode: boolean = false;
-  selectedUserId: string | undefined = '';
   private platformId = inject(PLATFORM_ID);
   protected readonly Number = Number;
 
@@ -55,8 +52,7 @@ export class Usercomponent implements OnInit {
     private userService: Userservice,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private el: ElementRef,
-    private ngZone: NgZone
+    private el: ElementRef
   ) {
   }
 
@@ -113,6 +109,16 @@ export class Usercomponent implements OnInit {
     });
     this.users = [...newItems];
     this.cdr.markForCheck();
+    this.cdr.detectChanges();
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.el.nativeElement.blur();
+    this.showModal = false;
     this.cdr.detectChanges();
   }
 

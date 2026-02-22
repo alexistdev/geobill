@@ -1,0 +1,50 @@
+<!--
+  ~ Copyright (c) 2026.
+  ~ Project: GeoBill
+  ~ Author: Alexsander Hendra Wijaya
+  ~ Github: https://github.com/alexistdev
+  ~ Email: alexistdev@gmail.com
+  -->
+
+<div #modalContainer class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" inert>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New User</h5>
+        <button type="button" class="btn-close" (click)="onClose()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="userForm">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" formControlName="name" maxlength="100">
+            @if (userForm.get('name')?.invalid && userForm.get('name')?.touched) {
+            <div class="text-danger">Name is required and must be at most 100 characters.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" [class]="emailValidationClass" id="email" formControlName="email" maxlength="100">
+            @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+            <div class="text-danger">Email is not valid.</div>
+            }
+            @if (validateEmail === false) {
+            <div class="text-danger">Email already exists.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" formControlName="password" maxlength="16">
+            @if (userForm.get('password')?.invalid && userForm.get('password')?.touched) {
+            <div class="text-danger">Password is required and must be at least 6 characters</div>
+            }
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="validateAndConfirm()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

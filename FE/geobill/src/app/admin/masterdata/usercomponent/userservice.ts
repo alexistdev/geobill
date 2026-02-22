@@ -17,6 +17,7 @@ import {Usermodel} from './usermodel.model';
 })
 export class Userservice {
   private apiUrl = '/api/v1/users';
+  private apiValidateEmail = '/api/v1/auth/validate';
 
   constructor(private http: HttpClient) { }
 
@@ -33,6 +34,11 @@ export class Userservice {
       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
     );
   }
+
+  validateEmail(email: string): Observable<Apiresponse<any>> {
+    return this.http.post<Apiresponse<any>>(`${this.apiValidateEmail}`, { email }, { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) });
+  }
+
 
 }
 
