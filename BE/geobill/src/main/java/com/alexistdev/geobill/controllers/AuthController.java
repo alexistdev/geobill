@@ -3,6 +3,7 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.dto.AuthDTO;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.exceptions.EmailExistException;
 import com.alexistdev.geobill.exceptions.SuspendedException;
 import com.alexistdev.geobill.models.entity.Role;
 import com.alexistdev.geobill.models.entity.User;
@@ -107,10 +108,14 @@ public class AuthController {
                 responseData.getMessages().add(msgSuccess);
                 responseData.setStatus(true);
                 return ResponseEntity.status(HttpStatus.OK).body(responseData);
+            } catch (EmailExistException em){
+                responseData.setStatus(false);
+                responseData.getMessages().add(em.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
             } catch (Exception e) {
                 responseData.setStatus(false);
                 responseData.getMessages().add(e.getMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
             }
         };
 
