@@ -58,8 +58,8 @@
                 <div>
                   <div class="input-group m-2"> <span class="input-group-text bg-danger-subtle" id="search-product"><i
                     class="bx bx-search-alt-2"></i></span>
-                    <input #searchBoxProduct type="text" class="form-control" placeholder="Search" aria-label="Search"
-                            aria-describedby="search-product">
+                    <input #searchBox type="text" class="form-control" placeholder="Search" aria-label="Search"
+                           (input)="onSearchChange(searchBox.value)" aria-describedby="search-user">
                   </div>
                 </div>
 
@@ -74,7 +74,7 @@
                     <div class="btn-group m-2">
                       <button type="button" class="btn btn-outline-primary" disabled>Sort</button>
                       <select class="btn btn-outline-primary" #pageSizeSelect
-                      >
+                              (change)="onPageSizeChange($event)">
                         <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
@@ -112,8 +112,8 @@
                                 </td>
                                 <td class="justify-content-center">
                                   <div class="d-flex order-actions">
-                                    <a href="javascript:;" class=""><i class='bx bxs-edit'></i></a>
-                                    <a href="javascript:;" class="ms-3"><i class='bx bxs-trash'></i></a>
+                                    <a href="javascript:" class=""><i class='bx bxs-edit'></i></a>
+                                    <a href="javascript:" class="ms-3"><i class='bx bxs-trash'></i></a>
                                   </div>
                                 </td>
                               </tr>
@@ -121,16 +121,16 @@
                       </tbody>
                       <tfoot>
                       <tr>
-                        <td colspan="12" class="text-start text-color-grey" style="font-size: 0.75rem;margin-left: 10px;">
-<!--                             Total Data : {{ totalData }} row.-->
+                        <td colspan="2" class="text-start text-color-grey" style="font-size: 0.75rem;margin-left: 10px;">
+                             Total Data : {{ totalData }} row.
                         </td>
-<!--                        @if (payload) {-->
-<!--                          <td colspan="6" class="text-end">-->
+                        @if (payload) {
+                          <td colspan="4" class="text-end">
 
-<!--                            <app-pagination [pageNumber]="pageNumber" [totalPages]="totalPages" [pageSize]="pageSize"-->
-<!--                                            (pageChange)="onPageChanged($event)"></app-pagination>-->
-<!--                          </td>-->
-<!--                        }-->
+                            <app-pagination [pageNumber]="pageNumber" [totalPages]="totalPages" [pageSize]="pageSize"
+                                            (pageChange)="onPageChanged($event)"></app-pagination>
+                          </td>
+                        }
 
                       </tr>
                       </tfoot>

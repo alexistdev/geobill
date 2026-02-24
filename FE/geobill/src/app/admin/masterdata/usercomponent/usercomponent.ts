@@ -19,6 +19,7 @@ import {Footer} from '../../../share/footer/footer';
 import {Topheader} from '../../../share/topheader/topheader';
 import {Usermodal} from './usermodal/usermodal';
 import {Userregisterrequest} from './request/userregisterrequest.model';
+import {Pagination} from '../../../share/pagination/pagination';
 declare var Lobibox: any;
 
 @Component({
@@ -30,7 +31,8 @@ declare var Lobibox: any;
     RouterModule,
     Footer,
     Topheader,
-    Usermodal
+    Usermodal,
+    Pagination
   ],
   templateUrl: './usercomponent.html',
   styleUrl: './usercomponent.css',
@@ -80,7 +82,7 @@ export class Usercomponent implements OnInit {
     const sortBy = 'createdDate';
     const direction = 'desc';
     const isFiltering = this.keyword !== "";
-
+    console.log(this.keyword);
     const request$ = isFiltering ?
       this.userService.getUsersByFilter(this.keyword, this.pageNumber, this.pageSize, sortBy, direction) :
       this.userService.getUsers(this.pageNumber, this.pageSize, sortBy, direction);
@@ -115,8 +117,27 @@ export class Usercomponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  onPageChanged(page: number) {
+    this.pageNumber = page;
+    this.loadData(this.pageNumber, this.pageSize);
+  }
+
+  onSearchChange(searchTerm: string) {
+    if (this.pageNumber > 0) {
+      this.pageNumber = 0;
+    }
+    console.log(searchTerm);
+    this.searchSubject.next(searchTerm);
+  }
+
   openModal() {
     this.showModal = true;
+  }
+
+  onPageSizeChange(event: any) {
+    this.pageSize = parseInt(event.target.value, 10);
+    this.loadData(0, this.pageSize);
+    console.log(this.pageSize);
   }
 
   closeModal() {
