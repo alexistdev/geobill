@@ -84,7 +84,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         menuParentUser.ifPresent(menu -> {
             Menu userChildren1 = createMenu("My Services", "/users/services", "", 1, menu.getId(),2,"us3","bx bx-server");
-            List<Menu> allMenuChildren = new ArrayList<>(List.of(userChildren1));
+            Menu userChildren2 = createMenu("Order New Services", "/users/services/order", "", 2, menu.getId(),2,"us4","bx bx-server");
+            List<Menu> allMenuChildren = new ArrayList<>(List.of(userChildren1,userChildren2));
             menuRepo.saveAll(allMenuChildren);
         });
 
@@ -113,6 +114,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         Optional<Menu> menuUser1 = menuRepo.findByCode("us1");
         Optional<Menu> menuUser2 = menuRepo.findByCode("us2");
         Optional<Menu> menuUser3 = menuRepo.findByCode("us3");
+        Optional<Menu> menuUser4 = menuRepo.findByCode("us4");
 
         List<RoleMenu> roleMenus = List.of(
                 Objects.requireNonNull(menuAdmin.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
@@ -122,7 +124,8 @@ public class DatabaseSeeder implements CommandLineRunner {
                 Objects.requireNonNull(menuAdmin5.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
                 Objects.requireNonNull(menuUser1.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)),
                 Objects.requireNonNull(menuUser2.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)),
-                Objects.requireNonNull(menuUser3.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)));
+                Objects.requireNonNull(menuUser3.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)),
+                Objects.requireNonNull(menuUser4.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)));
         roleMenuRepo.saveAll(roleMenus);
 
         log.info("Finished seeding role menus");
