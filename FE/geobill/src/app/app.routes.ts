@@ -19,6 +19,7 @@ import { Producttype } from './admin/masterdata/producttype/producttype';
 import { Productcomponent } from './admin/masterdata/productcomponent/productcomponent';
 import { Usercomponent } from './admin/masterdata/usercomponent/usercomponent';
 import { Userdetailcomponent } from './admin/masterdata/usercomponent/userdetailcomponent/userdetailcomponent';
+import {Orderservice} from './users/orderservice/orderservice';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -77,6 +78,13 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'] }
   },
+  {
+    path: 'users/services/order',
+    component: Orderservice,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['USER'] }
+  },
+
   {
     path: '**',
     component: Notfoundcomponent

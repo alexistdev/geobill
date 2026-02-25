@@ -3,6 +3,7 @@ import { Localstorageservice } from '../../utils/localstorage/localstorageservic
 import {Menutop} from '../../share/menutop/menutop';
 import {Footer} from '../../share/footer/footer';
 import {Header} from '../../share/header/header';
+import {Topheader} from '../../share/topheader/topheader';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -10,7 +11,7 @@ import {Header} from '../../share/header/header';
   imports: [
     Menutop,
     Footer,
-    Header
+    Topheader
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
