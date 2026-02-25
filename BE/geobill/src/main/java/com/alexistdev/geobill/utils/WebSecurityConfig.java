@@ -36,7 +36,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/v1/users").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET,
-                                "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
+                                "/api/v1/producttypes").hasAnyAuthority(Role.ADMIN.toString(),Role.USER.toString())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/producttypes").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.PATCH,
@@ -44,7 +44,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/menus").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET,
-                                "/api/v1/products").hasAuthority(Role.ADMIN.toString())
+                                "/api/v1/products").hasAnyAuthority(Role.ADMIN.toString(),Role.USER.toString())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/products").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.PATCH,
