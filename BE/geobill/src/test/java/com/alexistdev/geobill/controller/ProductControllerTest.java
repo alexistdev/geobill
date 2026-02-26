@@ -350,4 +350,36 @@ public class ProductControllerTest {
 
         verify(productService, times(1)).delete(uuid);
     }
+
+    @Test
+    @Order(13)
+    @DisplayName("13. Test Find Product - By Product ID")
+    void testFindProductsByProductTypeID() {
+        UUID uuid = UUID.randomUUID();
+        Product product = new Product();
+        product.setId(uuid);
+        product.setName("Test Product");
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setName("Test Product");
+
+        Page<Product> productPage = new PageImpl<>(List.of(product));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "id"));
+
+
+        when(productService.getAllProductsByProductTypeId(pageable, uuid)).thenReturn(productPage);
+        when(modelMapper.map(product, ProductDTO.class)).thenReturn(productDTO);
+
+        ResponseEntity<ResponseData<Page<ProductDTO>>> response =
+                productController.searchProductByType(uuid.toString(), 0,
+                        10, "id", "asc");
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertTrue(response.getBody().isStatus());
+        Assertions.assertNotNull(response.getBody().getPayload());
+        Assertions.assertEquals(1, response.getBody().getPayload().getContent().size());
+
+        verify(productService,times(1)).getAllProductsByProductTypeId(pageable,uuid);
+        verify(modelMapper, times(1)).map(any(Product.class), eq(ProductDTO.class));
+    }
 }

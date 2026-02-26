@@ -39,6 +39,8 @@ public class ProductController {
         this.modelMapper = modelMapper;
     }
 
+
+
     @GetMapping
     public ResponseEntity<ResponseData<Page<ProductDTO>>> getAllProducts(
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
@@ -90,6 +92,40 @@ public class ProductController {
         } catch (RuntimeException e){
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             productPage = productService.getAllProductsByFilter(fallbackPageable, filter);
+        }
+        responseData.getMessages().add(NO_PRODUCT_FOUND);
+        responseData.setStatus(false);
+
+        if (!productPage.isEmpty()) {
+            responseData.setStatus(true);
+            if (!responseData.getMessages().isEmpty()) {
+                responseData.getMessages().removeFirst();
+            }
+            responseData.getMessages().add("Retrieved page " + page + " of products");
+        }
+        Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
+        responseData.setPayload(productDTOPage);
+        return ResponseEntity.status(HttpStatus.OK).body(responseData);
+    }
+
+    @GetMapping("/search-by-type")
+    public ResponseEntity<ResponseData<Page<ProductDTO>>> searchProductByType(
+            @RequestParam(defaultValue = "") String id,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "10") @PositiveOrZero int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ){
+        ResponseData<Page<ProductDTO>> responseData = new ResponseData<>();
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ?
+                Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        Page<Product> productPage;
+        try {
+            productPage = productService.getAllProductsByProductTypeId(pageable, UUID.fromString(id));
+        } catch (RuntimeException e){
+            Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
+            productPage = productService.getAllProductsByProductTypeId(fallbackPageable, UUID.fromString(id));
         }
         responseData.getMessages().add(NO_PRODUCT_FOUND);
         responseData.setStatus(false);
