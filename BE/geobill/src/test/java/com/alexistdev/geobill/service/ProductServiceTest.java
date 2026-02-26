@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
@@ -259,5 +260,43 @@ public class ProductServiceTest {
         Assertions.assertEquals("Product not found with ID:" + nonExistingId, thrown.getMessage());
         verify(productRepo, times(1)).findById(nonExistingId);
         verify(productRepo, never()).save(any(Product.class));
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("10:Test Get All Products By Filter")
+    void testGetAllProductsByFilter() {
+        String keyword = "Shared";
+        List<Product> productList = Collections.singletonList(product);
+        Page<Product> productPage = new PageImpl<>(productList);
+
+        when(productRepo.findByFilter(eq(keyword.toLowerCase()), any(Pageable.class))).thenReturn(productPage);
+
+        Page<Product> allProducts = productService.getAllProductsByFilter(PageRequest.of(0, 10), keyword);
+
+        Assertions.assertNotNull(allProducts);
+        Assertions.assertEquals(1, allProducts.getContent().size());
+        Assertions.assertEquals(product.getName(), allProducts.getContent().getFirst().getName());
+        verify(productRepo, times(1)).findByFilter(eq(keyword.toLowerCase()),
+                any(Pageable.class));
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("11:Test Get All Products By Product Type UUID")
+    void testGetAllProductsByProductTypeId() {
+        UUID productTypeId = UUID.randomUUID();
+        List<Product> productList = Collections.singletonList(product);
+        Page<Product> productPage = new PageImpl<>(productList);
+
+        when(productRepo.findByProductTypeId(eq(productTypeId), any(Pageable.class))).thenReturn(productPage);
+
+        Page<Product> allProducts = productService.getAllProductsByProductTypeId(PageRequest.of(0, 10), productTypeId);
+
+        Assertions.assertNotNull(allProducts);
+        Assertions.assertEquals(1, allProducts.getContent().size());
+        Assertions.assertEquals(product.getName(), allProducts.getContent().getFirst().getName());
+        verify(productRepo, times(1))
+                .findByProductTypeId(eq(productTypeId), any(Pageable.class));
     }
 }
