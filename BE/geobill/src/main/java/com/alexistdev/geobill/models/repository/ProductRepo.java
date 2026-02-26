@@ -20,4 +20,7 @@ public interface ProductRepo extends JpaRepository<Product, UUID> {
 
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productType pt WHERE p.name LIKE %:keyword% AND p.isDeleted = false AND pt.isDeleted = false")
     Page<Product> findByFilter(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productType pt WHERE pt.id = :productTypeId AND p.isDeleted = false AND pt.isDeleted = false")
+    Page<Product> findByProductTypeId(@Param("productTypeId") UUID productTypeId, Pageable pageable);
 }

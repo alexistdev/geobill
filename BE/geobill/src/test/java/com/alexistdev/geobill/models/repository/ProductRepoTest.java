@@ -4,10 +4,7 @@ import com.alexistdev.geobill.models.entity.BaseEntity;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.entity.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -23,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @DataJpaTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
 public class ProductRepoTest {
 
@@ -92,7 +90,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Save Product")
+    @Order(1)
+    @DisplayName("1. Test Save Product")
     void testSaveProduct() {
         Product product = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -115,7 +114,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Find By Product UUID")
+    @Order(2)
+    @DisplayName("2. Test Find By Product UUID")
     void testFindByProductUUID() {
         Product product = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -128,7 +128,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Find All Products")
+    @Order(3)
+    @DisplayName("3. Test Find All Products")
     void testFindAllProducts() {
         Product product1 = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -148,7 +149,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Delete Product")
+    @Order(4)
+    @DisplayName("4. Test Delete Product")
     void testDeleteProduct() {
         Product product = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -182,7 +184,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Delete All Products")
+    @Order(5)
+    @DisplayName("5. Test Delete All Products")
     void testDeleteAllProducts() {
         Product product1 = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -224,7 +227,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Find By Name Including Deleted")
+    @Order(6)
+    @DisplayName("6. Test Find By Name Including Deleted")
     void testFindByNameIncludingDeleted() {
         Product product1 = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -255,14 +259,16 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test Find By Name Not Found")
+    @Order(7)
+    @DisplayName("7. Test Find By Name Not Found")
     void testFindByNameNotFound() {
         Optional<Product> foundProduct = productRepo.findByNameIncludingDeleted("Nonexistent Product");
         Assertions.assertFalse(foundProduct.isPresent());
     }
 
     @Test
-    @DisplayName("Test Find By Filter with keyword")
+    @Order(8)
+    @DisplayName("8. Test Find By Filter with keyword")
     void testFindByFilter() {
         Product product1 = createProduct("Basic Shared Hosting",
                 productType, 10.0, 1, "10GB",
@@ -286,7 +292,8 @@ public class ProductRepoTest {
     }
 
     @Test
-    @DisplayName("Test FindByIsDeletedFalse only returns products with non-deleted ProductTypes")
+    @Order(9)
+    @DisplayName("9. Test FindByIsDeletedFalse only returns products with non-deleted ProductTypes")
     void testFindByIsDeletedFalse() {
         // Create a product with a deleted product type
         Product productWithDeletedType = createProduct("Product with Deleted Type",
@@ -310,5 +317,27 @@ public class ProductRepoTest {
                 product -> product.getName().equals("Product with Active Type")));
         Assertions.assertFalse(result.stream().anyMatch(
                 product -> product.getName().equals("Product with Deleted Type")));
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("10. Test Find By Product Type Name")
+    void testFindByProductTypeId() {
+        Product product1 = createProduct("Basic Shared Hosting",
+                productType, 10.0, 1, "10GB",
+                "1000 Mbps", "1", "1", "1");
+        entityManager.persist(product1);
+        entityManager.flush();
+
+        Product product2 = createProduct("VPS",
+                productType, 100.0, 12, "100GB",
+                "10000 Mbps", "5", "5", "5");
+        entityManager.persist(product2);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Product> result = productRepo.findByProductTypeId(productType.getId(), pageable);
+        Assertions.assertEquals(2, result.getTotalElements());
+        Assertions.assertTrue(result.stream().anyMatch(product -> product.getName().equals("Basic Shared Hosting")));
+        Assertions.assertTrue(result.stream().anyMatch(product -> product.getName().equals("VPS")));
     }
 }

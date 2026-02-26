@@ -34,6 +34,10 @@ public class ProductService {
         return productRepo.findByFilter(keyword.toLowerCase(), pageable);
     }
 
+    public Page<Product> getAllProductsByProductTypeId(Pageable pageable, UUID productTypeId) {
+        return productRepo.findByProductTypeId(productTypeId, pageable);
+    }
+
     @Transactional
     public Product save(ProductRequest request) {
         Product saveProduct = new Product();
