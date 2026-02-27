@@ -51,6 +51,8 @@ public class WebSecurityConfig {
                                 "/api/v1/products").hasAuthority(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/products").hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/search-by-type").hasAnyAuthority(Role.ADMIN.toString(),Role.USER.toString())
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())
