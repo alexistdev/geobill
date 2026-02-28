@@ -120,4 +120,9 @@ export class Orderhosting implements OnInit, OnChanges {
   }
 
   protected readonly String = String;
+
+
+  goBuyNow(uuid: string) {
+    this.router.navigate(['/users/services/order/v'], { queryParams: {id : uuid} });
+  }
 }

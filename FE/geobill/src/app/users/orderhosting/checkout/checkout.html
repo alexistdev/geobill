@@ -1,0 +1,205 @@
+<div class="wrapper">
+  <!--start header wrapper-->
+  <div class="header-wrapper">
+    <!--start header -->
+    <app-header> </app-header>
+    <!--end header -->
+    <!--navigation-->
+    <div class="primary-menu">
+      <nav class="navbar navbar-expand-lg align-items-center">
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+          <div class="offcanvas-header border-bottom">
+            <div class="d-flex align-items-center">
+              <div class="">
+                <img src="assets/images/logo-icon.png" class="logo-icon" alt="logo icon">
+              </div>
+              <div class="">
+                <h4 class="logo-text">Rocker</h4>
+              </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <app-menutop></app-menutop>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end navigation-->
+  </div>
+  <!--end header wrapper-->
+  <!--start page wrapper -->
+  <div class="page-wrapper">
+    <div class="page-content">
+      <div class="row">
+        <div class="col-12 col-lg-12">
+
+          <div id="stepper1" class="bs-stepper">
+            <div class="card">
+
+              <div class="card-header">
+                <div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between ml-5 mr-5" role="tablist">
+                  <div class="step active" data-target="#test-l-1">
+                    <div class="step-trigger" role="tab" id="stepper1trigger1" aria-controls="test-l-1">
+                      <div class="bs-stepper-circle">1</div>
+                      <div class="">
+                        <h5 class="mb-0 steper-title">Detail Order</h5>
+                        <p class="mb-0 steper-sub-title">Your Order Summary</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bs-stepper-line"></div>
+                  <div class="step" data-target="#test-l-2">
+                    <div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
+                      <div class="bs-stepper-circle">2</div>
+                      <div class="">
+                        <h5 class="mb-0 steper-title">Checkout</h5>
+                        <p class="mb-0 steper-sub-title">Order Summary</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bs-stepper-line"></div>
+                  <div class="step" data-target="#test-l-3">
+                    <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
+                      <div class="bs-stepper-circle">3</div>
+                      <div class="">
+                        <h5 class="mb-0 steper-title">Invoice</h5>
+                        <p class="mb-0 steper-sub-title">Order Details</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="card-body">
+                  <div class="row">
+                    <!-- Left Column: Detail Order -->
+                    <div class="col-lg-8">
+                      <div class="detail-order-section">
+                        <h5 class="detail-order-heading">Detail Order</h5>
+                        <div class="plan-badge">NVME-1</div>
+                        <ul class="plan-features">
+                          <li><i class='bx bx-check'></i> <strong>Storage:</strong> 1 GB NVMe</li>
+                          <li><i class='bx bx-check'></i> <strong>Bandwidth:</strong> Unlimited</li>
+                          <li><i class='bx bx-check'></i> <strong>Databases:</strong> Unlimited</li>
+                          <li><i class='bx bx-check'></i> <strong>Email Accounts:</strong> Unlimited</li>
+                        </ul>
+
+                        <div class="row g-3 mt-3">
+                          <div class="col-12 col-lg-6">
+                            <label for="domainName" class="form-label">Domain Name</label>
+                            <input type="text" class="form-control" id="domainName" placeholder="e.g. example.com">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="col-lg-4">
+                      <div class="order-card">
+                        <div class="order-card-header">
+                          Order Summary
+                        </div>
+
+                        <div class="order-card-body">
+                          <div class="plan-section">
+                            <div class="plan-title">
+                              <span>Basic</span>
+                              <span class="price">$9.95</span>
+                            </div>
+                          </div>
+
+                          <div class="detail-row">
+                            <span>Setup Fee:</span>
+                            <span class="bold">$0.00</span>
+                          </div>
+                          <div class="detail-row">
+                            <span>1 Month:</span>
+                            <span class="bold">$9.95</span>
+                          </div>
+
+                          <div class="discount">
+                            <a href="#">(Change Discount Code)</a>
+                          </div>
+
+                          <hr>
+
+                          <div class="total">
+                            <div class="total-label">Total Due Today</div>
+                            <div class="total-price">$9.95</div>
+                          </div>
+
+                          <button class="btn-continue">CONTINUE</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+        </div>
+
+      </div><!--end row-->
+
+
+
+    </div>
+  </div>
+  <!--end page wrapper -->
+
+  <!-- search modal -->
+  <div class="modal" id="SearchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
+      <div class="modal-content">
+        <div class="modal-header gap-2">
+          <div class="position-relative popup-search w-100">
+            <input class="form-control form-control-lg ps-5 border border-3 border-primary" type="search" placeholder="Search">
+            <span class="position-absolute top-50 search-show ms-3 translate-middle-y start-0 top-50 fs-4"><i class='bx bx-search'></i></span>
+          </div>
+          <button type="button" class="btn-close d-md-none" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="search-list">
+            <p class="mb-1">Html Templates</p>
+            <div class="list-group">
+              <a href="javascript:;" class="list-group-item list-group-item-action active align-items-center d-flex gap-2 py-1"><i class='bx bxl-angular fs-4'></i>Best Html Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-vuejs fs-4'></i>Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-magento fs-4'></i>Responsive Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-shopify fs-4'></i>eCommerce Html Templates</a>
+            </div>
+            <p class="mb-1 mt-3">Web Designe Company</p>
+            <div class="list-group">
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-windows fs-4'></i>Best Html Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-dropbox fs-4' ></i>Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-opera fs-4'></i>Responsive Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-wordpress fs-4'></i>eCommerce Html Templates</a>
+            </div>
+            <p class="mb-1 mt-3">Software Development</p>
+            <div class="list-group">
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-mailchimp fs-4'></i>Best Html Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-zoom fs-4'></i>Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-sass fs-4'></i>Responsive Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-vk fs-4'></i>eCommerce Html Templates</a>
+            </div>
+            <p class="mb-1 mt-3">Online Shoping Portals</p>
+            <div class="list-group">
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-slack fs-4'></i>Best Html Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-skype fs-4'></i>Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-twitter fs-4'></i>Responsive Html5 Templates</a>
+              <a href="javascript:;" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bxl-vimeo fs-4'></i>eCommerce Html Templates</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end search modal -->
+
+
+  <!--start overlay-->
+  <div class="overlay toggle-icon"></div>
+  <!--end overlay-->
+  <!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+  <!--End Back To Top Button-->
+  <app-footer></app-footer>
+</div>
