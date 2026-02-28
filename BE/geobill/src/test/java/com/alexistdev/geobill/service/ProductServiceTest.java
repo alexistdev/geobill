@@ -1,6 +1,7 @@
 package com.alexistdev.geobill.service;
 
 import com.alexistdev.geobill.exceptions.DuplicateException;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductRepo;
@@ -298,5 +299,40 @@ public class ProductServiceTest {
         Assertions.assertEquals(product.getName(), allProducts.getContent().getFirst().getName());
         verify(productRepo, times(1))
                 .findByProductTypeId(eq(productTypeId), any(Pageable.class));
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("12:Test Get Product Exists and not deleted By Product ID")
+    void testFindById_ProductExistsAndNotDeleted() {
+        when(productRepo.findById(productId)).thenReturn(Optional.of(product));
+        Optional<Product> foundProduct = productService.findById(productId);
+
+        Assertions.assertTrue(foundProduct.isPresent());
+        Assertions.assertEquals(productId, foundProduct.get().getId());
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("13:Test Get Product Exists and deleted By Product ID")
+    void testFindById_ProductExistsButIsDeleted() {
+        product.setIsDeleted(true);
+        when(productRepo.findById(productId)).thenReturn(Optional.of(product));
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            productService.findById(productId);
+        });
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("14:Test Get Product Exist but product type is deleted- By Product ID")
+    void testFindById_ProductExistsButProductTypeIsDeleted() {
+        product.getProductType().setIsDeleted(true);
+        when(productRepo.findById(productId)).thenReturn(Optional.of(product));
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            productService.findById(productId);
+        });
     }
 }

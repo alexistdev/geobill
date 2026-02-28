@@ -1,6 +1,7 @@
 package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.exceptions.DuplicateException;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductRepo;
@@ -32,6 +33,17 @@ public class ProductService {
 
     public Page<Product> getAllProductsByFilter(Pageable pageable, String keyword) {
         return productRepo.findByFilter(keyword.toLowerCase(), pageable);
+    }
+
+    public Optional<Product> findById(UUID id) {
+        Optional<Product> foundProduct = productRepo.findById(id);
+        if(foundProduct.isPresent()){
+            Product product = foundProduct.get();
+            if(product.getIsDeleted() || product.getProductType().getIsDeleted()){
+                throw new NotFoundException("Product not found with ID: " + id);
+            }
+        }
+        return foundProduct;
     }
 
     public Page<Product> getAllProductsByProductTypeId(Pageable pageable, UUID productTypeId) {
