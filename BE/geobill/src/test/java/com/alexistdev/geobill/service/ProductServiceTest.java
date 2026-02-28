@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.service;
 
+import com.alexistdev.geobill.dto.ProductDTO;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Product;
@@ -8,11 +9,13 @@ import com.alexistdev.geobill.models.repository.ProductRepo;
 import com.alexistdev.geobill.request.ProductRequest;
 import com.alexistdev.geobill.services.ProductService;
 import com.alexistdev.geobill.services.ProductTypeService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +38,12 @@ public class ProductServiceTest {
 
     @Mock
     private ProductTypeService productTypeService;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @Mock
+    private MessagesUtils messagesUtils;
 
     @InjectMocks
     private ProductService productService;
@@ -125,6 +134,8 @@ public class ProductServiceTest {
     void testSaveProductExistingNotDeleted() {
         when(productTypeService.findByUUID(any(UUID.class))).thenReturn(productType);
         when(productRepo.findByNameIncludingDeleted(product.getName())).thenReturn(Optional.of(product));
+        when(messagesUtils.getMessage(eq("productservice.product.exist"), anyString()))
+                .thenReturn("Product with name 'Basic Shared Hosting' already exists");
 
         DuplicateException exception = Assertions.assertThrows(DuplicateException.class,
                 () -> productService.save(productRequest));
@@ -164,7 +175,6 @@ public class ProductServiceTest {
         ProductType newProductType = new ProductType();
         newProductType.setId(newProductTypeId);
 
-
         Product updatedProduct = new Product();
         updatedProduct.setId(productId);
         updatedProduct.setName(request.getName());
@@ -202,7 +212,6 @@ public class ProductServiceTest {
         when(productTypeService.findByUUID(newProductTypeId)).thenReturn(newProductType);
         when(productRepo.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-
         Product result = productService.update(productId, request);
 
         Assertions.assertNotNull(result);
@@ -221,10 +230,11 @@ public class ProductServiceTest {
         productRequest.setProductTypeId(UUID.randomUUID().toString());
 
         when(productRepo.findById(nonExistingId)).thenReturn(Optional.empty());
+        when(messagesUtils.getMessage(eq("productservice.product.not_found"), anyString()))
+                .thenReturn("Product not found with ID:" + nonExistingId);
 
-        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            productService.update(nonExistingId, productRequest);
-        });
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> productService.update(nonExistingId, productRequest));
 
         Assertions.assertTrue(thrown.getMessage().contains("Product not found with ID:"));
         Assertions.assertTrue(thrown.getMessage().contains(nonExistingId.toString()));
@@ -253,10 +263,11 @@ public class ProductServiceTest {
     void testDeleteProductNotFound() {
         UUID nonExistingId = UUID.randomUUID();
         when(productRepo.findById(nonExistingId)).thenReturn(Optional.empty());
+        when(messagesUtils.getMessage(eq("productservice.product.not_found"), anyString()))
+                .thenReturn("Product not found with ID:" + nonExistingId);
 
-        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-           productService.delete(nonExistingId);
-        });
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> productService.delete(nonExistingId));
 
         Assertions.assertEquals("Product not found with ID:" + nonExistingId, thrown.getMessage());
         verify(productRepo, times(1)).findById(nonExistingId);
@@ -306,10 +317,20 @@ public class ProductServiceTest {
     @DisplayName("12:Test Get Product Exists and not deleted By Product ID")
     void testFindById_ProductExistsAndNotDeleted() {
         when(productRepo.findById(productId)).thenReturn(Optional.of(product));
-        Optional<Product> foundProduct = productService.findById(productId);
+        when(messagesUtils.getMessage(eq("productservice.product.not_found"), anyString()))
+                .thenReturn("Product not found");
 
-        Assertions.assertTrue(foundProduct.isPresent());
-        Assertions.assertEquals(productId, foundProduct.get().getId());
+        ProductDTO mapped = new ProductDTO();
+        mapped.setId(productId.toString());
+        when(modelMapper.map(product, ProductDTO.class)).thenReturn(mapped);
+
+        ProductDTO foundProduct = productService.findById(productId);
+
+        Assertions.assertNotNull(foundProduct);
+        Assertions.assertEquals(productId.toString(), foundProduct.getId());
+
+        verify(productRepo, times(1)).findById(productId);
+        verify(modelMapper, times(1)).map(product, ProductDTO.class);
     }
 
     @Test
@@ -318,10 +339,11 @@ public class ProductServiceTest {
     void testFindById_ProductExistsButIsDeleted() {
         product.setIsDeleted(true);
         when(productRepo.findById(productId)).thenReturn(Optional.of(product));
+        when(messagesUtils.getMessage(eq("productservice.product.not_found"), anyString()))
+                .thenReturn("Product not found");
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
-            productService.findById(productId);
-        });
+        Assertions.assertThrows(NotFoundException.class,
+                () -> productService.findById(productId));
     }
 
     @Test
@@ -330,9 +352,10 @@ public class ProductServiceTest {
     void testFindById_ProductExistsButProductTypeIsDeleted() {
         product.getProductType().setIsDeleted(true);
         when(productRepo.findById(productId)).thenReturn(Optional.of(product));
+        when(messagesUtils.getMessage(eq("productservice.product.not_found"), anyString()))
+                .thenReturn("Product not found");
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
-            productService.findById(productId);
-        });
+        Assertions.assertThrows(NotFoundException.class,
+                () -> productService.findById(productId));
     }
 }

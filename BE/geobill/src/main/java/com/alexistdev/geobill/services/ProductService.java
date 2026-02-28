@@ -1,17 +1,18 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.dto.ProductDTO;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductRepo;
 import com.alexistdev.geobill.request.ProductRequest;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,11 +22,17 @@ import java.util.UUID;
 @Service
 public class ProductService {
 
-    @Autowired
-    private ProductRepo productRepo;
+    private final ProductRepo productRepo;
+    private final ProductTypeService productTypeService;
+    private final ModelMapper modelMapper;
+    private final MessagesUtils messagesUtils;
 
-    @Autowired
-    private ProductTypeService productTypeService;
+    public ProductService(ProductRepo productRepo, ProductTypeService productTypeService, ModelMapper modelMapper, MessagesUtils messagesUtils) {
+        this.productRepo = productRepo;
+        this.productTypeService = productTypeService;
+        this.modelMapper = modelMapper;
+        this.messagesUtils = messagesUtils;
+    }
 
     public Page<Product> getAllProducts(Pageable pageable){
         return productRepo.findByIsDeletedFalse(pageable);
@@ -35,15 +42,18 @@ public class ProductService {
         return productRepo.findByFilter(keyword.toLowerCase(), pageable);
     }
 
-    public Optional<Product> findById(UUID id) {
+    public ProductDTO findById(UUID id) {
         Optional<Product> foundProduct = productRepo.findById(id);
+        String message = messagesUtils.getMessage("productservice.product.not_found",
+                String.valueOf(id));
         if(foundProduct.isPresent()){
             Product product = foundProduct.get();
             if(product.getIsDeleted() || product.getProductType().getIsDeleted()){
-                throw new NotFoundException("Product not found with ID: " + id);
+                throw new NotFoundException(message);
             }
+            return convertToProductDTO(product);
         }
-        return foundProduct;
+        throw new NotFoundException(message);
     }
 
     public Page<Product> getAllProductsByProductTypeId(Pageable pageable, UUID productTypeId) {
@@ -62,8 +72,9 @@ public class ProductService {
             Product existing = foundProduct.get();
 
             if(!existing.getDeleted()){
-                log.info("Product with name '{}' already exists", request.getName());
-                throw new DuplicateException("Product with name '" + request.getName() + "' already exists");
+                String message = messagesUtils.getMessage("productservice.product.exist", request.getName());
+                log.info(message);
+                throw new DuplicateException(message);
             }
 
             updateProductFields(existing, request);
@@ -76,13 +87,14 @@ public class ProductService {
 
     public Product update(UUID id, ProductRequest request) {
         Product existingProduct = productRepo.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Product not found with ID:" + id));
+                .orElseThrow(()-> new IllegalArgumentException(messagesUtils.getMessage("productservice.product.not_found", String.valueOf(id))));
 
         Optional<Product> foundProduct = productRepo.findByNameIncludingDeleted(request.getName());
         if(foundProduct.isPresent()){
             if(!foundProduct.get().getId().equals(id)){
-                log.info("Product with name '{}' already exists", request.getName());
-                throw new DuplicateException("Product with name '" + request.getName() + "' already exists");
+                String message = messagesUtils.getMessage("productservice.product.exist", request.getName());
+                log.info(message);
+                throw new DuplicateException(message);
             }
         }
 
@@ -96,7 +108,8 @@ public class ProductService {
 
     public void delete(UUID id) {
         Product product = productRepo.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Product not found with ID:" + id));
+                .orElseThrow(()-> new IllegalArgumentException(
+                        messagesUtils.getMessage("productservice.product.not_found", String.valueOf(id))));
         product.setIsDeleted(true);
         productRepo.save(product);
     }
@@ -120,6 +133,8 @@ public class ProductService {
         target.setInfo5(source.getInfo5());
     }
 
-
+    private ProductDTO convertToProductDTO(Product product) {
+        return modelMapper.map(product, ProductDTO.class);
+    }
 
 }
