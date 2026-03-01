@@ -3,6 +3,7 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.dto.ProductDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.exceptions.DuplicateException;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.request.ProductRequest;
@@ -106,6 +107,26 @@ public class ProductController {
         Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
         responseData.setPayload(productDTOPage);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseData<ProductDTO>> searchProductById(@PathVariable("id") UUID uuid){
+        ResponseData<ProductDTO> responseData = new ResponseData<>();
+        responseData.setStatus(false);
+        try {
+            ProductDTO result = productService.findById(uuid);
+            responseData.getMessages().add("Retrieved product by id");
+            responseData.setStatus(true);
+            responseData.setPayload(result);
+            return ResponseEntity.status(HttpStatus.OK).body(responseData);
+        } catch (NotFoundException ne){
+            log.error("Error retrieving product by id", ne);
+            responseData.getMessages().add(ne.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        } catch (Exception e){
+            log.error("Error retrieving product by id", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+        }
     }
 
     @GetMapping("/search-by-type")

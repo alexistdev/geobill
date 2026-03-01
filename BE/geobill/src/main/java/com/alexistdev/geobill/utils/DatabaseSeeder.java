@@ -2,11 +2,9 @@ package com.alexistdev.geobill.utils;
 
 import com.alexistdev.geobill.dto.UserDTO;
 import com.alexistdev.geobill.models.entity.*;
-import com.alexistdev.geobill.models.repository.MenuRepo;
-import com.alexistdev.geobill.models.repository.ProductTypeRepo;
-import com.alexistdev.geobill.models.repository.RoleMenuRepo;
-import com.alexistdev.geobill.models.repository.UserRepo;
+import com.alexistdev.geobill.models.repository.*;
 import com.alexistdev.geobill.request.RegisterRequest;
+import com.alexistdev.geobill.services.ProductTypeService;
 import com.alexistdev.geobill.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +29,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private static final String SYSTEM_USER = "System";
     private static final String DEFAULT_PASSWORD = "password";
+    private final ProductTypeService productTypeService;
+    private final ProductRepo productRepo;
 
     @Override
     public void run(String... args) {
@@ -39,6 +39,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedRoleMenus();
             seedUsers();
             seedProductType();
+            seedProduct();
         }
     }
 
@@ -57,6 +58,75 @@ public class DatabaseSeeder implements CommandLineRunner {
         allProductTypes.addAll(List.of(productType1, productType2));
         productTypeRepo.saveAll(allProductTypes);
         log.info("Finished seeding product types");
+    }
+
+    private void seedProduct(){
+        log.info("Seeding product");
+
+        Optional<ProductType> productType = productTypeRepo.findByNameIncludingDeleted("Shared Hosting");
+        productType.ifPresent(productType1 -> {
+            Product product1 = createProduct(
+                    "NVME-1", productType1, 50000.0,
+                    12, "10GB", "1000 Mbps", "1",
+                    "1", "1",
+                    "1 GB RAM",
+                    "2 Core",
+                    "PHP, Ruby, Python, NodeJS",
+                    null, null
+            );
+
+            Product product2 = createProduct(
+                    "NVME-2", productType1, 150000.0,
+                    12, "40GB", "5000 Mbps", "1",
+                    "1", "1",
+                    "4 GB RAM",
+                    "4 Core",
+                    "PHP, Ruby, Python, NodeJS",
+                    null, null
+            );
+
+            Product product3 = createProduct(
+                    "NVME-3", productType1, 200000.0,
+                    12, "80GB", "Unlimited", "Unlimited",
+                    "Unlimited", "5",
+                    "6 GB RAM",
+                    "8 Core",
+                    "PHP, Ruby, Python, NodeJS",
+                    null, null
+            );
+            List<Product> allProducts = new ArrayList<>(List.of(product1, product2, product3));
+            productRepo.saveAll(allProducts);
+        });
+
+        log.info("Finished seeding product");
+    }
+
+    private Product createProduct(
+            String name, ProductType productType, double price,
+            int cycle, String capacity, String bandwith,
+            String addon_domain, String database_account, String ftp_account,
+            String info1, String info2, String info3, String info4, String info5
+    ) {
+        Product createdProduct = new Product();
+        createdProduct.setName(name);
+        createdProduct.setProductType(productType);
+        createdProduct.setPrice(price);
+        createdProduct.setCycle(cycle);
+        createdProduct.setCapacity(capacity);
+        createdProduct.setBandwith(bandwith);
+        createdProduct.setAddon_domain(addon_domain);
+        createdProduct.setDatabase_account(database_account);
+        createdProduct.setFtp_account(ftp_account);
+        createdProduct.setInfo1(info1);
+        createdProduct.setInfo2(info2);
+        createdProduct.setInfo3(info3);
+        createdProduct.setInfo4(info4);
+        createdProduct.setInfo5(info5);
+        createdProduct.setCreatedBy(SYSTEM_USER);
+        createdProduct.setCreatedDate(new java.util.Date());
+        createdProduct.setModifiedDate(new java.util.Date());
+        createdProduct.setIsDeleted(false);
+        return createdProduct;
     }
 
     private ProductType createProductType(String name) {
