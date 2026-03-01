@@ -115,6 +115,10 @@ export class Checkout implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.inputDomainName.startsWith('www.')) {
+      this.inputDomainName = this.inputDomainName.slice(4);
+    }
+
     const domainRegex = /^[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
     this.isDomainValid = domainRegex.test(this.inputDomainName);
 
