@@ -37,4 +37,10 @@ export class Orderhostingservice {
       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
     );
   }
+
+  getProductById(id: string): Observable<Apiresponse<Productmodel>> {
+    return this.http.get<Apiresponse<Productmodel>>(
+      `${this.apiUrlProduct}/${id}`,
+    )
+  }
 }
