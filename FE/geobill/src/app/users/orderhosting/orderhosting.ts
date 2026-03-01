@@ -72,6 +72,9 @@ export class Orderhosting implements OnInit, OnChanges {
         this.productTypes = data.payload.content;
         this.productTypesLoaded = true;
         this.cdr.detectChanges();
+        if(this.productTypes.length > 0) {
+          this.loadDataProduct(this.productTypes[0].id);
+        }
       },
       error: (err) => console.log(err)
     });

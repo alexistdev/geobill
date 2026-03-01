@@ -67,7 +67,6 @@
               </div>
               <div class="col-9">
                 <SELECT class="form-select" (change)="onSelect($event)">
-                  <OPTION value="0" selected>Select Hosting Service</OPTION>
                   @for (productType of productTypes; track productType.id){
                     <OPTION value="{{productType.id}}">{{productType.name}}</OPTION>
                   }
