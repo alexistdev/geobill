@@ -4,9 +4,10 @@ import { Header } from "../../../share/header/header";
 import { Menutop } from "../../../share/menutop/menutop";
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Orderhostingservice } from '../orderhostingservice';
-import { isPlatformBrowser, NgClass } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser, NgClass } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { ToNumberPipe } from '../tonumberpipe';
 
 @Component({
   selector: 'app-checkout',
@@ -16,7 +17,9 @@ import { FormsModule } from '@angular/forms';
     Menutop,
     RouterLink,
     NgClass,
-    FormsModule
+    FormsModule,
+    ToNumberPipe,
+    DecimalPipe
   ],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
@@ -42,6 +45,8 @@ export class Checkout implements OnInit, OnDestroy {
   isInvoicePageLoading: boolean = false;
   isDomainValid: boolean = false;
   isSubmitted: boolean = false;
+  originalPrice: string | null = null;
+
 
   private readonly destroy$ = new Subject<void>();
   private platformId = inject(PLATFORM_ID);
@@ -62,7 +67,25 @@ export class Checkout implements OnInit, OnDestroy {
         this.loadDetailProduct(this.productId);
       })
     }
+  }
 
+  changeCycle(selectedValue: any):void {
+    this.price = this.originalPrice;
+    let numericPrice = Number(this.price);
+
+    if(isNaN(numericPrice)) {
+      console.log("Invalid price value:", this.price);
+      numericPrice = 0;
+    }
+
+    let numericCycle = Number(selectedValue);
+    if(isNaN(numericCycle)) {
+      console.log("Invalid cycle value:", selectedValue);
+      numericCycle = 0;
+    }
+    var tempPrice = numericCycle * numericPrice;
+    this.price = tempPrice.toString();
+    this.cdr.detectChanges();
   }
 
   loadDetailProduct(id: string | null): void {
@@ -89,6 +112,7 @@ export class Checkout implements OnInit, OnDestroy {
         this.info3 = product.info3;
         this.info4 = product.info4;
         this.info5 = product.info5;
+        this.originalPrice = product.price.toString();
         this.cdr.detectChanges();
       },
       error: (err) => {

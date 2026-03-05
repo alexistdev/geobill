@@ -152,7 +152,7 @@
                         <div class="plan-section">
                           <div class="plan-title">
                             <span>{{ productName }}</span>
-                            <span class="price">Rp {{ price }}</span>
+                            <span class="price">Rp {{ price | toNumber | number:'1.2-2' }}</span>
                           </div>
                         </div>
 
@@ -162,7 +162,7 @@
                         </div>
                         <div class="detail-row">
                           <span>1 Month:</span>
-                          <span class="bold">Rp {{ price }}</span>
+                          <span class="bold">Rp {{ price | toNumber | number:'1.2-2' }}</span>
                         </div>
 
                         <div class="discount">
@@ -173,7 +173,7 @@
 
                         <div class="total">
                           <div class="total-label">Total Due Today</div>
-                          <div class="total-price">Rp {{ price }}</div>
+                          <div class="total-price">Rp {{ price | toNumber | number:'1.2-2' }}</div>
                         </div>
 
                         <button class="btn-continue" (click)="goToCheckout()">CONTINUE</button>
@@ -194,13 +194,13 @@
                         <div class="plan-section">
                           <div class="plan-title">
                             <span>{{ productName }} : {{ inputDomainName }}</span>
-                            <span class="price">Rp {{ price }}</span>
+                            <span class="price">Rp {{ price | toNumber | number:'1.2-2' }}</span>
                           </div>
                         </div>
                         <div class="detail-row">
                           <div class="col-lg-4">
                             <label for="cycle" class="form-label">Select Cycle</label>
-                            <select name="cycle" class="form-control" id="cycle">
+                            <select name="cycle" class="form-control" (change)="changeCycle(cycle.value)" #cycle id="cycle">
                               <option value="1">1 month</option>
                               <option value="3">3 months</option>
                               <option value="6">6 months</option>
@@ -208,17 +208,25 @@
                             </select>
                           </div>
 
-                          <span class="bold">Rp {{ price }}</span>
+                          <span class="bold">Rp {{ price | toNumber | number:'1.2-2' }}</span>
                         </div>
                         <div class="detail-row mt-5">
                           <span>Setup Fee:</span>
                           <span class="bold">Rp 0.00</span>
                         </div>
+                        <div class="detail-row">
+                          <span>Tax:</span>
+                          <span class="bold">Rp 0.00</span>
+                        </div>
+                        <div class="detail-row">
+                          <span class="text-danger">Discount:</span>
+                          <span class="bold text-danger">Rp 0.00</span>
+                        </div>
                         <hr>
 
                         <div class="total">
                           <div class="total-label">Total Due Today</div>
-                          <div class="total-price">Rp {{ price }}</div>
+                          <div class="total-price">Rp {{ price | toNumber | number:'1.2-2' }}</div>
                         </div>
 
                         <button class="btn-continue">CONFIRM CHECKOUT</button>

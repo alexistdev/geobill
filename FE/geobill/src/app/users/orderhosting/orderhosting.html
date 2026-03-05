@@ -82,17 +82,17 @@
                   @if(products.indexOf(product) % 4 === 0){
                     <div class="card-header bg-danger py-3">
                       <h5 class="card-title text-white text-uppercase text-center">{{ product.name }}</h5>
-                      <h6 class="card-price text-white text-center">Rp. {{ product.price }}<span class="term">/month</span></h6>
+                      <h6 class="card-price text-white text-center">Rp. {{ product.price |  number:'1.2-2' }}<span class="term">/month</span></h6>
                     </div>
                   }@else if(products.indexOf(product)% 4 === 1){
                     <div class="card-header bg-primary py-3">
                       <h5 class="card-title text-white text-uppercase text-center">{{ product.name }}</h5>
-                      <h6 class="card-price text-white text-center">Rp. {{ product.price }}<span class="term">/month</span></h6>
+                      <h6 class="card-price text-white text-center">Rp. {{ product.price |  number:'1.2-2' }}<span class="term">/month</span></h6>
                     </div>
                   }@else if(products.indexOf(product) % 4 === 2){
                     <div class="card-header bg-gradient-bloody py-3">
                       <h5 class="card-title text-white text-uppercase text-center">{{ product.name }}</h5>
-                      <h6 class="card-price text-white text-center">Rp. {{ product.price }}<span class="term">/month</span></h6>
+                      <h6 class="card-price text-white text-center">Rp. {{ product.price |  number:'1.2-2' }}<span class="term">/month</span></h6>
                     </div>
                   }@else {
                     <div class="card-header bg-gradient-scooter py-3">
