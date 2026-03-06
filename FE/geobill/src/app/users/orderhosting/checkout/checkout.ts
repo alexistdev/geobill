@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, inject, Inject, OnDestroy, OnInit, PLATFORM_ID} from '@angular/core';
 import { Footer } from "../../../share/footer/footer";
 import { Header } from "../../../share/header/header";
 import { Menutop } from "../../../share/menutop/menutop";
@@ -8,6 +8,8 @@ import { DecimalPipe, isPlatformBrowser, NgClass } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToNumberPipe } from '../tonumberpipe';
+import {Checkoutmodal} from './checkoutmodal/checkoutmodal';
+import {Localstorageservice} from '../../../utils/localstorage/localstorageservice';
 
 @Component({
   selector: 'app-checkout',
@@ -19,7 +21,8 @@ import { ToNumberPipe } from '../tonumberpipe';
     NgClass,
     FormsModule,
     ToNumberPipe,
-    DecimalPipe
+    DecimalPipe,
+    Checkoutmodal
   ],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
@@ -46,7 +49,8 @@ export class Checkout implements OnInit, OnDestroy {
   isDomainValid: boolean = false;
   isSubmitted: boolean = false;
   originalPrice: string | null = null;
-
+  showModal = false;
+  orderCycle: number = 1;
 
   private readonly destroy$ = new Subject<void>();
   private platformId = inject(PLATFORM_ID);
@@ -56,7 +60,9 @@ export class Checkout implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private orderhostingservice: Orderhostingservice,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private el: ElementRef,
+    private localStorageService: Localstorageservice,
   ) { }
 
   ngOnInit(): void {
@@ -79,6 +85,7 @@ export class Checkout implements OnInit, OnDestroy {
     }
 
     let numericCycle = Number(selectedValue);
+    this.orderCycle = numericCycle;
     if(isNaN(numericCycle)) {
       console.log("Invalid cycle value:", selectedValue);
       numericCycle = 0;
@@ -149,6 +156,23 @@ export class Checkout implements OnInit, OnDestroy {
     if (!this.isDomainValid) {
       console.log('Invalid domain format.');
     }
+  }
+
+  openModal() {
+    console.log("test");
+    this.showModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeModal() {
+    this.el.nativeElement.blur();
+    this.showModal = false;
+    this.cdr.detectChanges();
+  }
+
+  saveData() {
+    this.showModal = false;
+    let userId:string = this.localStorageService.getItem("userId");
   }
 
   ngOnDestroy(): void {

@@ -229,7 +229,7 @@
                           <div class="total-price">Rp {{ price | toNumber | number:'1.2-2' }}</div>
                         </div>
 
-                        <button class="btn-continue">CONFIRM CHECKOUT</button>
+                        <button class="btn-continue" (click)="openModal()">CONFIRM CHECKOUT</button>
                       </div>
                     </div>
                   </div>
@@ -329,7 +329,11 @@
     </div>
   </div>
   <!-- end search modal -->
-
+  <app-checkoutmodal
+    [show]="showModal"
+    (close)="closeModal()"
+    (confirmSubmit)="saveData()"
+  ></app-checkoutmodal>
 
   <!--start overlay-->
   <div class="overlay toggle-icon"></div>

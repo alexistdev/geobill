@@ -1,0 +1,25 @@
+<!--
+  ~ Copyright (c) 2026.
+  ~ Project: GeoBill
+  ~ Author: Alexsander Hendra Wijaya
+  ~ Github: https://github.com/alexistdev
+  ~ Email: alexistdev@gmail.com
+  -->
+
+<div #modalContainer class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" inert>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"> Checkout Confirmation</h5>
+        <button type="button" class="btn-close" (click)="onClose()">x</button>
+      </div>
+      <div class="modal-body">
+        Apakah anda yakin ingin menyimpan data ini?
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-danger" (click)="onClose()">Close</button>
+          <button type="button" class="btn btn-primary" (click)="onSubmit()"> Save</button>
+      </div>
+    </div>
+  </div>
+</div>
