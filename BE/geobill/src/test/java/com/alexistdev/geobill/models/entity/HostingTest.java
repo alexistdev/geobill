@@ -40,7 +40,7 @@ public class HostingTest {
         id = UUID.randomUUID();
         userId = UUID.randomUUID();
         productId = UUID.randomUUID();
-        hostingCode = 123456789L;
+        hostingCode = null;
         name = "Hosting 1";
         domain = "hosting1.com";
         price = 100.0;
@@ -99,7 +99,7 @@ public class HostingTest {
     @Test
     @Order(2)
     @DisplayName("2. Test Set Data")
-    void testSetData(){
+    void testSetData() {
         UUID newId = UUID.randomUUID();
         UUID newUserId = UUID.randomUUID();
         UUID newProductId = UUID.randomUUID();
@@ -108,7 +108,7 @@ public class HostingTest {
         Product newProduct = new Product();
         newProduct.setId(newProductId);
 
-        Long newHostingCode = 123L;
+        Long newHostingCode = null;
         String newName = "Hosting New";
         String newDomain = "hostingNew.com";
         Double newPrice = 200.0;
@@ -144,25 +144,25 @@ public class HostingTest {
     @Order(3)
     @DisplayName("3. Ensure Product is Serializable")
     void testSerializable() {
-        Assertions.assertInstanceOf(java.io.Serializable.class,hosting);
+        Assertions.assertInstanceOf(java.io.Serializable.class, hosting);
     }
 
     @Test
     @Order(4)
     @DisplayName("4. Should verify Menu extends BaseEntity")
     void testExtendsBaseEntity() {
-        Assertions.assertInstanceOf(BaseEntity.class,hosting);
+        Assertions.assertInstanceOf(BaseEntity.class, hosting);
     }
 
     @Test
     @Order(5)
     @DisplayName("5. Should verify id is UUID")
     void testIdIsUUID() {
-        try{
+        try {
             Field field = Hosting.class.getDeclaredField("id");
             field.setAccessible(true);
             Assertions.assertEquals(UUID.class, field.getType());
-        } catch (NoSuchFieldException  e){
+        } catch (NoSuchFieldException e) {
             fail("id field should exist in ProductType class");
         }
     }

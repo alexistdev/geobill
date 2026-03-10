@@ -43,6 +43,11 @@ public class ProductService {
     }
 
     public ProductDTO findById(UUID id) {
+        Product product = findEntityById(id);
+        return convertToProductDTO(product);
+    }
+
+    public Product findEntityById(UUID id) {
         Optional<Product> foundProduct = productRepo.findById(id);
         String message = messagesUtils.getMessage("productservice.product.not_found",
                 String.valueOf(id));
@@ -51,7 +56,7 @@ public class ProductService {
             if(product.getIsDeleted() || product.getProductType().getIsDeleted()){
                 throw new NotFoundException(message);
             }
-            return convertToProductDTO(product);
+            return product;
         }
         throw new NotFoundException(message);
     }

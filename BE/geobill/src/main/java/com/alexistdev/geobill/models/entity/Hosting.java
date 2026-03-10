@@ -63,7 +63,7 @@ public class Hosting extends BaseEntity<String> implements Serializable {
     private Date endDate;
 
     @NotNull
-    @Column(nullable = false, columnDefinition = "TINYINT(1)", length = 1)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private int status = 0;
 
 }
