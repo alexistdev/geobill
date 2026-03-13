@@ -41,9 +41,8 @@ public class Hosting extends BaseEntity<String> implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @Generated(event = EventType.INSERT)
-    @Column(name = "hosting_code", updatable = false, insertable = false, columnDefinition = "SERIAL")
-    private Long hostingCode;
+    @Column(name = "hosting_code", updatable = false, unique = true, nullable = false, length = 50)
+    private String hostingCode;
 
     @NotNull
     @Column(length = 100, nullable = false)

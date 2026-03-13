@@ -28,7 +28,7 @@ public class HostingService {
     }
 
     @Transactional
-    public Hosting addHosting(HostingRequest hostingRequest){
+    public Hosting addHosting(HostingRequest hostingRequest) {
         User userFound = userService.findUserByUUID(UUID.fromString(hostingRequest.getUserId()));
         Product productResult = productService.findEntityById(UUID.fromString(hostingRequest.getProductId()));
 
@@ -36,6 +36,7 @@ public class HostingService {
         Date endDate = this.getEndDate(hostingRequest.getCycle(), startDate);
 
         Hosting hosting = new Hosting();
+        hosting.setHostingCode(generateHostingCode());
         hosting.setName(String.format("%s - %s", productResult.getName(), hostingRequest.getDomainName()));
         hosting.setDomain(hostingRequest.getDomainName());
         hosting.setUser(userFound);
@@ -52,11 +53,20 @@ public class HostingService {
         return hostingRepo.save(hosting);
     }
 
-    private Date getEndDate(int cycle , Date startDate){
+    private Date getEndDate(int cycle, Date startDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startDate);
         calendar.add(Calendar.MONTH, cycle);
         return calendar.getTime();
+    }
+
+    private String generateHostingCode() {
+        String code;
+        do {
+            String randomStr = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+            code = "GE-" + randomStr;
+        } while (hostingRepo.existsByHostingCode(code));
+        return code;
     }
 
 }

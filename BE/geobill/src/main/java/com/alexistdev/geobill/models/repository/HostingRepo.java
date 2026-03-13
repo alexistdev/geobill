@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface HostingRepo extends JpaRepository<Hosting, UUID> {
+    boolean existsByHostingCode(String hostingCode);
 }

@@ -40,8 +40,8 @@ public class HostingRepoTest {
         User testUser = new User();
         testUser.setEmail("testUser@gmail.com");
         testUser.setPassword("password");
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(testUser, null, new ArrayList<>());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(testUser, null,
+                new ArrayList<>());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         productType = new ProductType();
@@ -83,6 +83,8 @@ public class HostingRepoTest {
 
     private Hosting createHosting(String name, String domain, Double price, int status) {
         Hosting hosting = new Hosting();
+        hosting.setHostingCode(
+                "GE-" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase());
         hosting.setUser(user);
         hosting.setProduct(product);
         hosting.setName(name);

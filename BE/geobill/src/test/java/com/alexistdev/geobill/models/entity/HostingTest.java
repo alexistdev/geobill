@@ -20,7 +20,7 @@ public class HostingTest {
     private UUID userId;
     private UUID productId;
     private Hosting hosting;
-    private Long hostingCode;
+    private String hostingCode;
     private String name;
     private String domain;
     private Double price;
@@ -108,7 +108,7 @@ public class HostingTest {
         Product newProduct = new Product();
         newProduct.setId(newProductId);
 
-        Long newHostingCode = null;
+        String newHostingCode = null;
         String newName = "Hosting New";
         String newDomain = "hostingNew.com";
         Double newPrice = 200.0;
