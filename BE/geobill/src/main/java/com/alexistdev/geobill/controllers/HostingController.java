@@ -7,7 +7,6 @@ import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -17,19 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/hosting")
 public class HostingController {
 
     private final HostingService hostingService;
-    private final ModelMapper modelMapper;
 
-    public HostingController(HostingService hostingService, ModelMapper modelMapper) {
+    public HostingController(HostingService hostingService) {
         this.hostingService = hostingService;
-        this.modelMapper = modelMapper;
     }
 
     @PostMapping
@@ -45,9 +40,7 @@ public class HostingController {
         try {
             Hosting hosting = hostingService.addHosting(request);
 
-            HostingDTO hostingDTO = modelMapper.map(hosting, HostingDTO.class);
-            hostingDTO.setUserId(UUID.fromString(request.getUserId()));
-            hostingDTO.setProductId(UUID.fromString(request.getProductId()));
+            HostingDTO hostingDTO = this.mapToHostingDTO(hosting);
 
             responseData.setStatus(true);
             responseData.getMessages().add("Hosting added successfully");
@@ -57,6 +50,17 @@ public class HostingController {
             log.error("Error adding Hosting", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
         }
+    }
+
+    private HostingDTO mapToHostingDTO(Hosting hosting) {
+        HostingDTO hostingDTO = new HostingDTO();
+        hostingDTO.setId(hosting.getId());
+        hostingDTO.setUserId(hosting.getUser().getId());
+        hostingDTO.setProductId(hosting.getProduct().getId());
+        hostingDTO.setDomainName(hosting.getDomain());
+        hostingDTO.setPrice(hosting.getPrice());
+        hostingDTO.setCycle(hosting.getProduct().getCycle());
+        return hostingDTO;
     }
 
     private void processErrors(Errors errors, ResponseData<?> responseData) {
