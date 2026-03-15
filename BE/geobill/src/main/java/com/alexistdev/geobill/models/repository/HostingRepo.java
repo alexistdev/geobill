@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface HostingRepo extends JpaRepository<Hosting, UUID> {
     boolean existsByHostingCode(String hostingCode);
+    boolean existsByUser_IdAndStatus(UUID userId, int status);
 }
