@@ -2,13 +2,13 @@ package com.alexistdev.geobill.config;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.Locale;
 
-@Configuration
+@TestConfiguration
 public class TestMessageSourceConfig {
 
     @Bean

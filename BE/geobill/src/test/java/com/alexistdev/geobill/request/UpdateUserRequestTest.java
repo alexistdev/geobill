@@ -1,6 +1,5 @@
 package com.alexistdev.geobill.request;
 
-import com.alexistdev.geobill.config.TestLocaleConfig;
 import com.alexistdev.geobill.config.TestMessageSourceConfig;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -15,7 +14,7 @@ import java.util.Locale;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { TestMessageSourceConfig.class, TestLocaleConfig.class })
+@ContextConfiguration(classes = { TestMessageSourceConfig.class })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UpdateUserRequestTest {
 

@@ -2,7 +2,6 @@ package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.dto.ResponseData;
-import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
@@ -10,8 +9,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,9 +50,4 @@ public class HostingController {
         return hostingDTO;
     }
 
-    private void processErrors(Errors errors, ResponseData<?> responseData) {
-        for (ObjectError error : errors.getAllErrors()) {
-            responseData.getMessages().add(error.getDefaultMessage());
-        }
-    }
 }
