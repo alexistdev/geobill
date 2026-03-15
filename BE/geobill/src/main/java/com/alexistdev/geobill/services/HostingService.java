@@ -1,10 +1,12 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.HostingRepo;
 import com.alexistdev.geobill.request.HostingRequest;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,22 +22,40 @@ public class HostingService {
     private final HostingRepo hostingRepo;
     private final ProductService productService;
     private final UserService userService;
+    private final MessagesUtils messagesUtils;
 
-    public HostingService(HostingRepo hostingRepo, ProductService productService, UserService userService) {
+    public HostingService(HostingRepo hostingRepo, ProductService productService, UserService userService, MessagesUtils messagesUtils) {
         this.hostingRepo = hostingRepo;
         this.productService = productService;
         this.userService = userService;
+        this.messagesUtils = messagesUtils;
     }
 
     @Transactional
     public Hosting addHosting(HostingRequest hostingRequest) {
         User userFound = userService.findUserByUUID(UUID.fromString(hostingRequest.getUserId()));
         Product productResult = productService.findEntityById(UUID.fromString(hostingRequest.getProductId()));
+        if(userFound == null ){
+            String userNotFoundMessage= messagesUtils.getMessage("hostingservice.user_not_found");
+            throw new NotFoundException(userNotFoundMessage);
+        }
+        if(productResult == null){
+            String productNotFoundMessage = messagesUtils.getMessage("hostingservice.product_not_found");
+            throw new NotFoundException(productNotFoundMessage);
+        }
+        if(this.doesUserHaveHostingWithStatus(userFound.getId(), 0)){
+            String userAlreadyHavePendingHosting = messagesUtils.getMessage("hostingservice.user_already_have_pending_hosting");
+            throw new RuntimeException(userAlreadyHavePendingHosting);
+        }
+        return hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
+    }
+
+    private Hosting createHosting(HostingRequest hostingRequest, User userFound, Product productResult) {
+        Hosting hosting = new Hosting();
 
         Date startDate = new Date();
         Date endDate = this.getEndDate(hostingRequest.getCycle(), startDate);
 
-        Hosting hosting = new Hosting();
         hosting.setHostingCode(generateHostingCode());
         hosting.setName(String.format("%s - %s", productResult.getName(), hostingRequest.getDomainName()));
         hosting.setDomain(hostingRequest.getDomainName());
@@ -45,12 +65,16 @@ public class HostingService {
         hosting.setStartDate(startDate);
         hosting.setEndDate(endDate);
         hosting.setStatus(0);
-        hosting.setCreatedBy(userFound.getUsername());
+        hosting.setCreatedBy(userFound.getEmail());
         hosting.setCreatedDate(new Date());
-        hosting.setModifiedBy(userFound.getUsername());
+        hosting.setModifiedBy(userFound.getEmail());
         hosting.setModifiedDate(new Date());
         hosting.setIsDeleted(false);
-        return hostingRepo.save(hosting);
+        return hosting;
+    }
+
+    private boolean doesUserHaveHostingWithStatus(UUID userId, int status) {
+        return hostingRepo.existsByUser_IdAndStatus(userId, status);
     }
 
     private Date getEndDate(int cycle, Date startDate) {
