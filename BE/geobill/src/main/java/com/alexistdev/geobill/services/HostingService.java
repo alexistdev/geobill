@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.exceptions.ConflictException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Product;
@@ -45,7 +46,7 @@ public class HostingService {
         }
         if(this.doesUserHaveHostingWithStatus(userFound.getId(), 0)){
             String userAlreadyHavePendingHosting = messagesUtils.getMessage("hostingservice.user_already_have_pending_hosting");
-            throw new RuntimeException(userAlreadyHavePendingHosting);
+            throw new ConflictException(userAlreadyHavePendingHosting);
         }
         return hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
     }

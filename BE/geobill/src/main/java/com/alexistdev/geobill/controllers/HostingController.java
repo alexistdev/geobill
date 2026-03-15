@@ -2,6 +2,7 @@ package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
@@ -28,28 +29,17 @@ public class HostingController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseData<HostingDTO>> addHosting(@Valid @RequestBody HostingRequest request, Errors errors){
+    public ResponseEntity<ResponseData<HostingDTO>> addHosting(@Valid @RequestBody HostingRequest request){
+        Hosting hosting = hostingService.addHosting(request);
+        HostingDTO hostingDTO = this.mapToHostingDTO(hosting);
+
         ResponseData<HostingDTO> responseData = new ResponseData<>();
         responseData.setStatus(false);
         responseData.setPayload(null);
-        if(errors.hasErrors()) {
-            processErrors(errors, responseData);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-        }
-
-        try {
-            Hosting hosting = hostingService.addHosting(request);
-
-            HostingDTO hostingDTO = this.mapToHostingDTO(hosting);
-
-            responseData.setStatus(true);
-            responseData.getMessages().add("Hosting added successfully");
-            responseData.setPayload(hostingDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
-        } catch (Exception e) {
-            log.error("Error adding Hosting", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
-        }
+        responseData.setStatus(true);
+        responseData.getMessages().add("Hosting added successfully");
+        responseData.setPayload(hostingDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
 
     private HostingDTO mapToHostingDTO(Hosting hosting) {
