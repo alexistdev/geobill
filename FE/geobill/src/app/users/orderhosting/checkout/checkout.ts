@@ -51,6 +51,7 @@ export class Checkout implements OnInit, OnDestroy {
   originalPrice: string | null = null;
   showModal = false;
   orderCycle: number = 1;
+  priceOrdered: number = 0;
 
   private readonly destroy$ = new Subject<void>();
   private platformId = inject(PLATFORM_ID);
@@ -92,6 +93,7 @@ export class Checkout implements OnInit, OnDestroy {
     }
     var tempPrice = numericCycle * numericPrice;
     this.price = tempPrice.toString();
+    this.priceOrdered = tempPrice;
     this.cdr.detectChanges();
   }
 
@@ -173,6 +175,11 @@ export class Checkout implements OnInit, OnDestroy {
   saveData() {
     this.showModal = false;
     let userId:string = this.localStorageService.getItem("userId");
+    console.log("User ID:", userId);
+    console.log("Domain Name:", this.inputDomainName);
+    console.log("Product ID:", this.productId);
+    console.log("Price:", this.price);
+    console.log("cycle:", this.orderCycle);
   }
 
   ngOnDestroy(): void {

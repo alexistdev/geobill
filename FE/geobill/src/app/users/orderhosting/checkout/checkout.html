@@ -194,7 +194,7 @@
                         <div class="plan-section">
                           <div class="plan-title">
                             <span>{{ productName }} : {{ inputDomainName }}</span>
-                            <span class="price">Rp {{ price | toNumber | number:'1.2-2' }}</span>
+                            <span class="price">Rp {{ originalPrice | toNumber | number:'1.2-2' }}</span>
                           </div>
                         </div>
                         <div class="detail-row">
@@ -207,8 +207,10 @@
                               <option value="12">12 months</option>
                             </select>
                           </div>
+                          <div class="col-lg-3 align-self-end text-end">
+                            <span class="text-success">{{  orderCycle }}</span> x <span class="bold">Rp {{ originalPrice | toNumber | number:'1.2-2' }}</span>
+                          </div>
 
-                          <span class="bold">Rp {{ price | toNumber | number:'1.2-2' }}</span>
                         </div>
                         <div class="detail-row mt-5">
                           <span>Setup Fee:</span>
