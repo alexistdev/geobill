@@ -24,12 +24,14 @@ public class HostingService {
     private final ProductService productService;
     private final UserService userService;
     private final MessagesUtils messagesUtils;
+    private final InvoiceService invoiceService;
 
-    public HostingService(HostingRepo hostingRepo, ProductService productService, UserService userService, MessagesUtils messagesUtils) {
+    public HostingService(HostingRepo hostingRepo, ProductService productService, UserService userService, MessagesUtils messagesUtils, InvoiceService invoiceService) {
         this.hostingRepo = hostingRepo;
         this.productService = productService;
         this.userService = userService;
         this.messagesUtils = messagesUtils;
+        this.invoiceService = invoiceService;
     }
 
     @Transactional
@@ -48,7 +50,9 @@ public class HostingService {
             String userAlreadyHavePendingHosting = messagesUtils.getMessage("hostingservice.user_already_have_pending_hosting");
             throw new ConflictException(userAlreadyHavePendingHosting);
         }
-        return hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
+        Hosting savedHosting = hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
+        invoiceService.createInvoice(savedHosting);
+        return savedHosting;
     }
 
     private Hosting createHosting(HostingRequest hostingRequest, User userFound, Product productResult) {

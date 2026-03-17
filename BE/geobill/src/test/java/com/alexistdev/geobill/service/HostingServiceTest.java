@@ -7,6 +7,7 @@ import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.HostingRepo;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
+import com.alexistdev.geobill.services.InvoiceService;
 import com.alexistdev.geobill.services.ProductService;
 import com.alexistdev.geobill.services.UserService;
 import com.alexistdev.geobill.utils.MessagesUtils;
@@ -35,6 +36,9 @@ public class HostingServiceTest {
 
     @Mock
     private MessagesUtils messagesUtils;
+
+    @Mock
+    private InvoiceService invoiceService;
 
     @InjectMocks
     private HostingService hostingService;
@@ -104,6 +108,7 @@ public class HostingServiceTest {
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(false);
         when(hostingRepo.existsByUser_IdAndStatus(any(UUID.class), eq(0))).thenReturn(false);
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
+        when(invoiceService.createInvoice(any(Hosting.class))).thenReturn(null);
 
         Hosting result = hostingService.addHosting(hostingRequest);
 
@@ -114,6 +119,7 @@ public class HostingServiceTest {
         Assertions.assertEquals(hosting.getEndDate(), result.getEndDate());
 
         verify(hostingRepo, times(1)).save(any(Hosting.class));
+        verify(invoiceService, times(1)).createInvoice(any(Hosting.class));
     }
 
     @Test
@@ -172,12 +178,14 @@ public class HostingServiceTest {
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(true, false);
         when(hostingRepo.existsByUser_IdAndStatus(any(UUID.class), eq(0))).thenReturn(false);
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
+        when(invoiceService.createInvoice(any(Hosting.class))).thenReturn(null);
 
         Hosting result = hostingService.addHosting(hostingRequest);
 
         Assertions.assertNotNull(result);
         // existsByHostingCode should have been called twice (1 collision + 1 success)
         verify(hostingRepo, times(2)).existsByHostingCode(anyString());
+        verify(invoiceService, times(1)).createInvoice(any(Hosting.class));
     }
 
     @Test
@@ -211,6 +219,7 @@ public class HostingServiceTest {
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(false);
         when(hostingRepo.existsByUser_IdAndStatus(any(UUID.class), eq(0))).thenReturn(false);
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
+        when(invoiceService.createInvoice(any(Hosting.class))).thenReturn(null);
 
         hostingService.addHosting(hostingRequest);
 
@@ -229,5 +238,7 @@ public class HostingServiceTest {
         Assertions.assertTrue(savedHosting.getHostingCode().startsWith("GE-"));
         Assertions.assertNotNull(savedHosting.getStartDate());
         Assertions.assertNotNull(savedHosting.getEndDate());
+
+        verify(invoiceService).createInvoice(savedHosting);
     }
 }

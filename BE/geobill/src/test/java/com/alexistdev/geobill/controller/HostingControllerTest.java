@@ -198,7 +198,7 @@ class HostingControllerTest {
         private HostingRequest lastRequest;
 
         private StubHostingService() {
-            super(null, null, null, null);
+            super(null, null, null, null,null);
         }
 
         @Override
