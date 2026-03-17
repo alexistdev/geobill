@@ -180,6 +180,9 @@ export class Checkout implements OnInit, OnDestroy {
     console.log("Product ID:", this.productId);
     console.log("Price:", this.price);
     console.log("cycle:", this.orderCycle);
+    this.isCheckoutPageLoading = false;
+    this.isInvoicePageLoading = true;
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
