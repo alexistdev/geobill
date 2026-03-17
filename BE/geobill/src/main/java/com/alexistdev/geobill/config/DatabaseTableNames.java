@@ -10,5 +10,5 @@ public class DatabaseTableNames {
     public static final String TB_PRODUCTS = "tb_products";
     public static final String TB_CUSTOMERS = "tb_customers";
     public static final String TB_HOSTING = "tb_hostings";
-
+    public static final String TB_INVOICES = "tb_invoices";
 }
