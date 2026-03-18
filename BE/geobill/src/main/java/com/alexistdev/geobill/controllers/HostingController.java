@@ -2,7 +2,6 @@ package com.alexistdev.geobill.controllers;
 
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.dto.ResponseData;
-import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
 import jakarta.validation.Valid;
@@ -27,8 +26,7 @@ public class HostingController {
 
     @PostMapping
     public ResponseEntity<ResponseData<HostingDTO>> addHosting(@Valid @RequestBody HostingRequest request){
-        Hosting hosting = hostingService.addHosting(request);
-        HostingDTO hostingDTO = this.mapToHostingDTO(hosting);
+        HostingDTO hostingDTO = hostingService.addHosting(request);
 
         ResponseData<HostingDTO> responseData = new ResponseData<>();
         responseData.setStatus(false);
@@ -37,17 +35,6 @@ public class HostingController {
         responseData.getMessages().add("Hosting added successfully");
         responseData.setPayload(hostingDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
-    }
-
-    private HostingDTO mapToHostingDTO(Hosting hosting) {
-        HostingDTO hostingDTO = new HostingDTO();
-        hostingDTO.setId(hosting.getId());
-        hostingDTO.setUserId(hosting.getUser().getId());
-        hostingDTO.setProductId(hosting.getProduct().getId());
-        hostingDTO.setDomainName(hosting.getDomain());
-        hostingDTO.setPrice(hosting.getPrice());
-        hostingDTO.setCycle(hosting.getProduct().getCycle());
-        return hostingDTO;
     }
 
 }

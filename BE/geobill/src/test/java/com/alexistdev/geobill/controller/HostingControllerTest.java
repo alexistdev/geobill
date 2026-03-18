@@ -3,9 +3,6 @@ package com.alexistdev.geobill.controller;
 import com.alexistdev.geobill.controllers.HostingController;
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.dto.ResponseData;
-import com.alexistdev.geobill.models.entity.Hosting;
-import com.alexistdev.geobill.models.entity.Product;
-import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import java.util.Date;
+
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -65,30 +62,16 @@ class HostingControllerTest {
         return request;
     }
 
-    private Hosting createHostingEntity(UUID ownerId, UUID selectedProductId) {
-        User user = new User();
-        user.setId(ownerId);
-        user.setEmail("test@example.com");
-        user.setFullName("Test User");
-
-        Product product = new Product();
-        product.setId(selectedProductId);
-        product.setName("Basic Hosting");
-        product.setPrice(99.99);
-        product.setCycle(24);
-
-        Hosting hosting = new Hosting();
-        hosting.setId(hostingId);
-        hosting.setUser(user);
-        hosting.setProduct(product);
-        hosting.setDomain("example.com");
-        hosting.setPrice(99.99);
-        hosting.setHostingCode("GE-ABCD1234");
-        hosting.setName("Basic Hosting - example.com");
-        hosting.setStartDate(new Date());
-        hosting.setEndDate(new Date());
-        hosting.setStatus(0);
-        return hosting;
+    private HostingDTO createHostingDTO(UUID ownerId, UUID selectedProductId) {
+        HostingDTO dto = new HostingDTO();
+        dto.setId(hostingId);
+        dto.setUserId(ownerId);
+        dto.setProductId(selectedProductId);
+        dto.setInvoiceId(UUID.randomUUID());
+        dto.setDomainName("example.com");
+        dto.setPrice(99.99);
+        dto.setCycle(24);
+        return dto;
     }
 
     @Test
@@ -96,7 +79,7 @@ class HostingControllerTest {
     @DisplayName("1. addHosting should return CREATED with mapped payload")
     void testAddHostingSuccess() {
         HostingRequest request = createHostingRequest();
-        hostingService.response = createHostingEntity(userId, productId);
+        hostingService.response = createHostingDTO(userId, productId);
 
         ResponseEntity<ResponseData<HostingDTO>> response = hostingController.addHosting(request);
 
@@ -142,7 +125,7 @@ class HostingControllerTest {
     @DisplayName("3. POST /api/v1/hosting should return 201 when request is valid")
     void testAddHostingEndpointSuccess() throws Exception {
         HostingRequest request = createHostingRequest();
-        hostingService.response = createHostingEntity(userId, productId);
+        hostingService.response = createHostingDTO(userId, productId);
 
         mockMvc.perform(post("/api/v1/hosting")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -192,7 +175,7 @@ class HostingControllerTest {
     }
 
     private static class StubHostingService extends HostingService {
-        private Hosting response;
+        private HostingDTO response;
         private RuntimeException exceptionToThrow;
         private int callCount;
         private HostingRequest lastRequest;
@@ -202,7 +185,7 @@ class HostingControllerTest {
         }
 
         @Override
-        public Hosting addHosting(HostingRequest hostingRequest) {
+        public HostingDTO addHosting(HostingRequest hostingRequest) {
             callCount++;
             lastRequest = hostingRequest;
             if (exceptionToThrow != null) {

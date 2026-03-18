@@ -1,8 +1,10 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.exceptions.ConflictException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
+import com.alexistdev.geobill.models.entity.Invoice;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.HostingRepo;
@@ -35,7 +37,7 @@ public class HostingService {
     }
 
     @Transactional
-    public Hosting addHosting(HostingRequest hostingRequest) {
+    public HostingDTO addHosting(HostingRequest hostingRequest) {
         User userFound = userService.findUserByUUID(UUID.fromString(hostingRequest.getUserId()));
         Product productResult = productService.findEntityById(UUID.fromString(hostingRequest.getProductId()));
         if(userFound == null ){
@@ -46,13 +48,22 @@ public class HostingService {
             String productNotFoundMessage = messagesUtils.getMessage("hostingservice.product_not_found");
             throw new NotFoundException(productNotFoundMessage);
         }
-        if(this.doesUserHaveHostingWithStatus(userFound.getId(), 0)){
+        if(this.doesUserHaveHostingWithStatus(userFound.getId())){
             String userAlreadyHavePendingHosting = messagesUtils.getMessage("hostingservice.user_already_have_pending_hosting");
             throw new ConflictException(userAlreadyHavePendingHosting);
         }
         Hosting savedHosting = hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
-        invoiceService.createInvoice(savedHosting);
-        return savedHosting;
+        Invoice savedInvoice = invoiceService.createInvoice(savedHosting);
+
+        HostingDTO hostingDTO = new HostingDTO();
+        hostingDTO.setId(savedHosting.getId());
+        hostingDTO.setUserId(savedHosting.getUser().getId());
+        hostingDTO.setProductId(savedHosting.getProduct().getId());
+        hostingDTO.setInvoiceId(savedInvoice.getId());
+        hostingDTO.setDomainName(savedHosting.getDomain());
+        hostingDTO.setPrice(savedHosting.getPrice());
+        hostingDTO.setCycle(hostingRequest.getCycle());
+        return hostingDTO;
     }
 
     private Hosting createHosting(HostingRequest hostingRequest, User userFound, Product productResult) {
@@ -78,8 +89,8 @@ public class HostingService {
         return hosting;
     }
 
-    private boolean doesUserHaveHostingWithStatus(UUID userId, int status) {
-        return hostingRepo.existsByUser_IdAndStatus(userId, status);
+    private boolean doesUserHaveHostingWithStatus(UUID userId) {
+        return hostingRepo.existsByUser_IdAndStatus(userId, 0);
     }
 
     private Date getEndDate(int cycle, Date startDate) {
