@@ -4,13 +4,18 @@ import { Header } from "../../../share/header/header";
 import { Menutop } from "../../../share/menutop/menutop";
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Orderhostingservice } from '../orderhostingservice';
-import { DecimalPipe, isPlatformBrowser, NgClass } from '@angular/common';
+import {DecimalPipe, isPlatformBrowser, NgClass} from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ToNumberPipe } from '../tonumberpipe';
 import {Checkoutmodal} from './checkoutmodal/checkoutmodal';
 import {Localstorageservice} from '../../../utils/localstorage/localstorageservice';
 import {Orderhostingrequest} from '../orderhostingrequest.model';
+import {HttpErrorResponse} from '@angular/common/http';
+import {Orderhostingresponse} from '../orderhostingresponse.model';
+import {InvoiceModel} from '../model/invoice.model';
+import {CustomerModel} from '../model/customer.model';
+declare var Lobibox: any;
 
 @Component({
   selector: 'app-checkout',
@@ -23,7 +28,7 @@ import {Orderhostingrequest} from '../orderhostingrequest.model';
     FormsModule,
     ToNumberPipe,
     DecimalPipe,
-    Checkoutmodal
+    Checkoutmodal,
   ],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
@@ -53,6 +58,33 @@ export class Checkout implements OnInit, OnDestroy {
   showModal = false;
   orderCycle: number = 1;
   priceOrdered: number = 0;
+
+  invoice: InvoiceModel = {
+    id: '',
+    invoiceCode: '',
+    detail: '',
+    subTotal: 0,
+    total: 0,
+    tax: 0,
+    discount: 0,
+    startDate: new Date(),
+    endDate: new Date(),
+    status: 0,
+    cycle: 0
+  }
+
+  customer: CustomerModel = {
+    id:'',
+    businessName: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    country: '',
+    postCode: '',
+    phone: '',
+    customerNumber: ''
+  }
 
   private readonly destroy$ = new Subject<void>();
   private platformId = inject(PLATFORM_ID);
@@ -157,12 +189,11 @@ export class Checkout implements OnInit, OnDestroy {
     this.isDomainValid = domainRegex.test(this.inputDomainName);
 
     if (!this.isDomainValid) {
-      console.log('Invalid domain format.');
+      //console.log('Invalid domain format.');
     }
   }
 
   openModal() {
-    console.log("test");
     this.showModal = true;
     this.cdr.detectChanges();
   }
@@ -187,20 +218,51 @@ export class Checkout implements OnInit, OnDestroy {
 
     this.orderhostingservice.addHosting(hostingData).subscribe({
       next: (data) => {
-        console.log("Data saved successfully:", data);
+        let orderHosting: Orderhostingresponse = data.payload as any;
+        this.invoice = orderHosting.invoiceDTO;
+        this.customer = orderHosting.customerDTO;
+        this.LobiboxMessage('success','Anda berhasil melakukan pemesanan produk, silahkan selesaikan pembayaran!','bx bx-check-circle');
+        this.isCheckoutPageLoading = false;
+        this.isInvoicePageLoading = true;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        if (err.message === 'Session expired') {
-          console.warn('User session ended. Redirecting...');
-          this.router.navigate(['/login']);
+        if(err instanceof HttpErrorResponse) {
+          if(err.status === 409){
+            this.isCheckoutPageLoading = false;
+            let message = err.error.messages[0];
+            this.LobiboxMessage('error', message, 'bx bx-check-circle');
+            this.router.navigate(['/users/services/order/v'], { queryParams: { id: this.productId} });
+          } else if(err.message === 'Session expired'){
+            console.warn('User session ended. Redirecting...');
+            this.router.navigate(['/login']);
+          } else {
+            console.error(err);
+            this.LobiboxMessage('error', err.error.messages[0], 'bx bx-check-circle');
+          }
         } else {
-          console.error(err);
+          console.error("An unexpected error occurred: ",err);
         }
       }
     });
-    this.isCheckoutPageLoading = false;
-    this.isInvoicePageLoading = true;
-    this.cdr.detectChanges();
+
+  }
+
+  LobiboxMessage(type: string, msg: string, icon: string): void {
+    if (typeof Lobibox !== 'undefined') {
+      Lobibox.notify(type, {
+        pauseDelayOnHover: true,
+        size: 'mini',
+        rounded: true,
+        delayIndicator: false,
+        icon: icon,
+        continueDelayOnInactiveTab: false,
+        position: 'top right',
+        msg: msg
+      });
+    } else {
+      console.warn('Lobibox is not defined.Ensure it is loaded correctly.');
+    }
   }
 
   ngOnDestroy(): void {

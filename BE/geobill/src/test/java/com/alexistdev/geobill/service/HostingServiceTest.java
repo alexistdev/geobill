@@ -1,18 +1,13 @@
 package com.alexistdev.geobill.service;
 
+import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.exceptions.NotFoundException;
-import com.alexistdev.geobill.models.entity.Hosting;
-import com.alexistdev.geobill.models.entity.Invoice;
-import com.alexistdev.geobill.models.entity.Product;
-import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.models.entity.*;
 import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.models.repository.HostingRepo;
 import com.alexistdev.geobill.request.HostingRequest;
-import com.alexistdev.geobill.services.HostingService;
-import com.alexistdev.geobill.services.InvoiceService;
-import com.alexistdev.geobill.services.ProductService;
-import com.alexistdev.geobill.services.UserService;
+import com.alexistdev.geobill.services.*;
 import com.alexistdev.geobill.utils.MessagesUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +31,9 @@ public class HostingServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private CustomerService customerService;
 
     @Mock
     private MessagesUtils messagesUtils;
@@ -119,15 +117,27 @@ public class HostingServiceTest {
         invoiceDTO.setCycle(hostingRequest.getCycle());
         when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
 
+        Customer customer = new Customer();
+        customer.setId(UUID.randomUUID());
+        customer.setBusinessName("Test Business");
+        when(customerService.findCustomerByUserId(any(User.class))).thenReturn(customer);
+
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setId(customer.getId().toString());
+        customerDTO.setBusinessName(customer.getBusinessName());
+
         HostingDTO result = hostingService.addHosting(hostingRequest);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(hosting.getDomain(), result.getDomainName());
         Assertions.assertEquals(hosting.getPrice(), result.getPrice());
         Assertions.assertEquals(hostingRequest.getCycle(), result.getCycle());
+        Assertions.assertNotNull(result.getCustomerDTO());
+        Assertions.assertEquals(customer.getBusinessName(), result.getCustomerDTO().getBusinessName());
 
         verify(hostingRepo, times(1)).save(any(Hosting.class));
         verify(invoiceService, times(1)).createInvoice(any(Hosting.class),anyInt());
+        verify(customerService, times(1)).findCustomerByUserId(any(User.class));
     }
 
     @Test
@@ -136,7 +146,6 @@ public class HostingServiceTest {
     void testAddHosting_UserNotFound() {
         UUID nonExistingUserId = UUID.randomUUID();
         hostingRequest.setUserId(nonExistingUserId.toString());
-        String nonExistingProductId = "User with ID " + nonExistingUserId + " not found";
 
         when(userService.findUserByUUID(any(UUID.class))).thenReturn(null);
         when(messagesUtils.getMessage("hostingservice.user_not_found")).thenReturn("User not found");
@@ -190,6 +199,10 @@ public class HostingServiceTest {
         Invoice invoice = new Invoice();
         invoice.setId(UUID.randomUUID());
         when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
+        Customer customer = new Customer();
+        customer.setId(UUID.randomUUID());
+        customer.setBusinessName("Test Business");
+        when(customerService.findCustomerByUserId(any(User.class))).thenReturn(customer);
 
         HostingDTO result = hostingService.addHosting(hostingRequest);
 
@@ -197,6 +210,7 @@ public class HostingServiceTest {
         // existsByHostingCode should have been called twice (1 collision + 1 success)
         verify(hostingRepo, times(2)).existsByHostingCode(anyString());
         verify(invoiceService, times(1)).createInvoice(any(Hosting.class),anyInt());
+        verify(customerService, times(1)).findCustomerByUserId(any(User.class));
     }
 
     @Test
@@ -235,6 +249,11 @@ public class HostingServiceTest {
         invoice.setId(UUID.randomUUID());
         when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
 
+        Customer customer = new Customer();
+        customer.setId(UUID.randomUUID());
+        customer.setBusinessName("Test Business");
+        when(customerService.findCustomerByUserId(any(User.class))).thenReturn(customer);
+
         hostingService.addHosting(hostingRequest);
 
         ArgumentCaptor<Hosting> captor = ArgumentCaptor.forClass(Hosting.class);
@@ -254,5 +273,6 @@ public class HostingServiceTest {
         Assertions.assertNotNull(savedHosting.getEndDate());
 
         verify(invoiceService).createInvoice(hosting,cycleTest);
+        verify(customerService).findCustomerByUserId(user);
     }
 }

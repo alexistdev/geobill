@@ -273,15 +273,14 @@
                           <div class="row contacts">
                             <div class="col invoice-to">
                               <div class="text-gray-light">INVOICE TO:</div>
-                              <h2 class="to">John Doe</h2>
-                              <div class="address">796 Silver Harbour, TX 79273, US</div>
-                              <div class="email"><a href="mailto:john@example.com">johncom</a>
-                              </div>
+                              <h2 class="to">{{ customer.businessName ? customer.businessName : 'CUSTOMER #' +customer.customerNumber}}</h2>
+                              <div class="address">{{ customer.address1 ? customer.address1 : 'address1'}} {{ customer.address2 ? ','+customer.address2 : '' }} {{customer.country ? ','+ customer.country: ''}}</div>
+                              <div class="address">{{customer.state ? customer.state: ''}} {{customer.phone ? ','+ customer.phone : ''}}</div>
                             </div>
                             <div class="col invoice-details">
-                              <h1 class="invoice-id">INVOICE 3-2-1</h1>
-                              <div class="date">Date of Invoice: 01/10/2018</div>
-                              <div class="date">Due Date: 30/10/2018</div>
+                              <h1 class="invoice-id">{{ invoice.invoiceCode }}</h1>
+                              <div class="date">Date of Invoice: {{ invoice.startDate }}</div>
+                              <div class="date">Due Date: {{ invoice.endDate }}</div>
                             </div>
                           </div>
                           <table>
@@ -300,37 +299,61 @@
                               <td class="text-left">
                                 <h3>
                                   <a target="_blank" href="javascript:;">
-                                    {{ productName  }}
+                                    {{ invoice.detail  }}
                                   </a>
                                 </h3>
                                 Domain Name : {{ inputDomainName }} </td>
-                              <td class="unit">{{  orderCycle }}</td>
+                              <td class="unit">{{  invoice.cycle }}</td>
                               <td class="qty">Rp. {{  originalPrice | toNumber | number:'1.2-2' }}</td>
-                              <td class="total">Rp. {{ price  | toNumber | number:'1.2-2' }}</td>
+                              <td class="total">Rp. {{ invoice.subTotal  | number:'1.2-2' }}</td>
                             </tr>
                             </tbody>
                             <tfoot>
                             <tr>
                               <td colspan="2"></td>
                               <td colspan="2">SUBTOTAL</td>
-                              <td>Rp. {{ price  | toNumber | number:'1.2-2' }}</td>
+                              <td>Rp. {{ invoice.subTotal | number:'1.2-2' }}</td>
                             </tr>
                             <tr>
                               <td colspan="2"></td>
                               <td colspan="2">TAX</td>
-                              <td>Rp 0.00</td>
+                              <td>Rp {{ invoice.tax | number:'1.2-2' }}</td>
                             </tr>
                             <tr>
                               <td colspan="2"></td>
                               <td colspan="2">GRAND TOTAL</td>
-                              <td>Rp. {{ price  | toNumber | number:'1.2-2' }}</td>
+                              <td>Rp. {{ invoice.total | number:'1.2-2' }}</td>
                             </tr>
                             </tfoot>
                           </table>
                           <div class="thanks">Thank you!</div>
                           <div class="notices">
-                            <div>NOTICE:</div>
-                            <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div>
+                            <div>TRANSFER:</div>
+                            <div class="notice">Silahkan lakukan pembayaran ke No Rekening Berikut:</div>
+                            <div class="col-lg-4 offset-1 mt-2">
+                              <table class="notice table-primary table-borderless text-body-secondary">
+                                <tr>
+                                  <td>Bank</td>
+                                  <td>:</td>
+                                  <td>BCA</td>
+                                </tr>
+                                <tr>
+                                  <td>A/N</td>
+                                  <td>:</td>
+                                  <td>GeoBill</td>
+                                </tr>
+                                <tr>
+                                  <td>JUMLAH</td>
+                                  <td>:</td>
+                                  <td><span class="text-danger">Rp. {{ invoice.total | number:'1.2-2' }}</span></td>
+                                </tr>
+                                <tr>
+                                  <td>BERITA</td>
+                                  <td>:</td>
+                                  <td><span class="text-danger">{{ invoice.invoiceCode }}</span></td>
+                                </tr>
+                              </table>
+                            </div>
                           </div>
                         </main>
                         <footer>Invoice was created on a computer and is valid without the signature and seal.</footer>

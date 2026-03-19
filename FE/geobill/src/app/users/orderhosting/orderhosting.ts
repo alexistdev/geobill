@@ -20,6 +20,7 @@ import {Payload} from '../../share/response/payload';
 import {Apiresponse} from '../../share/response/apiresponse';
 import {Router, RouterLink} from '@angular/router';
 import {ToNumberPipe} from './tonumberpipe';
+import {InvoiceModel} from './model/invoice.model';
 
 @Component({
   selector: 'app-orderhosting',
@@ -42,6 +43,7 @@ export class Orderhosting implements OnInit, OnChanges {
   protected pageSize: number = 0;
   protected size: number = 10;
   protected idSearch: string = "";
+
   homeLink = '/users/dashboard';
 
   protected productTypes: Producttypemodel[] = [];

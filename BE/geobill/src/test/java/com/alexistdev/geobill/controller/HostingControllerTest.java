@@ -2,6 +2,7 @@ package com.alexistdev.geobill.controller;
 
 import com.alexistdev.geobill.controllers.HostingController;
 import com.alexistdev.geobill.dto.HostingDTO;
+import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 
+import java.util.Date;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -67,10 +69,25 @@ class HostingControllerTest {
         dto.setId(hostingId);
         dto.setUserId(ownerId);
         dto.setProductId(selectedProductId);
-        dto.setInvoiceId(UUID.randomUUID());
         dto.setDomainName("example.com");
         dto.setPrice(99.99);
         dto.setCycle(24);
+
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setId(UUID.randomUUID().toString());
+        invoiceDTO.setInvoiceCode("INV-2024-001");
+        invoiceDTO.setDetail("Hosting invoice");
+        invoiceDTO.setSubTotal(99.99);
+        invoiceDTO.setTotal(119.99);
+        invoiceDTO.setTax(20.00);
+        invoiceDTO.setDiscount(0.0);
+        invoiceDTO.setStartDate(new Date());
+        invoiceDTO.setEndDate(new Date());
+        invoiceDTO.setStatus(1);
+        invoiceDTO.setCycle(12);
+
+        dto.setInvoiceDTO(invoiceDTO);
+
         return dto;
     }
 
@@ -100,6 +117,7 @@ class HostingControllerTest {
         Assertions.assertEquals("example.com", payload.getDomainName());
         Assertions.assertEquals(99.99, payload.getPrice());
         Assertions.assertEquals(24, payload.getCycle());
+        Assertions.assertNotNull(payload.getInvoiceDTO());
 
         Assertions.assertEquals(1, hostingService.callCount);
         Assertions.assertSame(request, hostingService.lastRequest);
@@ -138,7 +156,8 @@ class HostingControllerTest {
                 .andExpect(jsonPath("$.payload.productId").value(productId.toString()))
                 .andExpect(jsonPath("$.payload.domainName").value("example.com"))
                 .andExpect(jsonPath("$.payload.price").value(99.99))
-                .andExpect(jsonPath("$.payload.cycle").value(24));
+                .andExpect(jsonPath("$.payload.cycle").value(24))
+                .andExpect(jsonPath("$.payload.invoiceDTO").exists());
 
         Assertions.assertEquals(1, hostingService.callCount);
     }
@@ -181,7 +200,7 @@ class HostingControllerTest {
         private HostingRequest lastRequest;
 
         private StubHostingService() {
-            super(null, null, null, null,null);
+            super(null, null, null, null,null,null);
         }
 
         @Override

@@ -1,13 +1,11 @@
 package com.alexistdev.geobill.services;
 
+import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.exceptions.ConflictException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
-import com.alexistdev.geobill.models.entity.Hosting;
-import com.alexistdev.geobill.models.entity.Invoice;
-import com.alexistdev.geobill.models.entity.Product;
-import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.models.entity.*;
 import com.alexistdev.geobill.models.repository.HostingRepo;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.utils.MessagesUtils;
@@ -28,13 +26,19 @@ public class HostingService {
     private final UserService userService;
     private final MessagesUtils messagesUtils;
     private final InvoiceService invoiceService;
+    private final CustomerService customerService;
 
-    public HostingService(HostingRepo hostingRepo, ProductService productService, UserService userService, MessagesUtils messagesUtils, InvoiceService invoiceService) {
+    public HostingService(HostingRepo hostingRepo, ProductService productService,
+                          UserService userService,
+                          MessagesUtils messagesUtils,
+                          InvoiceService invoiceService,
+                          CustomerService customerService) {
         this.hostingRepo = hostingRepo;
         this.productService = productService;
         this.userService = userService;
         this.messagesUtils = messagesUtils;
         this.invoiceService = invoiceService;
+        this.customerService = customerService;
     }
 
     @Transactional
@@ -57,8 +61,28 @@ public class HostingService {
         Hosting savedHosting = hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
         Invoice savedInvoice = invoiceService.createInvoice(savedHosting,hostingRequest.getCycle());
         InvoiceDTO invoiceDTO = createInvoiceDTO(savedInvoice);
+        CustomerDTO customerDTO = findCustomer(userFound);
+        return createHostingDTO(savedHosting, invoiceDTO,customerDTO);
+    }
 
-        return createHostingDTO(savedHosting, invoiceDTO);
+    private CustomerDTO findCustomer(User user) {
+        Customer customerFound = customerService.findCustomerByUserId(user);
+        return this.createCustomerDTO(customerFound);
+    }
+
+    private CustomerDTO createCustomerDTO(Customer customer) {
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setId(customer.getId().toString());
+        customerDTO.setBusinessName(customer.getBusinessName());
+        customerDTO.setAddress1(customer.getAddress1());
+        customerDTO.setAddress2(customer.getAddress2());
+        customerDTO.setCity(customer.getCity());
+        customerDTO.setCountry(customer.getCountry());
+        customerDTO.setState(customer.getState());
+        customerDTO.setPostCode(customer.getPostCode());
+        customerDTO.setPhone(customer.getPhone());
+        customerDTO.setCustomerNumber(String.valueOf(customer.getCustomerNumber()));
+        return customerDTO;
     }
 
     private InvoiceDTO createInvoiceDTO(Invoice invoice) {
@@ -77,16 +101,16 @@ public class HostingService {
         return invoiceDTO;
     }
 
-    private HostingDTO createHostingDTO(Hosting hosting, InvoiceDTO invoiceDTO) {
+    private HostingDTO createHostingDTO(Hosting hosting, InvoiceDTO invoiceDTO, CustomerDTO customerDTO) {
         HostingDTO hostingDTO = new HostingDTO();
         hostingDTO.setId(hosting.getId());
         hostingDTO.setUserId(hosting.getUser().getId());
         hostingDTO.setProductId(hosting.getProduct().getId());
-        hostingDTO.setInvoiceId(hosting.getId());
         hostingDTO.setDomainName(hosting.getDomain());
         hostingDTO.setPrice(hosting.getPrice());
         hostingDTO.setCycle(invoiceDTO.getCycle());
         hostingDTO.setInvoiceDTO(invoiceDTO);
+        hostingDTO.setCustomerDTO(customerDTO);
         return hostingDTO;
     }
 
