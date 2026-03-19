@@ -40,11 +40,11 @@ public class HostingService {
     @Transactional
     public HostingDTO addHosting(HostingRequest hostingRequest) {
         User userFound = userService.findUserByUUID(UUID.fromString(hostingRequest.getUserId()));
-        Product productResult = productService.findEntityById(UUID.fromString(hostingRequest.getProductId()));
         if(userFound == null ){
             String userNotFoundMessage= messagesUtils.getMessage("hostingservice.user_not_found");
             throw new NotFoundException(userNotFoundMessage);
         }
+        Product productResult = productService.findEntityById(UUID.fromString(hostingRequest.getProductId()));
         if(productResult == null){
             String productNotFoundMessage = messagesUtils.getMessage("hostingservice.product_not_found");
             throw new NotFoundException(productNotFoundMessage);
@@ -58,7 +58,7 @@ public class HostingService {
         Invoice savedInvoice = invoiceService.createInvoice(savedHosting,hostingRequest.getCycle());
         InvoiceDTO invoiceDTO = createInvoiceDTO(savedInvoice);
 
-        return createHostingDTO(savedHosting, invoiceDTO.getCycle());
+        return createHostingDTO(savedHosting, invoiceDTO);
     }
 
     private InvoiceDTO createInvoiceDTO(Invoice invoice) {
@@ -77,7 +77,7 @@ public class HostingService {
         return invoiceDTO;
     }
 
-    private HostingDTO createHostingDTO(Hosting hosting, int cycle) {
+    private HostingDTO createHostingDTO(Hosting hosting, InvoiceDTO invoiceDTO) {
         HostingDTO hostingDTO = new HostingDTO();
         hostingDTO.setId(hosting.getId());
         hostingDTO.setUserId(hosting.getUser().getId());
@@ -85,7 +85,8 @@ public class HostingService {
         hostingDTO.setInvoiceId(hosting.getId());
         hostingDTO.setDomainName(hosting.getDomain());
         hostingDTO.setPrice(hosting.getPrice());
-        hostingDTO.setCycle(cycle);
+        hostingDTO.setCycle(invoiceDTO.getCycle());
+        hostingDTO.setInvoiceDTO(invoiceDTO);
         return hostingDTO;
     }
 

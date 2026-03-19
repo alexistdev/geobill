@@ -134,13 +134,18 @@ public class HostingServiceTest {
     @Order(2)
     @DisplayName("2. Test Add Hosting - User Not Found")
     void testAddHosting_UserNotFound() {
+        UUID nonExistingUserId = UUID.randomUUID();
+        hostingRequest.setUserId(nonExistingUserId.toString());
+        String nonExistingProductId = "User with ID " + nonExistingUserId + " not found";
+
         when(userService.findUserByUUID(any(UUID.class))).thenReturn(null);
-        when(productService.findEntityById(any(UUID.class))).thenReturn(product);
         when(messagesUtils.getMessage("hostingservice.user_not_found")).thenReturn("User not found");
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class,
                 () -> hostingService.addHosting(hostingRequest));
         Assertions.assertEquals("User not found", exception.getMessage());
+        verify(userService).findUserByUUID(UUID.fromString(hostingRequest.getUserId()));
+        verifyNoInteractions(productService, hostingRepo, invoiceService);
     }
 
     @Test
@@ -208,6 +213,7 @@ public class HostingServiceTest {
     @Order(7)
     @DisplayName("7. Test Add Hosting - Invalid Product UUID")
     void testAddHosting_InvalidProductUUID() {
+        when(userService.findUserByUUID(any(UUID.class))).thenReturn(user);
         hostingRequest.setProductId("not-a-valid-uuid");
 
         Assertions.assertThrows(IllegalArgumentException.class,
