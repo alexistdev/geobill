@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ToNumberPipe } from '../tonumberpipe';
 import {Checkoutmodal} from './checkoutmodal/checkoutmodal';
 import {Localstorageservice} from '../../../utils/localstorage/localstorageservice';
+import {Orderhostingrequest} from '../orderhostingrequest.model';
 
 @Component({
   selector: 'app-checkout',
@@ -175,11 +176,28 @@ export class Checkout implements OnInit, OnDestroy {
   saveData() {
     this.showModal = false;
     let userId:string = this.localStorageService.getItem("userId");
-    console.log("User ID:", userId);
-    console.log("Domain Name:", this.inputDomainName);
-    console.log("Product ID:", this.productId);
-    console.log("Price:", this.price);
-    console.log("cycle:", this.orderCycle);
+
+    let hostingData: Orderhostingrequest = {
+      userId : userId,
+      domainName : this.inputDomainName ?? '',
+      productId : this.productId ?? '',
+      price : Number(this.price) ?? 0,
+      cycle : this.orderCycle ?? 1
+    }
+
+    this.orderhostingservice.addHosting(hostingData).subscribe({
+      next: (data) => {
+        console.log("Data saved successfully:", data);
+      },
+      error: (err) => {
+        if (err.message === 'Session expired') {
+          console.warn('User session ended. Redirecting...');
+          this.router.navigate(['/login']);
+        } else {
+          console.error(err);
+        }
+      }
+    });
     this.isCheckoutPageLoading = false;
     this.isInvoicePageLoading = true;
     this.cdr.detectChanges();

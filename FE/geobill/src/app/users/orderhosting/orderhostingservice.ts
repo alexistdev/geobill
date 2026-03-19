@@ -12,6 +12,8 @@ import {Observable} from 'rxjs';
 import {Apiresponse} from '../../share/response/apiresponse';
 import {Producttypemodel} from '../../admin/masterdata/producttype/producttypemodel.model';
 import {Productmodel} from '../../admin/masterdata/productcomponent/productmodel.model';
+import {Orderhostingrequest} from './orderhostingrequest.model';
+import {Orderhostingresponse} from './orderhostingresponse.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +23,8 @@ export class Orderhostingservice {
   private apiUrl = '/api/v1/producttypes';
 
   private apiUrlProduct = '/api/v1/products';
+
+  private apiUrlHosting = '/api/v1/hosting';
 
   constructor(private http: HttpClient) { }
 
@@ -42,5 +46,13 @@ export class Orderhostingservice {
     return this.http.get<Apiresponse<Productmodel>>(
       `${this.apiUrlProduct}/${id}`,
     )
+  }
+
+  addHosting(data: Orderhostingrequest): Observable<Apiresponse<Orderhostingresponse>> {
+    return this.http.post<Apiresponse<Orderhostingresponse>>(
+      `${this.apiUrlHosting}`,
+      data,
+      { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+    );
   }
 }

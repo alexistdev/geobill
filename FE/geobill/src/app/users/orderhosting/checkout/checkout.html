@@ -305,25 +305,25 @@
                                 </h3>
                                 Domain Name : {{ inputDomainName }} </td>
                               <td class="unit">{{  orderCycle }}</td>
-                              <td class="qty">{{  originalPrice }}</td>
-                              <td class="total">{{ price }}</td>
+                              <td class="qty">Rp. {{  originalPrice | toNumber | number:'1.2-2' }}</td>
+                              <td class="total">Rp. {{ price  | toNumber | number:'1.2-2' }}</td>
                             </tr>
                             </tbody>
                             <tfoot>
                             <tr>
                               <td colspan="2"></td>
                               <td colspan="2">SUBTOTAL</td>
-                              <td>$5,200.00</td>
+                              <td>Rp. {{ price  | toNumber | number:'1.2-2' }}</td>
                             </tr>
                             <tr>
                               <td colspan="2"></td>
-                              <td colspan="2">TAX 25%</td>
-                              <td>$1,300.00</td>
+                              <td colspan="2">TAX</td>
+                              <td>Rp 0.00</td>
                             </tr>
                             <tr>
                               <td colspan="2"></td>
                               <td colspan="2">GRAND TOTAL</td>
-                              <td>$6,500.00</td>
+                              <td>Rp. {{ price  | toNumber | number:'1.2-2' }}</td>
                             </tr>
                             </tfoot>
                           </table>
