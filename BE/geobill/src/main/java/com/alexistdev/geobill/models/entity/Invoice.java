@@ -67,6 +67,10 @@ public class Invoice extends BaseEntity<String> implements Serializable {
     private Double discount;
 
     @NotNull
+    @Column(name = "cycle")
+    private int cycle;
+
+    @NotNull
     private Date startDate;
 
     @NotNull

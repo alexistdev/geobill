@@ -20,6 +20,7 @@ public class InvoiceTest {
     private Invoice invoice;
     private String invoiceCode;
     private String detail;
+    private int cycle;
     private Double subTotal;
     private Double total;
     private Double tax;
@@ -49,6 +50,7 @@ public class InvoiceTest {
         startDate = new Date();
         endDate = new Date();
         status = 0;
+        cycle = 1;
 
         User  user = new User();
         user.setId(userId);
@@ -65,6 +67,7 @@ public class InvoiceTest {
         invoice.setSubTotal(subTotal);
         invoice.setTotal(total);
         invoice.setTax(tax);
+        invoice.setCycle(cycle);
         invoice.setDiscount(discount);
         invoice.setStartDate(startDate);
         invoice.setEndDate(endDate);
@@ -89,6 +92,7 @@ public class InvoiceTest {
         Assertions.assertEquals(subTotal, invoice.getSubTotal());
         Assertions.assertEquals(total, invoice.getTotal());
         Assertions.assertEquals(tax, invoice.getTax());
+        Assertions.assertEquals(cycle, invoice.getCycle());
         Assertions.assertEquals(discount, invoice.getDiscount());
         Assertions.assertEquals(startDate, invoice.getStartDate());
         Assertions.assertEquals(endDate, invoice.getEndDate());
@@ -123,6 +127,7 @@ public class InvoiceTest {
         Date newStartDate = new Date();
         Date newEndDate = new Date();
         int newStatus = 1;
+        int newCycle = 2;
 
         invoice.setId(newId);
         invoice.setUser(newUser);
@@ -132,6 +137,7 @@ public class InvoiceTest {
         invoice.setSubTotal(newSubTotal);
         invoice.setTotal(newTotal);
         invoice.setTax(newTax);
+        invoice.setCycle(newCycle);
         invoice.setDiscount(newDiscount);
         invoice.setStartDate(newStartDate);
         invoice.setEndDate(newEndDate);
@@ -145,6 +151,7 @@ public class InvoiceTest {
         Assertions.assertEquals(newSubTotal, invoice.getSubTotal());
         Assertions.assertEquals(newTotal, invoice.getTotal());
         Assertions.assertEquals(newTax, invoice.getTax());
+        Assertions.assertEquals(newCycle, invoice.getCycle());
         Assertions.assertEquals(newDiscount, invoice.getDiscount());
         Assertions.assertEquals(newStartDate, invoice.getStartDate());
         Assertions.assertEquals(newEndDate, invoice.getEndDate());
