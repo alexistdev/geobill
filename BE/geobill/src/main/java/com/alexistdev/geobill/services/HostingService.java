@@ -1,6 +1,7 @@
 package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.dto.HostingDTO;
+import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.exceptions.ConflictException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
@@ -52,17 +53,39 @@ public class HostingService {
             String userAlreadyHavePendingHosting = messagesUtils.getMessage("hostingservice.user_already_have_pending_hosting");
             throw new ConflictException(userAlreadyHavePendingHosting);
         }
-        Hosting savedHosting = hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
-        Invoice savedInvoice = invoiceService.createInvoice(savedHosting);
 
+        Hosting savedHosting = hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
+        Invoice savedInvoice = invoiceService.createInvoice(savedHosting,hostingRequest.getCycle());
+        InvoiceDTO invoiceDTO = createInvoiceDTO(savedInvoice);
+
+        return createHostingDTO(savedHosting, invoiceDTO.getCycle());
+    }
+
+    private InvoiceDTO createInvoiceDTO(Invoice invoice) {
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setId(invoice.getId().toString());
+        invoiceDTO.setInvoiceCode(invoice.getInvoiceCode());
+        invoiceDTO.setDetail(invoice.getDetail());
+        invoiceDTO.setSubTotal(invoice.getSubTotal());
+        invoiceDTO.setTotal(invoice.getTotal());
+        invoiceDTO.setTax(invoice.getTax());
+        invoiceDTO.setCycle(invoice.getCycle());
+        invoiceDTO.setDiscount(invoice.getDiscount());
+        invoiceDTO.setStartDate(invoice.getStartDate());
+        invoiceDTO.setEndDate(invoice.getEndDate());
+        invoiceDTO.setStatus(invoice.getStatus());
+        return invoiceDTO;
+    }
+
+    private HostingDTO createHostingDTO(Hosting hosting, int cycle) {
         HostingDTO hostingDTO = new HostingDTO();
-        hostingDTO.setId(savedHosting.getId());
-        hostingDTO.setUserId(savedHosting.getUser().getId());
-        hostingDTO.setProductId(savedHosting.getProduct().getId());
-        hostingDTO.setInvoiceId(savedInvoice.getId());
-        hostingDTO.setDomainName(savedHosting.getDomain());
-        hostingDTO.setPrice(savedHosting.getPrice());
-        hostingDTO.setCycle(hostingRequest.getCycle());
+        hostingDTO.setId(hosting.getId());
+        hostingDTO.setUserId(hosting.getUser().getId());
+        hostingDTO.setProductId(hosting.getProduct().getId());
+        hostingDTO.setInvoiceId(hosting.getId());
+        hostingDTO.setDomainName(hosting.getDomain());
+        hostingDTO.setPrice(hosting.getPrice());
+        hostingDTO.setCycle(cycle);
         return hostingDTO;
     }
 

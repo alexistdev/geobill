@@ -19,20 +19,25 @@ public class InvoiceService {
     }
 
     @Transactional
-    public Invoice createInvoice(Hosting hosting){
+    public Invoice createInvoice(Hosting hosting, int cycle){
         Invoice invoice = new Invoice();
         invoice.setUser(hosting.getUser());
         invoice.setHosting(hosting);
         invoice.setInvoiceCode(generateInvoiceCode());
-        invoice.setDetail("Hosting service for " + hosting.getDomain());
+        invoice.setDetail(this.generateDetail(hosting.getDomain()));
         invoice.setSubTotal(hosting.getPrice());
         invoice.setTotal(hosting.getPrice());
+        invoice.setCycle(cycle);
         invoice.setTax(0.0);
         invoice.setDiscount(0.0);
         invoice.setStartDate(hosting.getStartDate());
         invoice.setEndDate(hosting.getEndDate());
         invoice.setStatus(0);
         return invoiceRepo.save(invoice);
+    }
+
+    private String generateDetail(String domain) {
+        return "Hosting service for " + domain;
     }
 
     private String generateInvoiceCode() {

@@ -5,6 +5,7 @@ import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.models.repository.HostingRepo;
 import com.alexistdev.geobill.request.HostingRequest;
@@ -113,16 +114,20 @@ public class HostingServiceTest {
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
         Invoice invoice = new Invoice();
         invoice.setId(UUID.randomUUID());
-        when(invoiceService.createInvoice(any(Hosting.class))).thenReturn(invoice);
+        invoice.setCycle(hostingRequest.getCycle());
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setCycle(hostingRequest.getCycle());
+        when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
 
         HostingDTO result = hostingService.addHosting(hostingRequest);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(hosting.getDomain(), result.getDomainName());
         Assertions.assertEquals(hosting.getPrice(), result.getPrice());
+        Assertions.assertEquals(hostingRequest.getCycle(), result.getCycle());
 
         verify(hostingRepo, times(1)).save(any(Hosting.class));
-        verify(invoiceService, times(1)).createInvoice(any(Hosting.class));
+        verify(invoiceService, times(1)).createInvoice(any(Hosting.class),anyInt());
     }
 
     @Test
@@ -179,14 +184,14 @@ public class HostingServiceTest {
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
         Invoice invoice = new Invoice();
         invoice.setId(UUID.randomUUID());
-        when(invoiceService.createInvoice(any(Hosting.class))).thenReturn(invoice);
+        when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
 
         HostingDTO result = hostingService.addHosting(hostingRequest);
 
         Assertions.assertNotNull(result);
         // existsByHostingCode should have been called twice (1 collision + 1 success)
         verify(hostingRepo, times(2)).existsByHostingCode(anyString());
-        verify(invoiceService, times(1)).createInvoice(any(Hosting.class));
+        verify(invoiceService, times(1)).createInvoice(any(Hosting.class),anyInt());
     }
 
     @Test
@@ -213,6 +218,7 @@ public class HostingServiceTest {
     @Order(8)
     @DisplayName("8. Test Add Hosting - Verify Saved Entity Fields")
     void testAddHosting_VerifySavedEntity() {
+        int cycleTest = 1;
         when(userService.findUserByUUID(any(UUID.class))).thenReturn(user);
         when(productService.findEntityById(any(UUID.class))).thenReturn(product);
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(false);
@@ -221,7 +227,7 @@ public class HostingServiceTest {
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
         Invoice invoice = new Invoice();
         invoice.setId(UUID.randomUUID());
-        when(invoiceService.createInvoice(any(Hosting.class))).thenReturn(invoice);
+        when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
 
         hostingService.addHosting(hostingRequest);
 
@@ -241,6 +247,6 @@ public class HostingServiceTest {
         Assertions.assertNotNull(savedHosting.getStartDate());
         Assertions.assertNotNull(savedHosting.getEndDate());
 
-        verify(invoiceService).createInvoice(hosting);
+        verify(invoiceService).createInvoice(hosting,cycleTest);
     }
 }

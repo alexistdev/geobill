@@ -13,4 +13,5 @@ public class HostingDTO {
     private String domainName;
     private Double price;
     private Integer cycle;
+    private InvoiceDTO invoiceDTO;
 }
