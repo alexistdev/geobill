@@ -43,12 +43,12 @@ public class HostingService {
         this.customerService = customerService;
     }
 
-    public Page<Hosting> getAllHostings(Pageable pageable){
-        return hostingRepo.findByIsDeletedFalse(pageable);
+    public Page<Hosting> getAllHostingsByUser(Pageable pageable,User user){
+        return hostingRepo.findByUserAndIsDeletedFalse(pageable, user);
     }
 
-    public Page<Hosting> getAllHostingsByFilter(Pageable pageable, String keyword) {
-        return hostingRepo.findByIsDeletedFalse(pageable);
+    public Page<Hosting> getAllHostingsByFilter(Pageable pageable, String keyword, User user) {
+        return hostingRepo.findByUserWithFilterAndIsDeletedFalse(keyword, user, pageable);
     }
 
     @Transactional

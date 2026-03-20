@@ -228,7 +228,7 @@ public class HostingRepoTest {
         entityManager.clear();
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Hosting> result = hostingRepo.findByFilter("com", pageable);
+        Page<Hosting> result = hostingRepo.findByUserWithFilterAndIsDeletedFalse("com", user, pageable);
         Assertions.assertEquals(1, result.getTotalElements());
         Assertions.assertTrue(result.stream().anyMatch(hosting
                 -> hosting.getDomain().equals("domain.com")));
