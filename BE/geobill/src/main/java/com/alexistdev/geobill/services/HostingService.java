@@ -10,6 +10,8 @@ import com.alexistdev.geobill.models.repository.HostingRepo;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.utils.MessagesUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,14 @@ public class HostingService {
         this.messagesUtils = messagesUtils;
         this.invoiceService = invoiceService;
         this.customerService = customerService;
+    }
+
+    public Page<Hosting> getAllHostings(Pageable pageable){
+        return hostingRepo.findByIsDeletedFalse(pageable);
+    }
+
+    public Page<Hosting> getAllHostingsByFilter(Pageable pageable, String keyword) {
+        return hostingRepo.findByIsDeletedFalse(pageable);
     }
 
     @Transactional

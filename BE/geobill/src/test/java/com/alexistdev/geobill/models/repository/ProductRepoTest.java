@@ -30,9 +30,6 @@ public class ProductRepoTest {
     @Autowired
     private ProductRepo productRepo;
 
-    @Autowired
-    private ProductTypeRepo productTypeRepo;
-
     private static final String SYSTEM_USER = "System";
 
     private ProductType productType;

@@ -1,14 +1,13 @@
 package com.alexistdev.geobill.models.repository;
 
-import com.alexistdev.geobill.models.entity.Hosting;
-import com.alexistdev.geobill.models.entity.Product;
-import com.alexistdev.geobill.models.entity.ProductType;
-import com.alexistdev.geobill.models.entity.Role;
-import com.alexistdev.geobill.models.entity.User;
+import com.alexistdev.geobill.models.entity.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,7 +30,6 @@ public class HostingRepoTest {
 
     private static final String SYSTEM_USER = "System";
 
-    private ProductType productType;
     private Product product;
     private User user;
 
@@ -44,7 +42,7 @@ public class HostingRepoTest {
                 new ArrayList<>());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        productType = new ProductType();
+        ProductType productType = new ProductType();
         productType.setName("Shared Hosting");
         productType.setCreatedBy(SYSTEM_USER);
         productType.setCreatedDate(new Date());
@@ -178,5 +176,62 @@ public class HostingRepoTest {
         }
 
         Assertions.assertTrue(isDeletedBool, "Hosting should be soft-deleted in the database");
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("5. Test Delete All Hostings")
+    void testDeleteAllHostings() {
+        Hosting hosting1 = createHosting("Hosting 1 Domain.com", "domain.com", 100.0, 0);
+        Hosting hosting2 = createHosting("Hosting 2 Domain.net", "domain.net", 200.0, 1);
+        entityManager.persist(hosting1);
+        entityManager.flush();
+        entityManager.persist(hosting2);
+        entityManager.flush();
+        entityManager.clear();
+
+        hostingRepo.deleteAll();
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Hosting> allHostings = hostingRepo.findAll();
+        Assertions.assertEquals(0, allHostings.size());
+
+        //validate soft deleted
+        List<?> results = entityManager.getEntityManager()
+                .createNativeQuery("SELECT is_deleted FROM tb_hostings WHERE uuid IN (?1, ?2)")
+                .setParameter(1, hosting1.getId())
+                .setParameter(2, hosting2.getId())
+                .getResultList();
+
+        Assertions.assertEquals(2, results.size(), "Both hostings should still exist in the DB");
+        for (Object isDeleted : results) {
+            boolean isDeletedBool = false;
+            if (isDeleted instanceof Boolean) {
+                isDeletedBool = (Boolean) isDeleted;
+            } else if (isDeleted instanceof Number) {
+                isDeletedBool = ((Number) isDeleted).intValue() == 1;
+            }
+            Assertions.assertTrue(isDeletedBool, "Hosting should be soft-deleted in the database");
+        }
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("6. Test Find By Filter")
+    void testFindByFilter() {
+        Hosting hosting1 = createHosting("Hosting 1 Domain.com", "domain.com", 100.0, 0);
+        Hosting hosting2 = createHosting("Hosting 2 Domain.net", "domain.net", 200.0, 1);
+        entityManager.persist(hosting1);
+        entityManager.persist(hosting2);
+        entityManager.flush();
+        entityManager.clear();
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Hosting> result = hostingRepo.findByFilter("com", pageable);
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertTrue(result.stream().anyMatch(hosting
+                -> hosting.getDomain().equals("domain.com")));
+        Assertions.assertFalse(result.stream().anyMatch(BaseEntity::getIsDeleted));
     }
 }
