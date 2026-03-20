@@ -36,6 +36,10 @@ public class InvoiceService {
         return invoiceRepo.save(invoice);
     }
 
+    public Invoice findLatestInvoiceByHosting(Hosting hosting) {
+        return invoiceRepo.findFirstByHostingOrderByCreatedDateDesc(hosting);
+    }
+
     private String generateDetail(String domain) {
         return "Hosting service for " + domain;
     }
