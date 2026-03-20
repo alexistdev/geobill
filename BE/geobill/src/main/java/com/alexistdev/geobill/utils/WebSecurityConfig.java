@@ -55,6 +55,8 @@ public class WebSecurityConfig {
                                 "/api/v1/search-by-type").hasAnyAuthority(Role.ADMIN.toString(),Role.USER.toString())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/hosting").hasAnyAuthority(Role.ADMIN.toString(), Role.USER.toString())
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/hosting").hasAnyAuthority(Role.ADMIN.toString(), Role.USER.toString())
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())

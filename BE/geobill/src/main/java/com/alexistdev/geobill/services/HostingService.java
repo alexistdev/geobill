@@ -2,6 +2,7 @@ package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.dto.HostingDTO;
+import com.alexistdev.geobill.dto.HostingUserDTO;
 import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.exceptions.ConflictException;
 import com.alexistdev.geobill.exceptions.NotFoundException;
@@ -11,13 +12,16 @@ import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.utils.MessagesUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,8 +47,25 @@ public class HostingService {
         this.customerService = customerService;
     }
 
-    public Page<Hosting> getAllHostingsByUser(Pageable pageable,User user){
-        return hostingRepo.findByUserAndIsDeletedFalse(pageable, user);
+    public Page<HostingUserDTO> getAllHostingsByUser(Pageable pageable, User user){
+        Page<Hosting> result = hostingRepo.findByUserAndIsDeletedFalse(pageable, user);
+
+        List<HostingUserDTO> hostingUserDTOList =  result.getContent().stream()
+                .map(this::convertToHostingUserDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(hostingUserDTOList, pageable, result.getTotalElements());
+    }
+
+    private HostingUserDTO convertToHostingUserDTO(Hosting hosting){
+        HostingUserDTO hostingUserDTO = new HostingUserDTO();
+        hostingUserDTO.setId(hosting.getId().toString());
+        hostingUserDTO.setName(hosting.getName());
+        hostingUserDTO.setDomain(hosting.getDomain());
+        hostingUserDTO.setPrice(hosting.getPrice());
+        hostingUserDTO.setEndDate(hosting.getEndDate().toString());
+        hostingUserDTO.setStatus(hosting.getStatus());
+        return hostingUserDTO;
     }
 
     public Page<Hosting> getAllHostingsByFilter(Pageable pageable, String keyword, User user) {

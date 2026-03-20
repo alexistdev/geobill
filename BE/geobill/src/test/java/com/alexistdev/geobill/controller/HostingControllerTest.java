@@ -6,6 +6,7 @@ import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
+import com.alexistdev.geobill.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ class HostingControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private StubHostingService hostingService;
+    private UserService userService;
     private HostingController hostingController;
     private MockMvc mockMvc;
 
@@ -39,7 +41,8 @@ class HostingControllerTest {
     @BeforeEach
     void setUp() {
         hostingService = new StubHostingService();
-        hostingController = new HostingController(hostingService);
+        userService = new StubUserService();
+        hostingController = new HostingController(hostingService, userService);
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
@@ -211,6 +214,12 @@ class HostingControllerTest {
                 throw exceptionToThrow;
             }
             return response;
+        }
+    }
+
+    private static class StubUserService extends UserService {
+        private StubUserService() {
+            super(null, null, null, null, null);
         }
     }
 }

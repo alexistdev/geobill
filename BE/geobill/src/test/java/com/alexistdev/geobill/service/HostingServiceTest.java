@@ -2,6 +2,7 @@ package com.alexistdev.geobill.service;
 
 import com.alexistdev.geobill.dto.CustomerDTO;
 import com.alexistdev.geobill.dto.HostingDTO;
+import com.alexistdev.geobill.dto.HostingUserDTO;
 import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.*;
@@ -19,10 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -85,8 +83,10 @@ public class HostingServiceTest {
 
 
         hosting = new Hosting();
+        hosting.setId(UUID.randomUUID());
         hosting.setUser(user);
         hosting.setProduct(product);
+        hosting.setName("Hosting Product - " + domainName);
         hosting.setDomain(domainName);
         hosting.setPrice(price);
         hosting.setStartDate(startDate);
@@ -287,14 +287,21 @@ public class HostingServiceTest {
     @Order(9)
     @DisplayName("9. Test Get All Hostings By User")
     void testGetAllHostingByUser() {
-        Page<Hosting> hostingPage = new PageImpl<>(Collections.singletonList(hosting));
+        Pageable pageable = Pageable.ofSize(10);
+        List<Hosting> hostings = Collections.singletonList(hosting);
+        Page<Hosting> hostingPage = new PageImpl<>(hostings, pageable, hostings.size());
         when(hostingRepo.findByUserAndIsDeletedFalse(any(), eq(user))).thenReturn(hostingPage);
 
-        Page<Hosting> result = hostingService.getAllHostingsByUser(Pageable.ofSize(10), user);
+        Page<HostingUserDTO> result = hostingService.getAllHostingsByUser(Pageable.ofSize(10), user);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.getContent().size());
-        Assertions.assertEquals(hosting.getDomain(), result.getContent().getFirst().getDomain());
+
+        HostingUserDTO dto = result.getContent().getFirst();
+        Assertions.assertEquals(hosting.getId().toString(), dto.getId());
+        Assertions.assertEquals(hosting.getName(), dto.getName());
+        Assertions.assertEquals(hosting.getDomain(), dto.getDomain());
+        Assertions.assertEquals(hosting.getPrice(), dto.getPrice());
 
         verify(hostingRepo, times(1)).findByUserAndIsDeletedFalse(any(), eq(user));
     }
@@ -303,10 +310,11 @@ public class HostingServiceTest {
     @Order(10)
     @DisplayName("10. Test Get All Hostings By User - Empty Result")
     void testGetAllHostings_EmptyResult() {
-        Page<Hosting> emptyPage = new PageImpl<>(Collections.emptyList());
-        when(hostingRepo.findByUserAndIsDeletedFalse(any(), eq(user))).thenReturn(emptyPage);
+        Pageable pageable = Pageable.ofSize(10);
+        Page<Hosting> emptyPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+        when(hostingRepo.findByUserAndIsDeletedFalse(pageable, user)).thenReturn(emptyPage);
 
-        Page<Hosting> result = hostingService.getAllHostingsByUser(Pageable.ofSize(10), user);
+        Page<HostingUserDTO> result = hostingService.getAllHostingsByUser(Pageable.ofSize(10), user);
 
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.getContent().isEmpty());
