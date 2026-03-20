@@ -59,6 +59,13 @@ public class HostingService {
 
     private HostingUserDTO convertToHostingUserDTO(Hosting hosting){
         HostingUserDTO hostingUserDTO = new HostingUserDTO();
+        Invoice invoice = invoiceService.findLatestInvoiceByHosting(hosting);
+
+        if(invoice != null){
+            hostingUserDTO.setInvoiceId(invoice.getId().toString());
+        }
+
+        hostingUserDTO.setProductId(hosting.getProduct().getId().toString());
         hostingUserDTO.setId(hosting.getId().toString());
         hostingUserDTO.setName(hosting.getName());
         hostingUserDTO.setDomain(hosting.getDomain());
