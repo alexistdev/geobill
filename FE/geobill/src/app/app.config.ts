@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeId from '@angular/common/locales/id';
+
+registerLocaleData(localeId);
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -18,6 +22,7 @@ export const appConfig: ApplicationConfig = {
       multi: true
     },
     provideRouter(routes),
-    provideClientHydration(withEventReplay())
+    provideClientHydration(withEventReplay()),
+    { provide: LOCALE_ID, useValue: 'id-ID' }
   ]
 };
