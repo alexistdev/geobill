@@ -47,7 +47,12 @@ export class CredentialEncryptedService {
     if (!this.isBrowser()) {
       return '';
     }
-    return sessionStorage.getItem(this.ENCRYPTION_KEY) || '';
+    let key = sessionStorage.getItem(this.ENCRYPTION_KEY);
+    if (!key) {
+      this.initializeEncryptionKey();
+      key = sessionStorage.getItem(this.ENCRYPTION_KEY);
+    }
+    return key || '';
   }
 
   /**
