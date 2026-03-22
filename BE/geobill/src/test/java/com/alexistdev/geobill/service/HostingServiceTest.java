@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -54,6 +55,7 @@ public class HostingServiceTest {
     private Product product;
     private Invoice invoice;
     private Customer customer;
+    private SimpleDateFormat dateFormat;
 
     @BeforeEach
     void setUp() {
@@ -64,6 +66,8 @@ public class HostingServiceTest {
         int cycle = 1;
         Date startDate = new Date();
         Date endDate = this.getEndDate(cycle, startDate);
+
+        dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
         hostingRequest = new HostingRequest();
         hostingRequest.setUserId(userId);
@@ -302,6 +306,7 @@ public class HostingServiceTest {
         Assertions.assertEquals(hosting.getDomain(), dto.getDomain());
         Assertions.assertEquals(hosting.getPrice(), dto.getPrice());
         Assertions.assertEquals(latestInvoice.getId().toString(), dto.getInvoiceId());
+        Assertions.assertEquals(dateFormat.format(hosting.getEndDate()), dto.getEndDate());
 
         verify(hostingRepo, times(1)).findByUserAndIsDeletedFalse(any(), eq(user));
         verify(invoiceService, times(1)).findLatestInvoiceByHosting(any(Hosting.class));

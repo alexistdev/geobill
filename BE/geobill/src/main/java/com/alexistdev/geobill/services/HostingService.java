@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -60,17 +61,19 @@ public class HostingService {
     private HostingUserDTO convertToHostingUserDTO(Hosting hosting){
         HostingUserDTO hostingUserDTO = new HostingUserDTO();
         Invoice invoice = invoiceService.findLatestInvoiceByHosting(hosting);
-
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         if(invoice != null){
             hostingUserDTO.setInvoiceId(invoice.getId().toString());
         }
+
+        Date endDate = hosting.getEndDate();
 
         hostingUserDTO.setProductId(hosting.getProduct().getId().toString());
         hostingUserDTO.setId(hosting.getId().toString());
         hostingUserDTO.setName(hosting.getName());
         hostingUserDTO.setDomain(hosting.getDomain());
         hostingUserDTO.setPrice(hosting.getPrice());
-        hostingUserDTO.setEndDate(hosting.getEndDate().toString());
+        hostingUserDTO.setEndDate(dateFormat.format(endDate));
         hostingUserDTO.setStatus(hosting.getStatus());
         return hostingUserDTO;
     }
