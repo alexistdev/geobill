@@ -21,6 +21,7 @@ import { Usercomponent } from './admin/masterdata/usercomponent/usercomponent';
 import { Userdetailcomponent } from './admin/masterdata/usercomponent/userdetailcomponent/userdetailcomponent';
 import {Orderhosting} from './users/orderhosting/orderhosting';
 import {Checkout} from './users/orderhosting/checkout/checkout';
+import {InvoiceComponent} from './users/invoice-component/invoice-component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -76,6 +77,12 @@ export const routes: Routes = [
   {
     path: 'users/services',
     component: HostingService,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['USER'] }
+  },
+  {
+    path: 'users/billings',
+    component: InvoiceComponent,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['USER'] }
   },

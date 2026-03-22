@@ -144,19 +144,28 @@ public class DatabaseSeeder implements CommandLineRunner {
         List<Menu> allMenus = new ArrayList<>(menuAdmin());
         Menu menu2 = createMenu("Dashboard", "/users/dashboard", "menu-title d-flex align-items-center", 1, null,2,"us1","bx bx-home-alt");
         Menu menu3 = createMenu("Services", "#", "menu-title d-flex align-items-center", 2, null,2,"us2","bx bx-collection");
+        Menu menu4 = createMenu("Billing", "#", "menu-title d-flex align-items-center", 2, null,2,"us3","bx bx-money");
+        Menu menu5 = createMenu("Support", "#", "menu-title d-flex align-items-center", 2, null,2,"us4","bx bx-headphone");
 
-        allMenus.addAll(List.of(menu2, menu3));
+        allMenus.addAll(List.of(menu2, menu3, menu4, menu5));
         menuRepo.saveAll(allMenus);
 
-        Optional<Menu> menuParentUser = menuRepo.findByCode("us2");
+        Optional<Menu> menuParentServices = menuRepo.findByCode("us2");
+        Optional<Menu> menuParentBillings = menuRepo.findByCode("us3");
 
         Optional<Menu> menuParentAdmin = menuRepo.findByCode("ad2");
 
-        menuParentUser.ifPresent(menu -> {
-            Menu userChildren1 = createMenu("My Services", "/users/services", "", 1, menu.getId(),2,"us3","bx bx-server");
-            Menu userChildren2 = createMenu("Order New Services", "/users/services/order", "", 2, menu.getId(),2,"us4","bx bx-server");
+        menuParentServices.ifPresent(menu -> {
+            Menu userChildren1 = createMenu("My Services", "/users/services", "", 1, menu.getId(),2,"uc1","bx bx-server");
+            Menu userChildren2 = createMenu("Order New Services", "/users/services/order", "", 2, menu.getId(),2,"uc2","bx bx-cart");
+
             List<Menu> allMenuChildren = new ArrayList<>(List.of(userChildren1,userChildren2));
             menuRepo.saveAll(allMenuChildren);
+        });
+
+        menuParentBillings.ifPresent(menu -> {
+            Menu userChildrenBilling = createMenu("My Invoices", "/users/billings", "", 1, menu.getId(),2,"uc3","bx bx-barcode");
+            menuRepo.save(userChildrenBilling);
         });
 
         menuParentAdmin.ifPresent(menu -> {
@@ -176,35 +185,30 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedRoleMenus() {
         log.info("Seeding role menus");
 
-        Optional<Menu> menuAdmin = menuRepo.findByCode("ad1");
-        Optional<Menu> menuAdmin2 = menuRepo.findByCode("ad2");
-        Optional<Menu> menuAdmin3 = menuRepo.findByCode("ad3");
-        Optional<Menu> menuAdmin4 = menuRepo.findByCode("ad4");
-        Optional<Menu> menuAdmin5 = menuRepo.findByCode("ad5");
-        Optional<Menu> menuUser1 = menuRepo.findByCode("us1");
-        Optional<Menu> menuUser2 = menuRepo.findByCode("us2");
-        Optional<Menu> menuUser3 = menuRepo.findByCode("us3");
-        Optional<Menu> menuUser4 = menuRepo.findByCode("us4");
+        Map<Role, List<String>> roleMenuCodes = Map.of(
+                Role.ADMIN, List.of("ad1", "ad2", "ad3", "ad4", "ad5"),
+                Role.USER, List.of("us1", "us2", "us3", "us4", "uc1", "uc2", "uc3")
+        );
 
-        List<RoleMenu> roleMenus = List.of(
-                Objects.requireNonNull(menuAdmin.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
-                Objects.requireNonNull(menuAdmin2.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
-                Objects.requireNonNull(menuAdmin3.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
-                Objects.requireNonNull(menuAdmin4.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
-                Objects.requireNonNull(menuAdmin5.map(menu -> createRoleMenu(Role.ADMIN, menu)).orElse(null)),
-                Objects.requireNonNull(menuUser1.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)),
-                Objects.requireNonNull(menuUser2.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)),
-                Objects.requireNonNull(menuUser3.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)),
-                Objects.requireNonNull(menuUser4.map(menu -> createRoleMenu(Role.USER, menu)).orElse(null)));
+        List<RoleMenu> roleMenus = roleMenuCodes.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(code -> createRoleMenu(entry.getKey(), getMenuOrThrow(code))))
+                .toList();
+
         roleMenuRepo.saveAll(roleMenus);
-
         log.info("Finished seeding role menus");
+    }
+
+    private Menu getMenuOrThrow(String code){
+        return menuRepo.findByCode(code).orElseThrow(() -> new RuntimeException("Menu not found with code: " + code));
     }
 
     private void seedUsers() {
         log.info("Seeding users");
         RegisterRequest user = createUser("user", "user@gmail.com");
         userService.registerUser(user);
+        RegisterRequest testUser2 = createUser("user2", "user2@gmail.com");
+        userService.registerUser(testUser2);
         RegisterRequest staff = createUser("staff", "staff@gmail.com");
         UserDTO staffUser = userService.registerUser(staff);
         RegisterRequest admin = createUser("admin", "admin@gmail.com");
