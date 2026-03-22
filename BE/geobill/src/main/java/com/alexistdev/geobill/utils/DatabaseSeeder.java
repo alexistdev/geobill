@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+import static java.awt.SystemColor.menu;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -152,6 +154,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         Optional<Menu> menuParentServices = menuRepo.findByCode("us2");
         Optional<Menu> menuParentBillings = menuRepo.findByCode("us3");
+        Optional<Menu> menuParentSupports = menuRepo.findByCode("us4");
 
         Optional<Menu> menuParentAdmin = menuRepo.findByCode("ad2");
 
@@ -177,7 +180,11 @@ public class DatabaseSeeder implements CommandLineRunner {
             menuRepo.saveAll(allMenuChildren);
         });
 
-
+        menuParentSupports.ifPresent(menu ->{
+                Menu userChildrenSupport = createMenu("My Tickets", "/users/support/tickets", "", 1, menu.getId(),2,"uc4","bx bx-comment-edit");
+                List<Menu> allMenuChildren = new ArrayList<>(List.of(userChildrenSupport));
+                menuRepo.saveAll(allMenuChildren);
+        });
 
         log.info("Finished seeding menus");
     }
@@ -187,7 +194,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         Map<Role, List<String>> roleMenuCodes = Map.of(
                 Role.ADMIN, List.of("ad1", "ad2", "ad3", "ad4", "ad5"),
-                Role.USER, List.of("us1", "us2", "us3", "us4", "uc1", "uc2", "uc3")
+                Role.USER, List.of("us1", "us2", "us3", "us4", "uc1", "uc2", "uc3", "uc4")
         );
 
         List<RoleMenu> roleMenus = roleMenuCodes.entrySet().stream()
