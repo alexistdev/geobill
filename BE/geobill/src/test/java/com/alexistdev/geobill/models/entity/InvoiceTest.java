@@ -21,10 +21,11 @@ public class InvoiceTest {
     private String invoiceCode;
     private String detail;
     private int cycle;
-    private Double subTotal;
-    private Double total;
-    private Double tax;
-    private Double discount;
+    private double price;
+    private double subTotal;
+    private double total;
+    private double tax;
+    private double discount;
     private Date startDate;
     private Date endDate;
     private int status;
@@ -43,6 +44,7 @@ public class InvoiceTest {
         hostingId = UUID.randomUUID();
         invoiceCode = "INV-001";
         detail = "Invoice Detail";
+        price = 100.00;
         subTotal = 100.00;
         total = 120.00;
         tax = 20.00;
@@ -64,6 +66,7 @@ public class InvoiceTest {
         invoice.setHosting(hosting);
         invoice.setInvoiceCode(invoiceCode);
         invoice.setDetail(detail);
+        invoice.setPrice(price);
         invoice.setSubTotal(subTotal);
         invoice.setTotal(total);
         invoice.setTax(tax);
@@ -89,6 +92,7 @@ public class InvoiceTest {
         Assertions.assertEquals(hostingId, invoice.getHosting().getId());
         Assertions.assertEquals(invoiceCode, invoice.getInvoiceCode());
         Assertions.assertEquals(detail, invoice.getDetail());
+        Assertions.assertEquals(price, invoice.getPrice());
         Assertions.assertEquals(subTotal, invoice.getSubTotal());
         Assertions.assertEquals(total, invoice.getTotal());
         Assertions.assertEquals(tax, invoice.getTax());
@@ -120,10 +124,11 @@ public class InvoiceTest {
 
         String newInvoiceCode = "INV-002";
         String newDetail = "Invoice Detail 2";
-        Double newSubTotal = 200.00;
-        Double newTotal = 130.00;
-        Double newTax = 30.00;
-        Double newDiscount = 20.00;
+        double newPrice = 150.00;
+        double newSubTotal = 200.00;
+        double newTotal = 130.00;
+        double newTax = 30.00;
+        double newDiscount = 20.00;
         Date newStartDate = new Date();
         Date newEndDate = new Date();
         int newStatus = 1;
@@ -134,6 +139,7 @@ public class InvoiceTest {
         invoice.setHosting(newHosting);
         invoice.setInvoiceCode(newInvoiceCode);
         invoice.setDetail(newDetail);
+        invoice.setPrice(newPrice);
         invoice.setSubTotal(newSubTotal);
         invoice.setTotal(newTotal);
         invoice.setTax(newTax);
@@ -148,6 +154,7 @@ public class InvoiceTest {
         Assertions.assertEquals(newHostingId, invoice.getHosting().getId());
         Assertions.assertEquals(newInvoiceCode, invoice.getInvoiceCode());
         Assertions.assertEquals(newDetail, invoice.getDetail());
+        Assertions.assertEquals(newPrice, invoice.getPrice());
         Assertions.assertEquals(newSubTotal, invoice.getSubTotal());
         Assertions.assertEquals(newTotal, invoice.getTotal());
         Assertions.assertEquals(newTax, invoice.getTax());
@@ -191,20 +198,16 @@ public class InvoiceTest {
     void testNullNotAllowed() {
         invoice.setUser(null);
         invoice.setHosting(null);
-        invoice.setInvoiceCode(null);
         invoice.setDetail(null);
-        invoice.setSubTotal(null);
-        invoice.setTotal(null);
-        invoice.setTax(null);
-        invoice.setDiscount(null);
+        invoice.setInvoiceCode(null);
         invoice.setStartDate(null);
         invoice.setEndDate(null);
 
         Set<ConstraintViolation<Invoice>> violations = validator.validate(invoice);
         Assertions.assertFalse(violations.isEmpty());
 
-        Assertions.assertEquals(10, violations.size(),
-                "Should have exactly 10 validation errors for null mandatory fields");
+        Assertions.assertEquals(6, violations.size(),
+                "Should have exactly 6 validation errors for null mandatory fields");
 
         List<String> violatedProperties = violations.stream()
                 .map(v -> v.getPropertyPath().toString())
@@ -214,10 +217,6 @@ public class InvoiceTest {
         Assertions.assertTrue(violatedProperties.contains("hosting"), "Missing violation for 'hosting'");
         Assertions.assertTrue(violatedProperties.contains("invoiceCode"), "Missing violation for 'invoiceCode'");
         Assertions.assertTrue(violatedProperties.contains("detail"), "Missing violation for 'detail'");
-        Assertions.assertTrue(violatedProperties.contains("subTotal"), "Missing violation for 'subTotal'");
-        Assertions.assertTrue(violatedProperties.contains("total"), "Missing violation for 'total'");
-        Assertions.assertTrue(violatedProperties.contains("tax"), "Missing violation for 'tax'");
-        Assertions.assertTrue(violatedProperties.contains("discount"), "Missing violation for 'discount'");
         Assertions.assertTrue(violatedProperties.contains("startDate"), "Missing violation for 'startDate'");
         Assertions.assertTrue(violatedProperties.contains("endDate"), "Missing violation for 'endDate'");
     }

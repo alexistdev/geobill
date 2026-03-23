@@ -100,7 +100,7 @@ public class HostingService {
         }
 
         Hosting savedHosting = hostingRepo.save(this.createHosting(hostingRequest, userFound, productResult));
-        Invoice savedInvoice = invoiceService.createInvoice(savedHosting,hostingRequest.getCycle());
+        Invoice savedInvoice = invoiceService.createInvoice(savedHosting,hostingRequest);
         InvoiceDTO invoiceDTO = createInvoiceDTO(savedInvoice);
         CustomerDTO customerDTO = findCustomer(userFound);
         return createHostingDTO(savedHosting, invoiceDTO,customerDTO);

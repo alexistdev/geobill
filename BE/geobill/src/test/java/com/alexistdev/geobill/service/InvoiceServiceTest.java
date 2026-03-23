@@ -2,15 +2,18 @@ package com.alexistdev.geobill.service;
 
 import com.alexistdev.geobill.dto.InvoiceUserDTO;
 import com.alexistdev.geobill.exceptions.NotFoundException;
+import com.alexistdev.geobill.factory.InvoiceFactory;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
+import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.InvoiceRepo;
+import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.InvoiceService;
+import com.alexistdev.geobill.services.ProductService;
 import com.alexistdev.geobill.utils.MessagesUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,6 +40,12 @@ public class InvoiceServiceTest {
     @Mock
     private MessagesUtils messagesUtils;
 
+    @Mock
+    private ProductService productService;
+
+    @Mock
+    private InvoiceFactory invoiceFactory;
+
     @InjectMocks
     private InvoiceService invoiceService;
 
@@ -46,29 +55,25 @@ public class InvoiceServiceTest {
     void createInvoice_shouldMapFieldsAndSave() {
         Hosting hosting = createHosting();
         int cycle = 12;
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setPrice(150000.0);
+        HostingRequest request = createHostingRequest(product.getId(), cycle);
 
-        when(invoiceRepo.existsByInvoiceCode(any())).thenReturn(false);
+        Invoice expectedInvoice = createInvoice("INV-001", cycle, product.getPrice() * cycle, product.getPrice() * cycle, hosting.getStartDate(), hosting.getEndDate());
+        expectedInvoice.setUser(hosting.getUser());
+        expectedInvoice.setHosting(hosting);
+
+        when(invoiceFactory.createInvoice(hosting, request)).thenReturn(expectedInvoice);
         when(invoiceRepo.save(any(Invoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Invoice result = invoiceService.createInvoice(hosting, cycle);
+        Invoice result = invoiceService.createInvoice(hosting, request);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(hosting.getUser(), result.getUser());
-        Assertions.assertEquals(hosting, result.getHosting());
-        Assertions.assertTrue(result.getInvoiceCode().startsWith("INV-"));
-        Assertions.assertEquals("Hosting service for " + hosting.getDomain(), result.getDetail());
-        Assertions.assertEquals(hosting.getPrice(), result.getSubTotal());
-        Assertions.assertEquals(hosting.getPrice(), result.getTotal());
-        Assertions.assertEquals(0.0, result.getTax());
-        Assertions.assertEquals(0.0, result.getDiscount());
-        Assertions.assertEquals(cycle, result.getCycle());
-        Assertions.assertEquals(hosting.getStartDate(), result.getStartDate());
-        Assertions.assertEquals(hosting.getEndDate(), result.getEndDate());
-        Assertions.assertEquals(0, result.getStatus());
+        Assertions.assertEquals(expectedInvoice, result);
 
-        ArgumentCaptor<Invoice> captor = ArgumentCaptor.forClass(Invoice.class);
-        verify(invoiceRepo, times(1)).save(captor.capture());
-        Assertions.assertEquals(result.getInvoiceCode(), captor.getValue().getInvoiceCode());
+        verify(invoiceRepo, times(1)).save(expectedInvoice);
+        verify(invoiceFactory, times(1)).createInvoice(hosting, request);
     }
 
     @Test
@@ -76,15 +81,22 @@ public class InvoiceServiceTest {
     @DisplayName("2. Test create Invoice - should retry when generated code already exists")
     void createInvoice_shouldRetryWhenCodeExists() {
         Hosting hosting = createHosting();
+        int cycle = 1;
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setPrice(150000.0);
+        HostingRequest request = createHostingRequest(product.getId(), cycle);
 
-        when(invoiceRepo.existsByInvoiceCode(any())).thenReturn(true, false);
+        Invoice expectedInvoice1 = createInvoice("INV-001", cycle, product.getPrice() * cycle, product.getPrice() * cycle, hosting.getStartDate(), hosting.getEndDate());
+        Invoice expectedInvoice2 = createInvoice("INV-002", cycle, product.getPrice() * cycle, product.getPrice() * cycle, hosting.getStartDate(), hosting.getEndDate());
+
+        when(invoiceFactory.createInvoice(hosting, request)).thenReturn(expectedInvoice1).thenReturn(expectedInvoice2);
         when(invoiceRepo.save(any(Invoice.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Invoice result = invoiceService.createInvoice(hosting, 1);
+        Invoice result = invoiceService.createInvoice(hosting, request);
 
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.getInvoiceCode().startsWith("INV-"));
-        verify(invoiceRepo, times(2)).existsByInvoiceCode(any());
+        verify(invoiceFactory, times(1)).createInvoice(hosting, request);
         verify(invoiceRepo, times(1)).save(any(Invoice.class));
     }
 
@@ -217,9 +229,8 @@ public class InvoiceServiceTest {
         when(messagesUtils.getMessage("invoiceservice.invoice_not_found", invoiceId.toString()))
                 .thenReturn("Invoice not found");
 
-        Assertions.assertThrows(NotFoundException.class, () -> {
-            invoiceService.getInvoiceById(invoiceId.toString());
-        });
+        Assertions.assertThrows(NotFoundException.class, () ->
+            invoiceService.getInvoiceById(invoiceId.toString()));
 
         verify(invoiceRepo, times(1)).findById(invoiceId);
     }
@@ -257,5 +268,12 @@ public class InvoiceServiceTest {
         invoice.setEndDate(endDate);
         invoice.setStatus(0);
         return invoice;
+    }
+
+    private HostingRequest createHostingRequest(UUID productId, int cycle) {
+        HostingRequest request = new HostingRequest();
+        request.setProductId(productId.toString());
+        request.setCycle(cycle);
+        return request;
     }
 }

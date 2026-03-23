@@ -129,7 +129,7 @@ public class HostingServiceTest {
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(false);
         when(hostingRepo.existsByUser_IdAndStatus(any(UUID.class), eq(0))).thenReturn(false);
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
-        when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
+        when(invoiceService.createInvoice(any(Hosting.class), any(HostingRequest.class))).thenReturn(invoice);
         when(customerService.findCustomerByUserId(any(User.class))).thenReturn(customer);
 
         HostingDTO result = hostingService.addHosting(hostingRequest);
@@ -142,7 +142,7 @@ public class HostingServiceTest {
         Assertions.assertEquals(customer.getBusinessName(), result.getCustomerDTO().getBusinessName());
 
         verify(hostingRepo, times(1)).save(any(Hosting.class));
-        verify(invoiceService, times(1)).createInvoice(any(Hosting.class),anyInt());
+        verify(invoiceService, times(1)).createInvoice(any(Hosting.class), any(HostingRequest.class));
         verify(customerService, times(1)).findCustomerByUserId(any(User.class));
     }
 
@@ -209,7 +209,7 @@ public class HostingServiceTest {
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(true, false);
         when(hostingRepo.existsByUser_IdAndStatus(any(UUID.class), eq(0))).thenReturn(false);
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
-        when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
+        when(invoiceService.createInvoice(any(Hosting.class), any(HostingRequest.class))).thenReturn(invoice);
         when(customerService.findCustomerByUserId(any(User.class))).thenReturn(customer);
 
         HostingDTO result = hostingService.addHosting(hostingRequest);
@@ -218,7 +218,7 @@ public class HostingServiceTest {
         // existsByHostingCode should have been called twice (1 collision + 1 success)
         verify(hostingRepo, times(2)).existsByHostingCode(anyString());
         verify(hostingRepo, times(1)).save(any(Hosting.class));
-        verify(invoiceService, times(1)).createInvoice(any(Hosting.class),anyInt());
+        verify(invoiceService, times(1)).createInvoice(any(Hosting.class), any(HostingRequest.class));
         verify(customerService, times(1)).findCustomerByUserId(any(User.class));
     }
 
@@ -252,13 +252,12 @@ public class HostingServiceTest {
     @Order(8)
     @DisplayName("8. Test Add Hosting - Verify Saved Entity Fields")
     void testAddHosting_VerifySavedEntity() {
-        int cycleTest = 1;
         when(userService.findUserByUUID(any(UUID.class))).thenReturn(user);
         when(productService.findEntityById(any(UUID.class))).thenReturn(product);
         when(hostingRepo.existsByHostingCode(anyString())).thenReturn(false);
         when(hostingRepo.existsByUser_IdAndStatus(any(UUID.class), eq(0))).thenReturn(false);
         when(hostingRepo.save(any(Hosting.class))).thenReturn(hosting);
-        when(invoiceService.createInvoice(any(Hosting.class),anyInt())).thenReturn(invoice);
+        when(invoiceService.createInvoice(any(Hosting.class), any(HostingRequest.class))).thenReturn(invoice);
         when(customerService.findCustomerByUserId(any(User.class))).thenReturn(customer);
 
         hostingService.addHosting(hostingRequest);
@@ -279,7 +278,7 @@ public class HostingServiceTest {
         Assertions.assertNotNull(savedHosting.getStartDate());
         Assertions.assertNotNull(savedHosting.getEndDate());
 
-        verify(invoiceService).createInvoice(hosting,cycleTest);
+        verify(invoiceService).createInvoice(hosting, hostingRequest);
         verify(customerService).findCustomerByUserId(user);
     }
 

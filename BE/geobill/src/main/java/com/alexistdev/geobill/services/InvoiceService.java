@@ -2,10 +2,13 @@ package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.dto.InvoiceUserDTO;
 import com.alexistdev.geobill.exceptions.NotFoundException;
+import com.alexistdev.geobill.factory.InvoiceFactory;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
+import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.InvoiceRepo;
+import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +26,16 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceService {
 
-    public final InvoiceRepo invoiceRepo;
-    public final MessagesUtils messagesUtils;
+    private final InvoiceRepo invoiceRepo;
+    private final MessagesUtils messagesUtils;
+    private final InvoiceFactory invoiceFactory;
 
-    public InvoiceService(InvoiceRepo invoiceRepo, MessagesUtils messagesUtils) {
+
+    public InvoiceService(InvoiceRepo invoiceRepo, MessagesUtils messagesUtils,
+                          InvoiceFactory invoiceFactory) {
         this.invoiceRepo = invoiceRepo;
         this.messagesUtils = messagesUtils;
+        this.invoiceFactory = invoiceFactory;
     }
 
     public Page<InvoiceUserDTO> getAllInvoicesByUser(Pageable pageable, User user){
@@ -77,37 +84,11 @@ public class InvoiceService {
     }
 
     @Transactional
-    public Invoice createInvoice(Hosting hosting, int cycle){
-        Invoice invoice = new Invoice();
-        invoice.setUser(hosting.getUser());
-        invoice.setHosting(hosting);
-        invoice.setInvoiceCode(generateInvoiceCode());
-        invoice.setDetail(this.generateDetail(hosting.getDomain()));
-        invoice.setSubTotal(hosting.getPrice());
-        invoice.setTotal(hosting.getPrice());
-        invoice.setCycle(cycle);
-        invoice.setTax(0.0);
-        invoice.setDiscount(0.0);
-        invoice.setStartDate(hosting.getStartDate());
-        invoice.setEndDate(hosting.getEndDate());
-        invoice.setStatus(0);
-        return invoiceRepo.save(invoice);
+    public Invoice createInvoice(Hosting hosting, HostingRequest hostingRequest) {
+        return invoiceRepo.save(invoiceFactory.createInvoice(hosting, hostingRequest));
     }
 
     public Invoice findLatestInvoiceByHosting(Hosting hosting) {
         return invoiceRepo.findFirstByHostingOrderByCreatedDateDesc(hosting);
-    }
-
-    private String generateDetail(String domain) {
-        return "Hosting service for " + domain;
-    }
-
-    private String generateInvoiceCode() {
-        String code;
-        do {
-            String randomStr = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
-            code = "INV-" + randomStr;
-        } while (invoiceRepo.existsByInvoiceCode(code));
-        return code;
     }
 }

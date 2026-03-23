@@ -51,24 +51,28 @@ public class Invoice extends BaseEntity<String> implements Serializable {
     private String detail;
 
     @NotNull
+    @Column(name = "price")
+    private double price = 0.00;
+
+    @NotNull
     @Column(name = "sub_total")
-    private Double subTotal;
+    private double subTotal = 0.00;
 
     @NotNull
     @Column(name = "total")
-    private Double total;
+    private double total = 0.00;
 
     @NotNull
     @Column(name = "tax")
-    private Double tax;
+    private double tax = 0.00;
 
     @NotNull
     @Column(name = "discount")
-    private Double discount;
+    private double discount = 0.00;
 
     @NotNull
     @Column(name = "cycle")
-    private int cycle;
+    private int cycle = 1;
 
     @NotNull
     private Date startDate;
