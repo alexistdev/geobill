@@ -1,5 +1,6 @@
 package com.alexistdev.geobill.service;
 
+  import com.alexistdev.geobill.dto.InvoiceUserDTO;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
 import com.alexistdev.geobill.models.entity.User;
@@ -11,11 +12,20 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -98,6 +108,88 @@ public class InvoiceServiceTest {
         verify(invoiceRepo, times(1)).findFirstByHostingOrderByCreatedDateDesc(hosting);
     }
 
+    @Test
+    @Order(4)
+    @DisplayName("4. Test getAllInvoicesByUser - should return mapped page")
+    void getAllInvoicesByUser_shouldReturnMappedPage() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Invoice invoice1 = createInvoice("INV-001", 1, 100000.0, 120000.0, new Date(1735689600000L), new Date(1738368000000L));
+        Invoice invoice2 = createInvoice("INV-002", 12, 200000.0, 240000.0, new Date(1740787200000L), new Date(1743465600000L));
+        Page<Invoice> invoicePage = new PageImpl<>(Arrays.asList(invoice1, invoice2), pageable, 2);
+
+        when(invoiceRepo.findByUserIdAndIsDeletedFalse(eq(user), eq(pageable))).thenReturn(invoicePage);
+
+        Page<InvoiceUserDTO> result = invoiceService.getAllInvoicesByUser(pageable, user);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(2, result.getTotalElements());
+        Assertions.assertEquals(2, result.getContent().size());
+
+        InvoiceUserDTO first = result.getContent().getFirst();
+        Assertions.assertEquals(invoice1.getId().toString(), first.getId());
+        Assertions.assertEquals(invoice1.getHosting().getId().toString(), first.getHostingId());
+        Assertions.assertEquals("INV-001", first.getInvoiceCode());
+        Assertions.assertEquals("Invoice detail for INV-001", first.getDetail());
+        Assertions.assertEquals(100000.0, first.getSubTotal());
+        Assertions.assertEquals(120000.0, first.getTotal());
+        Assertions.assertEquals(10.0, first.getTax());
+        Assertions.assertEquals(0.0, first.getDiscount());
+        Assertions.assertEquals(1, first.getCycle());
+        Assertions.assertEquals(0, first.getStatus());
+
+        verify(invoiceRepo, times(1)).findByUserIdAndIsDeletedFalse(user, pageable);
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("5. Test getAllInvoicesByUser - should return empty page when no invoices")
+    void getAllInvoicesByUser_shouldReturnEmptyPage() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Invoice> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+        when(invoiceRepo.findByUserIdAndIsDeletedFalse(eq(user), eq(pageable))).thenReturn(emptyPage);
+
+        Page<InvoiceUserDTO> result = invoiceService.getAllInvoicesByUser(pageable, user);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result.isEmpty());
+        Assertions.assertEquals(0, result.getTotalElements());
+        verify(invoiceRepo, times(1)).findByUserIdAndIsDeletedFalse(user, pageable);
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("6. Test convertToInvoiceUserDTO - should map all invoice fields correctly")
+    void convertToInvoiceUserDTO_shouldMapAllFieldsCorrectly() throws Exception {
+        Date startDate = new Date(1735689600000L);
+        Date endDate = new Date(1738368000000L);
+        Invoice invoice = createInvoice("INV-REFLECTION", 3, 50000.0, 60000.0, startDate, endDate);
+
+        Method method = InvoiceService.class.getDeclaredMethod("convertToInvoiceUserDTO", Invoice.class);
+        method.setAccessible(true);
+        InvoiceUserDTO result = (InvoiceUserDTO) method.invoke(invoiceService, invoice);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(invoice.getId().toString(), result.getId());
+        Assertions.assertEquals(invoice.getHosting().getId().toString(), result.getHostingId());
+        Assertions.assertEquals(invoice.getInvoiceCode(), result.getInvoiceCode());
+        Assertions.assertEquals(invoice.getDetail(), result.getDetail());
+        Assertions.assertEquals(invoice.getSubTotal(), result.getSubTotal());
+        Assertions.assertEquals(invoice.getTotal(), result.getTotal());
+        Assertions.assertEquals(invoice.getTax(), result.getTax());
+        Assertions.assertEquals(invoice.getDiscount(), result.getDiscount());
+        Assertions.assertEquals(invoice.getCycle(), result.getCycle());
+        Assertions.assertEquals(dateFormat.format(startDate), result.getStartDate());
+        Assertions.assertEquals(dateFormat.format(endDate), result.getEndDate());
+        Assertions.assertEquals(invoice.getStatus(), result.getStatus());
+    }
+
     private Hosting createHosting() {
         User user = new User();
         user.setId(UUID.randomUUID());
@@ -111,5 +203,25 @@ public class InvoiceServiceTest {
         hosting.setStartDate(new Date());
         hosting.setEndDate(new Date());
         return hosting;
+    }
+
+    private Invoice createInvoice(String invoiceCode, int cycle, double subTotal, double total, Date startDate, Date endDate) {
+        Invoice invoice = new Invoice();
+        invoice.setId(UUID.randomUUID());
+        invoice.setUser(new User());
+        Hosting hosting = new Hosting();
+        hosting.setId(UUID.randomUUID());
+        invoice.setHosting(hosting);
+        invoice.setInvoiceCode(invoiceCode);
+        invoice.setDetail("Invoice detail for " + invoiceCode);
+        invoice.setSubTotal(subTotal);
+        invoice.setTotal(total);
+        invoice.setTax(10.0);
+        invoice.setDiscount(0.0);
+        invoice.setCycle(cycle);
+        invoice.setStartDate(startDate);
+        invoice.setEndDate(endDate);
+        invoice.setStatus(0);
+        return invoice;
     }
 }

@@ -3,11 +3,15 @@ package com.alexistdev.geobill.models.repository;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
 import com.alexistdev.geobill.models.entity.User;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.junit.jupiter.api.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -124,6 +128,54 @@ public class InvoiceRepoTest {
 
         Assertions.assertNotNull(foundInvoice);
         Assertions.assertEquals(invoice.getId(), foundInvoice.getId());
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("7. Test findByUserIdAndIsDeletedFalse - User with Invoices")
+    void testFindByUserIdAndIsDeletedFalse_UserWithInvoices() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setFullName("John Doe");
+        user.setEmail("john.doe@example.com");
+
+        Invoice invoice1 = createInvoice();
+        invoice1.setUser(user);
+        Invoice invoice2 = createInvoice();
+        invoice2.setUser(user);
+
+        Pageable pageable = Pageable.unpaged();
+        Page<Invoice> expectedPage = new org.springframework.data.domain.PageImpl<>(List.of(invoice1, invoice2));
+
+        when(invoiceRepo.findByUserIdAndIsDeletedFalse(user, pageable)).thenReturn(expectedPage);
+
+        Page<Invoice> result = invoiceRepo.findByUserIdAndIsDeletedFalse(user, pageable);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(2, result.getTotalElements());
+        Assertions.assertTrue(result.getContent().contains(invoice1));
+        Assertions.assertTrue(result.getContent().contains(invoice2));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("8. Test findByUserIdAndIsDeletedFalse - User with No Invoices")
+    void testFindByUserIdAndIsDeletedFalse_UserWithNoInvoices() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setFullName("Jane Doe");
+        user.setEmail("jane.doe@example.com");
+
+        Pageable pageable = Pageable.unpaged();
+        Page<Invoice> emptyPage = new org.springframework.data.domain.PageImpl<>(List.of());
+
+        when(invoiceRepo.findByUserIdAndIsDeletedFalse(user, pageable)).thenReturn(emptyPage);
+
+        Page<Invoice> result = invoiceRepo.findByUserIdAndIsDeletedFalse(user, pageable);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(0, result.getTotalElements());
+        Assertions.assertTrue(result.getContent().isEmpty());
     }
 
     private Invoice createInvoice() {
