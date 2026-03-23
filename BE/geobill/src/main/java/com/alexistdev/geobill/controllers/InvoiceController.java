@@ -68,6 +68,18 @@ public class InvoiceController {
         return ResponseEntity.ok(responseData);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseData<InvoiceUserDTO>> getInvoiceByUUID(@PathVariable("id") String uuid) {
+        ResponseData<InvoiceUserDTO> responseData = new ResponseData<>();
+        responseData.setStatus(false);
+        responseData.setPayload(null);
+        InvoiceUserDTO result = invoiceService.getInvoiceById(uuid);
+        responseData.getMessages().add("Retrieved invoice by id");
+        responseData.setStatus(true);
+        responseData.setPayload(result);
+        return null;
+    }
+
     private <T> void handleNonEmptyPage(ResponseData<Page<T>> responseData, Page<?> pageResult, int pageNumber){
         if(!pageResult.isEmpty()){
             responseData.setStatus(true);

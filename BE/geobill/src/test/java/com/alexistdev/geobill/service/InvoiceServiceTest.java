@@ -1,11 +1,13 @@
 package com.alexistdev.geobill.service;
 
-  import com.alexistdev.geobill.dto.InvoiceUserDTO;
+import com.alexistdev.geobill.dto.InvoiceUserDTO;
+import com.alexistdev.geobill.exceptions.NotFoundException;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
 import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.models.repository.InvoiceRepo;
 import com.alexistdev.geobill.services.InvoiceService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,14 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
+import java.util.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -36,6 +33,9 @@ public class InvoiceServiceTest {
 
     @Mock
     private InvoiceRepo invoiceRepo;
+
+    @Mock
+    private MessagesUtils messagesUtils;
 
     @InjectMocks
     private InvoiceService invoiceService;
@@ -188,6 +188,40 @@ public class InvoiceServiceTest {
         Assertions.assertEquals(dateFormat.format(startDate), result.getStartDate());
         Assertions.assertEquals(dateFormat.format(endDate), result.getEndDate());
         Assertions.assertEquals(invoice.getStatus(), result.getStatus());
+    }
+
+
+    @Test
+    @Order(7)
+    @DisplayName("7. Test getInvoiceById - should return InvoiceUserDTO when invoice exists")
+    void getInvoiceById_shouldReturnInvoiceUserDTOWhenInvoiceExists() {
+        UUID invoiceId = UUID.randomUUID();
+        Invoice invoice = createInvoice("INV-GET-BY-ID", 6, 70000.0, 80000.0, new Date(1743552000000L), new Date(1746230400000L));
+        invoice.setId(invoiceId);
+
+        when(invoiceRepo.findById(invoiceId)).thenReturn(Optional.of(invoice));
+
+        InvoiceUserDTO result = invoiceService.getInvoiceById(invoiceId.toString());
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(invoiceId.toString(), result.getId());
+        Assertions.assertEquals(invoice.getInvoiceCode(), result.getInvoiceCode());
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("8. Test getInvoiceById - should throw NotFoundException when invoice does not exist")
+    void getInvoiceById_shouldThrowNotFoundExceptionWhenInvoiceDoesNotExist() {
+        UUID invoiceId = UUID.randomUUID();
+        when(invoiceRepo.findById(invoiceId)).thenReturn(Optional.empty());
+        when(messagesUtils.getMessage("invoiceservice.invoice_not_found", invoiceId.toString()))
+                .thenReturn("Invoice not found");
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            invoiceService.getInvoiceById(invoiceId.toString());
+        });
+
+        verify(invoiceRepo, times(1)).findById(invoiceId);
     }
 
     private Hosting createHosting() {
