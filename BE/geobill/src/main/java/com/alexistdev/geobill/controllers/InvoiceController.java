@@ -77,7 +77,7 @@ public class InvoiceController {
         responseData.getMessages().add("Retrieved invoice by id");
         responseData.setStatus(true);
         responseData.setPayload(result);
-        return null;
+        return ResponseEntity.ok(responseData);
     }
 
     private <T> void handleNonEmptyPage(ResponseData<Page<T>> responseData, Page<?> pageResult, int pageNumber){

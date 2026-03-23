@@ -3,7 +3,7 @@ import {Footer} from "../../share/footer/footer";
 import {Header} from "../../share/header/header";
 import {Menutop} from "../../share/menutop/menutop";
 import {InvoiceResponseModel} from './model/response/invoice-response.model';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {DecimalPipe, isPlatformBrowser} from '@angular/common';
 import {Apiresponse} from '../../share/response/apiresponse';
 import {InvoiceServiceApi} from './service/invoice-service-api.service';
@@ -14,7 +14,8 @@ import {InvoiceServiceApi} from './service/invoice-service-api.service';
     Footer,
     Header,
     Menutop,
-    DecimalPipe
+    DecimalPipe,
+    RouterLink
   ],
   templateUrl: './invoice-component.html',
   styleUrl: './invoice-component.css',

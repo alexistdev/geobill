@@ -22,6 +22,7 @@ import { Userdetailcomponent } from './admin/masterdata/usercomponent/userdetail
 import {Orderhosting} from './users/orderhosting/orderhosting';
 import {Checkout} from './users/orderhosting/checkout/checkout';
 import {InvoiceComponent} from './users/invoice-component/invoice-component';
+import {InvoiceDetailComponent} from './users/invoice-detail-component/invoice-detail-component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -82,9 +83,18 @@ export const routes: Routes = [
   },
   {
     path: 'users/billings',
-    component: InvoiceComponent,
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['USER'] }
+    data: { roles: ['USER'] },
+    children: [
+      {
+        path: '',
+        component: InvoiceComponent
+      },
+      {
+        path: ':uuid',
+        component: InvoiceDetailComponent
+      }
+    ]
   },
   {
     path: 'users/services/order',
