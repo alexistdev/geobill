@@ -10,10 +10,11 @@ public class InvoiceUserDTO {
     private String hostingId;
     private String invoiceCode;
     private String detail;
-    private Double subTotal;
-    private Double total;
-    private Double tax;
-    private Double discount;
+    private double price;
+    private double subTotal;
+    private double total;
+    private double tax;
+    private double discount;
     private String startDate;
     private String endDate;
     private int status;

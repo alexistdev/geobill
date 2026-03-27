@@ -110,7 +110,7 @@
                                 {{invoice()?.detail}}
                               </td>
                               <td class="unit">{{ invoice()?.cycle }} Month</td>
-                              <td class="qty">Rp. {{ invoice()?.total | number:'1.2-2' }}</td>
+                              <td class="qty">Rp. {{ invoice()?.price | number:'1.2-2' }}</td>
                               <td class="total">Rp. {{ invoice()?.total | number:'1.2-2' }}</td>
                             </tr>
                             </tbody>
