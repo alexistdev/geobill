@@ -41,9 +41,6 @@ public class InvoiceServiceTest {
     private MessagesUtils messagesUtils;
 
     @Mock
-    private ProductService productService;
-
-    @Mock
     private InvoiceFactory invoiceFactory;
 
     @InjectMocks
@@ -259,6 +256,7 @@ public class InvoiceServiceTest {
         invoice.setHosting(hosting);
         invoice.setInvoiceCode(invoiceCode);
         invoice.setDetail("Invoice detail for " + invoiceCode);
+        invoice.setPrice(150000.0);
         invoice.setSubTotal(subTotal);
         invoice.setTotal(total);
         invoice.setTax(10.0);

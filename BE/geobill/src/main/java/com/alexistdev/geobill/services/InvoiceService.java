@@ -72,6 +72,7 @@ public class InvoiceService {
         }
         invoiceUserDTO.setInvoiceCode(invoice.getInvoiceCode());
         invoiceUserDTO.setDetail(invoice.getDetail());
+        invoiceUserDTO.setPrice(invoice.getPrice());
         invoiceUserDTO.setSubTotal(invoice.getSubTotal());
         invoiceUserDTO.setTotal(invoice.getTotal());
         invoiceUserDTO.setTax(invoice.getTax());

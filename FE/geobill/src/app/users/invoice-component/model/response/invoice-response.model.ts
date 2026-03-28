@@ -10,6 +10,7 @@ export interface InvoiceResponseModel {
   hostingId: string;
   invoiceCode: string;
   detail: string;
+  price: number;
   subTotal: number;
   total: number;
   tax: number;
