@@ -64,3 +64,6 @@ With these steps, you'll have the GeoBill application up and running, ready for 
 ![Administrator Page](https://github.com/alexistdev/geobill/blob/main/gambar/gambar2.png?raw=true)
 ![Administrator Page](https://github.com/alexistdev/geobill/blob/main/gambar/gambar3.png?raw=true)
 ![Administrator Page](https://github.com/alexistdev/geobill/blob/main/gambar/gambar4.png?raw=true)
+
+
+-- test trigger jenkins --
