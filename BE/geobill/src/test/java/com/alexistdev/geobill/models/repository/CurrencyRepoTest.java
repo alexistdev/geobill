@@ -13,7 +13,7 @@ import java.util.Optional;
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class CurrenctyRepoTest {
+public class CurrencyRepoTest {
 
     @Autowired
     private TestEntityManager entityManager;

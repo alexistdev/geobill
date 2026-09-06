@@ -30,7 +30,6 @@ class HostingControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private StubHostingService hostingService;
-    private UserService userService;
     private HostingController hostingController;
     private MockMvc mockMvc;
 
@@ -41,7 +40,7 @@ class HostingControllerTest {
     @BeforeEach
     void setUp() {
         hostingService = new StubHostingService();
-        userService = new StubUserService();
+        UserService userService = new StubUserService();
         hostingController = new HostingController(hostingService, userService);
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
@@ -219,7 +218,7 @@ class HostingControllerTest {
 
     private static class StubUserService extends UserService {
         private StubUserService() {
-            super(null, null, null, null, null);
+            super(null, null, null, null, null, null);
         }
     }
 }

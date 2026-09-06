@@ -16,6 +16,7 @@ import com.alexistdev.geobill.request.UpdateUserRequest;
 import com.alexistdev.geobill.services.CustomerService;
 import com.alexistdev.geobill.services.UserService;
 import com.alexistdev.geobill.utils.MessagesUtils;
+import com.alexistdev.geolicense.starter.service.LicenseHolder;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -59,6 +60,9 @@ public class UserServiceTest {
 
     @Mock
     private MessagesUtils messagesUtils;
+
+    @Mock
+    private LicenseHolder licenseHolder;
 
     private User user;
     private LoginRequest loginRequest;
@@ -111,6 +115,7 @@ public class UserServiceTest {
     @Order(1)
     @DisplayName("1. Test load User by Username and then return UserDetails")
     void loadUserByUsername_UserFound_ReturnsUserDetails() {
+        when(licenseHolder.isValid()).thenReturn(true);
         when(userRepo.findByEmail(registerRequest.getEmail())).thenReturn(Optional.of(user));
 
         UserDetails userDetails = userService.loadUserByUsername(registerRequest.getEmail());
@@ -123,6 +128,7 @@ public class UserServiceTest {
     @Order(2)
     @DisplayName("2. Test load User by Username and then throw UsernameNotFoundException")
     void loadUserByUsername_UserNotFound_ThrowsUsernameNotFoundException() {
+        when(licenseHolder.isValid()).thenReturn(true);
         when(userRepo.findByEmail(registerRequest.getEmail())).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(registerRequest.getEmail()));
     }

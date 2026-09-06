@@ -16,6 +16,7 @@ import com.alexistdev.geobill.request.RegisterRequest;
 import com.alexistdev.geobill.request.UpdateUserRequest;
 
 import com.alexistdev.geobill.utils.MessagesUtils;
+import com.alexistdev.geolicense.starter.service.LicenseHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,14 +40,16 @@ public class UserService implements UserDetailsService {
     private final UserRepo userRepo;
     private final CustomerService customerService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final LicenseHolder licenseHolder;
     private final CustomerRepo customerRepo;
     private final MessagesUtils messagesUtils;
 
     public UserService(UserRepo userRepo, CustomerService customerService,
-            BCryptPasswordEncoder bCryptPasswordEncoder, CustomerRepo customerRepo, MessagesUtils messagesUtils) {
+                       BCryptPasswordEncoder bCryptPasswordEncoder, LicenseHolder licenseHolder, CustomerRepo customerRepo, MessagesUtils messagesUtils) {
         this.userRepo = userRepo;
         this.customerService = customerService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.licenseHolder = licenseHolder;
         this.customerRepo = customerRepo;
         this.messagesUtils = messagesUtils;
     }
@@ -55,6 +58,11 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        if(!licenseHolder.isValid()) {
+            throw new RuntimeException("Internal Server Error");
+        }
+
         return userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String
                 .format("User %s not found", email)));
     }
