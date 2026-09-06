@@ -33,12 +33,12 @@ public class Currency extends BaseEntity<String>{
 
     @NotBlank
     @Size(max = 50)
-    @Column(length = 50, nullable = false)
+    @Column(length = 50, nullable = false   )
     private String name;
 
     @NotBlank
     @Size(max = 5)
-    @Column(length = 5, nullable = false)
+    @Column(length = 5, nullable = false, unique = true)
     private String code;
 
     @NotBlank

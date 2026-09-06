@@ -1,6 +1,5 @@
 package com.alexistdev.geobill.models.repository;
 
-import com.alexistdev.geobill.models.entity.Domaintld;
 import com.alexistdev.geobill.models.entity.Menu;
 import org.springframework.data.jpa.repository.JpaRepository;
 

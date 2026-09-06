@@ -1,6 +1,9 @@
 package com.alexistdev.geobill;
 
+import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.utils.AuditorAwareImpl;
+import com.alexistdev.geolicense.starter.service.LicenseHolder;
+import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -15,13 +18,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+@Getter
 @SpringBootApplication
 @EnableJpaRepositories
 @EnableJpaAuditing
 @EntityScan
 public class GeobillApplication {
 
-	public static void main(String[] args) {
+	@SuppressWarnings("unused")
+	private LicenseHolder licenseHolder;
+
+    public static void main(String[] args) {
 		SpringApplication.run(GeobillApplication.class, args);
 	}
 
@@ -44,10 +51,10 @@ public class GeobillApplication {
 		// Custom mapping for Product to ProductDTO
 		modelMapper.createTypeMap(com.alexistdev.geobill.models.entity.Product.class,
 				com.alexistdev.geobill.dto.ProductDTO.class)
-				.addMappings(mapper -> {
-					mapper.map(src -> src.getProductType(),
-							com.alexistdev.geobill.dto.ProductDTO::setProductTypeDTO);
-				});
+				.addMappings(mapper ->
+					mapper.map(Product::getProductType,
+							com.alexistdev.geobill.dto.ProductDTO::setProductTypeDTO)
+				);
 
 		return modelMapper;
 	}
