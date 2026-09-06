@@ -44,7 +44,7 @@ public class Menu extends BaseEntity<String> implements Serializable {
     @Column(name = "type_menu", nullable = false)
     private int typeMenu;
 
-    @Column(name = "code", nullable = false, length = 3)
+    @Column(name = "code", nullable = false, length = 50)
     private String code;
 
 }

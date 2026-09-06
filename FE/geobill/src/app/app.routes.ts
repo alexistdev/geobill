@@ -23,6 +23,7 @@ import {Orderhosting} from './users/orderhosting/orderhosting';
 import {Checkout} from './users/orderhosting/checkout/checkout';
 import {InvoiceComponent} from './users/invoice-component/invoice-component';
 import {InvoiceDetailComponent} from './users/invoice-detail-component/invoice-detail-component';
+import {Ticketcomponent} from './admin/support/ticketcomponent/ticketcomponent';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -62,6 +63,12 @@ export const routes: Routes = [
         component: Userdetailcomponent
       }
     ]
+  },
+  {
+    path: 'admin/ticket',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+    component: Ticketcomponent
   },
   {
     path: 'staff/dashboard',
