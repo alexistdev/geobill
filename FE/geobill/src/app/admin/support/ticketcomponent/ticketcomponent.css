@@ -1,0 +1,187 @@
+/*
+ * Copyright (c) 2026.
+ * Project: GeoBill
+ * Author: Alexsander Hendra Wijaya
+ * Github: https://github.com/alexistdev
+ * Email: alexistdev@gmail.com
+ */
+
+.ticket-page {
+  align-items: flex-start;
+}
+
+/* ---------- filter panel ---------- */
+.filter-panel-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background-color: transparent;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-panel-header i {
+  font-size: 1rem;
+  color: var(--bs-secondary-color);
+}
+
+.filter-panel-title {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.filter-label {
+  font-size: .8125rem;
+  margin-bottom: .375rem;
+  color: var(--bs-secondary-color);
+}
+
+.filter-panel .form-control,
+.filter-panel .form-select {
+  font-size: .875rem;
+}
+
+/* ---------- ticket panel ---------- */
+.ticket-panel-header {
+  background-color: transparent;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ticket-panel-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.ticket-icon-btn {
+  padding: .25rem .5rem;
+  line-height: 1;
+  border: 0;
+  color: var(--bs-secondary-color);
+}
+
+.ticket-icon-btn:hover {
+  color: var(--bs-emphasis-color);
+}
+
+.ticket-icon-btn i {
+  font-size: 1.125rem;
+}
+
+/* ---------- tabs ---------- */
+.ticket-tabs {
+  gap: 1rem;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ticket-tabs-list {
+  gap: .25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ticket-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.ticket-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .875rem .5rem;
+  margin-right: .75rem;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--bs-secondary-color);
+  font-size: .9375rem;
+}
+
+.ticket-tab:hover {
+  color: var(--bs-emphasis-color);
+}
+
+.ticket-tab.active {
+  color: var(--bs-emphasis-color);
+  border-bottom-color: var(--bs-primary);
+}
+
+.ticket-tab-count {
+  min-width: 1.5rem;
+  padding: .125rem .375rem;
+  border-radius: .375rem;
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-secondary-color);
+  font-size: .75rem;
+  text-align: center;
+}
+
+.ticket-tab.active .ticket-tab-count {
+  color: var(--bs-emphasis-color);
+}
+
+.ticket-add-btn {
+  flex-shrink: 0;
+  padding: .375rem .625rem;
+  line-height: 1;
+}
+
+.ticket-add-btn i {
+  font-size: 1.125rem;
+}
+
+/* ---------- ticket rows ---------- */
+.ticket-row {
+  gap: 1rem;
+  padding: .875rem .25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ticket-row:last-child {
+  border-bottom: 0;
+}
+
+.ticket-row-number {
+  margin-right: .75rem;
+  color: var(--bs-secondary-color);
+  font-size: .8125rem;
+}
+
+.ticket-row-meta {
+  gap: 1.25rem;
+  color: var(--bs-secondary-color);
+  font-size: .8125rem;
+}
+
+/* ---------- empty state ---------- */
+.ticket-empty {
+  min-height: 15rem;
+  padding: 2rem 1rem;
+  color: var(--bs-secondary-color);
+}
+
+.ticket-empty-icon {
+  width: 4rem;
+  height: 3rem;
+  margin-bottom: 1.25rem;
+  opacity: .55;
+}
+
+.ticket-empty-text {
+  font-size: .9375rem;
+}
+
+@media (max-width: 575.98px) {
+  .ticket-tabs {
+    gap: .5rem;
+    padding: 0 .75rem;
+  }
+
+  .ticket-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

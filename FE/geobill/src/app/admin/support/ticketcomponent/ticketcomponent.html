@@ -1,0 +1,184 @@
+<!--
+  ~ Copyright (c) 2026.
+  ~ Project: GeoBill
+  ~ Author: Alexsander Hendra Wijaya
+  ~ Github: https://github.com/alexistdev
+  ~ Email: alexistdev@gmail.com
+  -->
+
+<div class="wrapper">
+  <!--start header wrapper-->
+  <div class="header-wrapper">
+    <!--start header -->
+    <header>
+      <app-topheader></app-topheader>
+    </header>
+    <!--end header -->
+    <!--navigation-->
+    <div class="primary-menu">
+      <nav class="navbar navbar-expand-lg align-items-center">
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar"
+          aria-labelledby="offcanvasNavbarLabel">
+          <div class="offcanvas-header border-bottom">
+            <div class="d-flex align-items-center">
+              <div class="">
+                <img src="assets/images/logo-icon.png" class="logo-icon" alt="logo icon">
+              </div>
+              <div class="">
+                <h4 class="logo-text">Rocker</h4>
+              </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <app-menutop></app-menutop>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--end navigation-->
+  </div>
+  <!--end header wrapper-->
+  <!--start page wrapper -->
+  <div class="page-wrapper">
+    <div class="page-content">
+      <div class="row g-3 ticket-page">
+
+        <!--start filter panel-->
+        @if (!expanded) {
+          <div class="col-12 col-lg-3">
+            <div class="card radius-10 filter-panel mb-0">
+              <div class="card-header filter-panel-header">
+                <i class='bx bx-filter-alt'></i>
+                <span class="filter-panel-title">Filters</span>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label filter-label" for="filterTicketNumber">Ticket Number</label>
+                  <input type="text" id="filterTicketNumber" class="form-control" placeholder="Enter ticket number"
+                    [(ngModel)]="filter.ticketNumber">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label filter-label" for="filterSummary">Summary</label>
+                  <input type="text" id="filterSummary" class="form-control" placeholder="Search summary"
+                    [(ngModel)]="filter.summary">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label filter-label" for="filterPriority">Priority</label>
+                  <select id="filterPriority" class="form-select" [(ngModel)]="filter.priority">
+                    @for (option of priorities; track option) {
+                      <option [value]="option">{{ option }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label filter-label" for="filterDepartment">Department</label>
+                  <select id="filterDepartment" class="form-select" [(ngModel)]="filter.department">
+                    @for (option of departments; track option) {
+                      <option [value]="option">{{ option }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label filter-label" for="filterAssignedTo">Assigned To</label>
+                  <select id="filterAssignedTo" class="form-select" [(ngModel)]="filter.assignedTo">
+                    @for (option of assignees; track option) {
+                      <option [value]="option">{{ option }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label filter-label" for="filterLastReply">Last Reply</label>
+                  <select id="filterLastReply" class="form-select" [(ngModel)]="filter.lastReply">
+                    @for (option of lastReplies; track option) {
+                      <option [value]="option">{{ option }}</option>
+                    }
+                  </select>
+                </div>
+
+                <button type="button" class="btn btn-primary w-100 mb-2" (click)="applyFilters()">
+                  <i class='bx bx-filter-alt me-1'></i>Apply Filters
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+                  <i class='bx bx-x-circle me-1'></i>Clear Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+        <!--end filter panel-->
+
+        <!--start ticket panel-->
+        <div class="col-12" [class.col-lg-9]="!expanded">
+          <div class="card radius-10 ticket-panel mb-0">
+            <div class="card-header ticket-panel-header d-flex align-items-center justify-content-between">
+              <h5 class="mb-0 ticket-panel-title">Tickets</h5>
+              <button type="button" class="btn ticket-icon-btn" (click)="toggleExpand()"
+                [attr.aria-label]="expanded ? 'Collapse' : 'Expand'">
+                <i class='bx' [ngClass]="expanded ? 'bx-collapse' : 'bx-expand-alt'"></i>
+              </button>
+            </div>
+
+            <div class="ticket-tabs d-flex align-items-center justify-content-between">
+              <div class="ticket-tabs-list d-flex align-items-center">
+                @for (tab of tabs; track tab.key) {
+                  <button type="button" class="ticket-tab" [class.active]="activeTab === tab.key"
+                    (click)="selectTab(tab.key)">
+                    <span class="ticket-tab-label">{{ tab.label }}</span>
+                    <span class="ticket-tab-count">{{ tab.count }}</span>
+                  </button>
+                }
+              </div>
+              <button type="button" class="btn btn-primary ticket-add-btn" aria-label="New ticket">
+                <i class='bx bx-plus'></i>
+              </button>
+            </div>
+
+            <div class="card-body">
+              @for (ticket of visibleTickets; track ticket.id) {
+                <div class="ticket-row d-flex align-items-center justify-content-between">
+                  <div class="ticket-row-main">
+                    <span class="ticket-row-number">{{ ticket.number }}</span>
+                    <span class="ticket-row-summary">{{ ticket.summary }}</span>
+                  </div>
+                  <div class="ticket-row-meta d-flex align-items-center">
+                    <span class="ticket-row-priority">{{ ticket.priority }}</span>
+                    <span class="ticket-row-department">{{ ticket.department }}</span>
+                    <span class="ticket-row-assigned">{{ ticket.assignedTo }}</span>
+                    <span class="ticket-row-reply">{{ ticket.lastReply }}</span>
+                  </div>
+                </div>
+              } @empty {
+                <div class="ticket-empty d-flex flex-column align-items-center justify-content-center">
+                  <svg class="ticket-empty-icon" viewBox="0 0 64 48" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 30 L14 6 H50 L60 30 V38 A6 6 0 0 1 54 44 H10 A6 6 0 0 1 4 38 Z" />
+                    <path d="M4 30 H20 L24 36 H40 L44 30 H60" />
+                  </svg>
+                  <p class="ticket-empty-text mb-0">There are currently no tickets with this status.</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <!--end ticket panel-->
+
+      </div><!--end row-->
+    </div>
+  </div>
+  <!--end page wrapper -->
+
+  <!--start overlay-->
+  <div class="overlay toggle-icon"></div>
+  <!--end overlay-->
+  <!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+  <!--End Back To Top Button-->
+  <footer class="page-footer">
+    <p class="mb-0">Copyright © 2023. All right reserved.</p>
+  </footer>
+</div>
