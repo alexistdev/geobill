@@ -33,3 +33,4 @@ build/
 .vscode/
 /D:MYLOG/spring.log
 /D:MYLOG/
+/src/main/java/com/alexistdev/geobill/seeder/README.md
