@@ -7,6 +7,7 @@ import com.alexistdev.geobill.models.repository.MenuRepo;
 import com.alexistdev.geobill.models.repository.RoleMenuRepo;
 
 import org.springframework.transaction.annotation.Transactional;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
 
-    @Autowired
-    private MenuRepo menuRepo;
+    private final MenuRepo menuRepo;
+    private final RoleMenuRepo roleMenuRepo;
+    private final MessagesUtils messagesUtils;
 
-    @Autowired
-    private RoleMenuRepo roleMenuRepo;
+    public MenuService(MenuRepo menuRepo, RoleMenuRepo roleMenuRepo, MessagesUtils messagesUtils) {
+        this.menuRepo = menuRepo;
+        this.roleMenuRepo = roleMenuRepo;
+        this.messagesUtils = messagesUtils;
+    }
 
     @Transactional
     public List<Menu> getMenusByRole(Role role) {
@@ -66,7 +71,7 @@ public class MenuService {
         Optional<Menu> existingMenuOpt = menuRepo.findById(id);
 
         if (!existingMenuOpt.isPresent()) {
-            throw new IllegalArgumentException("Menu not found with ID: " + id);
+            throw new IllegalArgumentException(messagesUtils.getMessage("menuservice.menu_not_found", id.toString()));
         }
 
         Menu menu = existingMenuOpt.get();

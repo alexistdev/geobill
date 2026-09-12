@@ -3,8 +3,8 @@ package com.alexistdev.geobill.controllers;
 import com.alexistdev.geobill.dto.MenuDTO;
 import com.alexistdev.geobill.models.entity.Menu;
 import com.alexistdev.geobill.services.MenuService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,13 @@ import java.util.UUID;
 @RequestMapping("/api/v1/menus")
 public class MenuController {
 
-    @Autowired
-    private MenuService menuService;
+    private final MenuService menuService;
+    private final MessagesUtils messagesUtils;
+
+    public MenuController(MenuService menuService, MessagesUtils messagesUtils) {
+        this.menuService = menuService;
+        this.messagesUtils = messagesUtils;
+    }
 
     @GetMapping
     public ResponseEntity<List<Menu>> getAllMenus() {
@@ -62,7 +67,7 @@ public class MenuController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             log.error("Error creating menu", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating menu");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(messagesUtils.getMessage("menucontroller.create_failed"));
         }
     }
 
@@ -90,7 +95,7 @@ public class MenuController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             log.error("Error updating menu", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating menu");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(messagesUtils.getMessage("menucontroller.update_failed"));
         }
     }
 
@@ -105,10 +110,10 @@ public class MenuController {
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             log.error("Invalid UUID format: {}", id);
-            return ResponseEntity.badRequest().body("Invalid UUID format");
+            return ResponseEntity.badRequest().body(messagesUtils.getMessage("menucontroller.invalid_uuid"));
         } catch (Exception e) {
             log.error("Error deleting menu", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting menu");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(messagesUtils.getMessage("menucontroller.delete_failed"));
         }
     }
 }

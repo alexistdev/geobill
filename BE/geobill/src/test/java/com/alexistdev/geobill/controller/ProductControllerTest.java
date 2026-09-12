@@ -7,6 +7,7 @@ import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.Product;
 import com.alexistdev.geobill.request.ProductRequest;
 import com.alexistdev.geobill.services.ProductService;
+import com.alexistdev.geobill.utils.TestMessagesUtils;
 import org.junit.jupiter.api.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
@@ -33,7 +34,7 @@ public class ProductControllerTest {
     void setUp() {
         productService = mock(ProductService.class);
         modelMapper = mock(ModelMapper.class);
-        productController = new ProductController(productService, modelMapper);
+        productController = new ProductController(productService, modelMapper, TestMessagesUtils.create());
     }
 
     @Test

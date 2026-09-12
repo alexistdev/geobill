@@ -1,12 +1,12 @@
 package com.alexistdev.geobill.controllers;
 
-import com.alexistdev.geobill.config.ValidationConstant;
 import com.alexistdev.geobill.dto.ProductTypeDTO;
 import com.alexistdev.geobill.dto.ResponseData;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.request.ProductTypeRequest;
 import com.alexistdev.geobill.services.ProductTypeService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +28,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/producttypes")
 public class ProductTypeController {
 
-    private static final String NO_PRODUCT_TYPE_FOUND = "No product type found";
-
     private final ProductTypeService productTypeService;
     private final ModelMapper modelMapper;
+    private final MessagesUtils messagesUtils;
 
 
-    public ProductTypeController(ProductTypeService productTypeService, ModelMapper modelMapper) {
+    public ProductTypeController(ProductTypeService productTypeService, ModelMapper modelMapper,
+                                 MessagesUtils messagesUtils) {
         this.productTypeService = productTypeService;
         this.modelMapper = modelMapper;
+        this.messagesUtils = messagesUtils;
     }
 
     @GetMapping
@@ -65,7 +66,7 @@ public class ProductTypeController {
             productTypePage = productTypeService.getAllProductTypes(fallbackPageable);
         }
 
-        responseData.getMessages().add(NO_PRODUCT_TYPE_FOUND);
+        responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.no_product_type"));
         responseData.setStatus(false);
 
         handleNonEmptyPage(responseData,productTypePage,page);
@@ -98,13 +99,13 @@ public class ProductTypeController {
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             productTypePage = productTypeService.getAllProductTypesByFilter(fallbackPageable, filter);
         }
-        responseData.getMessages().add(NO_PRODUCT_TYPE_FOUND);
+        responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.no_product_type"));
         responseData.setStatus(false);
 
         if(!productTypePage.isEmpty()){
             responseData.setStatus(true);
             responseData.getMessages().removeFirst();
-            responseData.getMessages().add("Retrieved page " + page + " of product types");
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.page_retrieved", String.valueOf(page)));
         }
         Page<ProductTypeDTO> productTypeDTOS = productTypePage.map(productType -> modelMapper.map(productType, ProductTypeDTO.class));
         responseData.setPayload(productTypeDTOS);
@@ -122,7 +123,7 @@ public class ProductTypeController {
 
         try {
             ProductType result = productTypeService.save(modelMapper.map(request, ProductType.class));
-            responseData.getMessages().add(ValidationConstant.success("Product Type"));
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.product_type_created"));
             responseData.setPayload(modelMapper.map(result, ProductTypeDTO.class));
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
@@ -133,7 +134,7 @@ public class ProductTypeController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
         } catch (Exception e) {
             log.error("Error creating Product Type", e);
-            responseData.getMessages().add("Error :" + e.getMessage());
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.error", e.getMessage()));
             responseData.setPayload(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
         }
@@ -144,7 +145,7 @@ public class ProductTypeController {
         ResponseData<ProductTypeDTO> responseData = new ResponseData<>();
         responseData.setStatus(false);
         if(request.getId() == null){
-            responseData.getMessages().add("Product Type ID is required");
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.id_required"));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
@@ -155,7 +156,7 @@ public class ProductTypeController {
 
         try {
             ProductType result = productTypeService.update(request.getId(), modelMapper.map(request, ProductType.class));
-            responseData.getMessages().add(ValidationConstant.success("Product Type"));
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.product_type_created"));
             responseData.setPayload(modelMapper.map(result, ProductTypeDTO.class));
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
@@ -171,7 +172,7 @@ public class ProductTypeController {
         responseData.setStatus(false);
         try {
             productTypeService.delete(uuid);
-            responseData.getMessages().add(ValidationConstant.deleted("Product Type"));
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.product_type_deleted"));
             responseData.setStatus(true);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         } catch (Exception e) {
@@ -186,7 +187,7 @@ public class ProductTypeController {
             if(!responseData.getMessages().isEmpty()){
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + pageNumber + " of product types");
+            responseData.getMessages().add(messagesUtils.getMessage("producttypecontroller.page_retrieved", String.valueOf(pageNumber)));
         }
     }
 

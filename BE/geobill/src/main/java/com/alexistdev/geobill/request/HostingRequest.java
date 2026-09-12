@@ -11,27 +11,27 @@ import lombok.Setter;
 @Getter
 @Setter
 public class HostingRequest {
-    @NotBlank(message = "userId is required")
+    @NotBlank(message = "{hostingRequest.userId.required}")
     @Pattern(
             regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
-            message = "userId must be a valid UUID"
+            message = "{hostingRequest.userId.uuid}"
     )
     private String userId;
 
-    @NotBlank(message = "productId is required")
+    @NotBlank(message = "{hostingRequest.productId.required}")
     @Pattern(
             regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
-            message = "productId must be a valid UUID"
+            message = "{hostingRequest.productId.uuid}"
     )
     private String productId;
 
-    @NotBlank(message = "domainName is required")
+    @NotBlank(message = "{hostingRequest.domainName.required}")
     private String domainName;
 
-    @NotNull(message = "price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "price must be greater than 0")
+    @NotNull(message = "{hostingRequest.price.required}")
+    @DecimalMin(value = "0.0", inclusive = false, message = "{hostingRequest.price.min}")
     private Double price;
 
-    @Min(value = 1, message = "cycle must be at least 1 month")
+    @Min(value = 1, message = "{hostingRequest.cycle.min}")
     private int cycle;
 }

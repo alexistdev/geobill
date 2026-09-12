@@ -60,11 +60,10 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         if(!licenseHolder.isValid()) {
-            throw new RuntimeException("Internal Server Error");
+            throw new RuntimeException(messagesUtils.getMessage("userservice.internal_error"));
         }
 
-        return userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(String
-                .format("User %s not found", email)));
+        return userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(messagesUtils.getMessage("userservice.username_not_found", email)));
     }
 
     @Transactional

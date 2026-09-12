@@ -1,6 +1,7 @@
 package com.alexistdev.geobill.factory;
 
 import com.alexistdev.geobill.exceptions.NotFoundException;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import com.alexistdev.geobill.models.entity.Hosting;
 import com.alexistdev.geobill.models.entity.Invoice;
 import com.alexistdev.geobill.models.entity.Product;
@@ -15,10 +16,13 @@ import java.util.UUID;
 public class InvoiceFactory {
     private final ProductService productService;
     private final InvoiceCodeGenerator invoiceCodeGenerator;
+    private final MessagesUtils messagesUtils;
 
-    public InvoiceFactory(ProductService productService, InvoiceCodeGenerator invoiceCodeGenerator) {
+    public InvoiceFactory(ProductService productService, InvoiceCodeGenerator invoiceCodeGenerator,
+                          MessagesUtils messagesUtils) {
         this.productService = productService;
         this.invoiceCodeGenerator = invoiceCodeGenerator;
+        this.messagesUtils = messagesUtils;
     }
 
     public Invoice createInvoice(Hosting hosting, HostingRequest hostingRequest) {
@@ -26,7 +30,7 @@ public class InvoiceFactory {
         Product product = productService.findEntityById(productId);
 
         if (product == null) {
-            throw new NotFoundException("Product not found with ID: " + productId); // Replace with custom exception
+            throw new NotFoundException(messagesUtils.getMessage("invoicefactory.product_not_found", productId.toString()));
         }
 
         int cycle = hostingRequest.getCycle();

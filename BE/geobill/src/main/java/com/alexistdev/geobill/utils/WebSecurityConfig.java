@@ -59,6 +59,44 @@ public class WebSecurityConfig {
                                 "/api/v1/hosting").hasAnyAuthority(Role.ADMIN.toString(), Role.USER.toString())
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/invoice").hasAnyAuthority(Role.ADMIN.toString(), Role.USER.toString())
+
+                        // Ticketing: milik sendiri boleh diakses semua peran.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/tickets/me", "/api/v1/tickets/tabs/me")
+                                .hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString(), Role.USER.toString())
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/tickets/auto-close").hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/tickets", "/api/v1/tickets/*/replies")
+                                .hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString(), Role.USER.toString())
+                        // Detail tiket dibatasi service: klien hanya menemukan tiketnya sendiri.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/tickets/{id}", "/api/v1/tickets/number/*")
+                                .hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString(), Role.USER.toString())
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/tickets", "/api/v1/tickets/tabs", "/api/v1/tickets/assigned/me")
+                                .hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString())
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/v1/tickets/**").hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/v1/tickets/**").hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString())
+
+                        // Departemen dan template balasan: dibaca staff, diubah admin.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/ticket-departments/active")
+                                .hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString(), Role.USER.toString())
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/ticket-departments/**", "/api/v1/ticket-canned-replies/**")
+                                .hasAnyAuthority(Role.ADMIN.toString(), Role.STAFF.toString())
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/v1/ticket-departments/**", "/api/v1/ticket-canned-replies/**")
+                                .hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/v1/ticket-departments/**", "/api/v1/ticket-canned-replies/**")
+                                .hasAuthority(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/v1/ticket-departments/**", "/api/v1/ticket-canned-replies/**")
+                                .hasAuthority(Role.ADMIN.toString())
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults())

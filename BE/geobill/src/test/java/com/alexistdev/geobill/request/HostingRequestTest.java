@@ -1,9 +1,8 @@
 package com.alexistdev.geobill.request;
 
+import com.alexistdev.geobill.utils.TestValidators;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.Set;
@@ -16,8 +15,7 @@ public class HostingRequestTest {
 
     @BeforeEach
     void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        validator = TestValidators.create();
     }
 
     @Test

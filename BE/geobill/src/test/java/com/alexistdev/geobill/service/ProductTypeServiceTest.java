@@ -4,6 +4,7 @@ import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import com.alexistdev.geobill.services.ProductTypeService;
+import com.alexistdev.geobill.utils.TestMessagesUtils;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,6 @@ public class ProductTypeServiceTest {
     @Mock
     private ProductTypeRepo productTypeRepo;
 
-    @InjectMocks
     private ProductTypeService productTypeService;
 
     private ProductType productType;
@@ -42,6 +42,7 @@ public class ProductTypeServiceTest {
 
     @BeforeEach
     void setUp() {
+        productTypeService = new ProductTypeService(productTypeRepo, TestMessagesUtils.create());
         productTypeId = UUID.randomUUID();
         productType = new ProductType();
         productType.setId(productTypeId);

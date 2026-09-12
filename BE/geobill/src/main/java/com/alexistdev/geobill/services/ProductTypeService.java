@@ -1,6 +1,7 @@
 package com.alexistdev.geobill.services;
 
 import com.alexistdev.geobill.exceptions.DuplicateException;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.models.repository.ProductTypeRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +17,13 @@ import java.util.UUID;
 @Service
 public class ProductTypeService {
 
-    @Autowired
-    private ProductTypeRepo productTypeRepo;
+    private final ProductTypeRepo productTypeRepo;
+    private final MessagesUtils messagesUtils;
+
+    public ProductTypeService(ProductTypeRepo productTypeRepo, MessagesUtils messagesUtils) {
+        this.productTypeRepo = productTypeRepo;
+        this.messagesUtils = messagesUtils;
+    }
 
     public Page<ProductType> getAllProductTypes(Pageable pageable){
         return productTypeRepo.findByIsDeletedFalse(pageable);
@@ -34,7 +40,7 @@ public class ProductTypeService {
 
             if(!existing.getDeleted()){
                 log.info("ProductType with name '" + productType.getName() + "' already exists");
-               throw new DuplicateException("ProductType with name '" + productType.getName() + "' already exists");
+               throw new DuplicateException(messagesUtils.getMessage("producttypeservice.name_exist", productType.getName()));
             }
 
             existing.setDeleted(false);
@@ -46,7 +52,7 @@ public class ProductTypeService {
 
     public ProductType update(UUID id, ProductType productType) {
         ProductType existingProductType = productTypeRepo.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("ProductType not found with ID: " + id));
+                .orElseThrow(()-> new IllegalArgumentException(messagesUtils.getMessage("producttypeservice.not_found", id.toString())));
 
         if(existingProductType.getDeleted()){
             existingProductType.setName(productType.getName());
@@ -59,7 +65,7 @@ public class ProductTypeService {
 
     public void delete(UUID id) {
         ProductType productType = productTypeRepo.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("ProductType not found with ID: " + id));
+                .orElseThrow(()-> new IllegalArgumentException(messagesUtils.getMessage("producttypeservice.not_found", id.toString())));
         productType.setDeleted(true);
         productTypeRepo.save(productType);
     }

@@ -5,6 +5,7 @@ import com.alexistdev.geolicense.starter.properties.GeoLicenseProperties;
 import com.alexistdev.geolicense.starter.scheduler.LicenseVerificationScheduler;
 import com.alexistdev.geolicense.starter.service.LicenseActivationService;
 import com.alexistdev.geolicense.starter.service.LicenseHolder;
+import com.alexistdev.geolicense.starter.service.LicenseStateStore;
 import com.alexistdev.geolicense.starter.service.LicenseVerificationService;
 import com.alexistdev.geolicense.starter.service.MachineIdGenerator;
 import org.springframework.boot.ApplicationRunner;
@@ -22,8 +23,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class GeoLicenseAutoConfiguration {
 
     @Bean
-    public MachineIdGenerator machineIdGenerator() {
-        return new MachineIdGenerator();
+    public MachineIdGenerator machineIdGenerator(GeoLicenseProperties properties) {
+        return new MachineIdGenerator(properties);
+    }
+
+    @Bean
+    public LicenseStateStore licenseStateStore(GeoLicenseProperties properties) {
+        return new LicenseStateStore(properties);
     }
 
     @Bean
@@ -34,8 +40,11 @@ public class GeoLicenseAutoConfiguration {
     @Bean
     public LicenseActivationService licenseActivationService(GeoLicenseProperties properties,
                                                              LicenseHolder licenseHolder,
-                                                             MachineIdGenerator machineIdGenerator) {
-        return new LicenseActivationService(properties, licenseHolder, machineIdGenerator);
+                                                             MachineIdGenerator machineIdGenerator,
+                                                             LicenseStateStore stateStore,
+                                                             LicenseVerificationService verificationService) {
+        return new LicenseActivationService(properties, licenseHolder, machineIdGenerator,
+                stateStore, verificationService);
     }
 
     @Bean
@@ -57,9 +66,10 @@ public class GeoLicenseAutoConfiguration {
         return new LicenseVerificationScheduler(verificationService);
     }
 
-    // Runs at startup — fails app context if license activation fails (hard fail)
+    // Runs at startup — re-uses the stored activation when possible, and fails the app context
+    // when no usable activation can be obtained (hard fail)
     @Bean
     public ApplicationRunner licenseActivationRunner(LicenseActivationService activationService) {
-        return args -> activationService.activate();
+        return args -> activationService.ensureActivated();
     }
 }
