@@ -9,11 +9,11 @@ import lombok.Setter;
 @Setter
 public class TicketReplyRequest {
 
-    @NotBlank(message = "ticketId is required")
+    /** Diisi controller dari path, bukan dari kiriman klien. */
     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "ticketId must be a valid UUID")
     private String ticketId;
 
-    @NotBlank(message = "userId is required")
+    /** Diisi controller dari pengguna yang sedang login, bukan dari kiriman klien. */
     @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "userId must be a valid UUID")
     private String userId;
 
