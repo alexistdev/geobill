@@ -21,10 +21,22 @@ public interface TicketRepo extends JpaRepository<Ticket, UUID> {
 
     Optional<Ticket> findByTicketNumber(String ticketNumber);
 
+    /**
+     * Nomor tiket unik di level database termasuk baris yang sudah di-soft-delete,
+     * jadi pengecekannya harus melewati filter is_deleted.
+     */
+    @Query(value = "SELECT COUNT(*) > 0 FROM tb_tickets WHERE ticket_number = :ticketNumber", nativeQuery = true)
+    boolean existsByTicketNumberIncludingDeleted(@Param("ticketNumber") String ticketNumber);
+
+    @Query(value = "SELECT COUNT(*) FROM tb_tickets WHERE ticket_number LIKE CONCAT(:prefix, '%')", nativeQuery = true)
+    long countByTicketNumberPrefixIncludingDeleted(@Param("prefix") String prefix);
+
     /** Klien hanya boleh membuka tiket miliknya sendiri. */
     Optional<Ticket> findByIdAndUser(UUID id, User user);
 
     long countByStatus(TicketStatus status);
+
+    long countByDepartment_Id(UUID departmentId);
 
     long countByAssignedTo_IdAndStatus(UUID assignedToId, TicketStatus status);
 
