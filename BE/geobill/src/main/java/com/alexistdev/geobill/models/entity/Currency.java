@@ -23,6 +23,7 @@ import java.util.UUID;
 @Table(name = DatabaseTableNames.TB_CURRENCY)
 @SQLDelete(sql = "UPDATE " + DatabaseTableNames.TB_CURRENCY + " SET is_deleted = true WHERE uuid = ?")
 @Where(clause = "is_deleted = false")
+@SuppressWarnings("SqlResolve")
 public class Currency extends BaseEntity<String>{
 
     @Id

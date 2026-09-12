@@ -24,6 +24,7 @@ import java.util.UUID;
 @Table(name = DatabaseTableNames.TB_PRODUCTS)
 @SQLDelete(sql = "UPDATE " + DatabaseTableNames.TB_PRODUCTS + " SET is_deleted = true WHERE uuid = ?")
 @Where(clause = "is_deleted = false")
+@SuppressWarnings("SqlResolve")
 public class Product extends BaseEntity<String> implements Serializable {
 
     @Id

@@ -12,4 +12,13 @@ public class DatabaseTableNames {
     public static final String TB_HOSTING = "tb_hostings";
     public static final String TB_INVOICES = "tb_invoices";
     public static final String TB_CURRENCY = "tb_currencies";
+
+    //Ticketing
+    public static final String TB_TICKET_DEPARTMENTS = "tb_ticket_departments";
+    public static final String TB_TICKET_DEPARTMENT_STAFFS = "tb_ticket_department_staffs";
+    public static final String TB_TICKETS = "tb_tickets";
+    public static final String TB_TICKET_REPLIES = "tb_ticket_replies";
+    public static final String TB_TICKET_ATTACHMENTS = "tb_ticket_attachments";
+    public static final String TB_TICKET_HISTORIES = "tb_ticket_histories";
+    public static final String TB_TICKET_CANNED_REPLIES = "tb_ticket_canned_replies";
 }

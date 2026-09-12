@@ -23,6 +23,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("SqlResolve")
 public class User extends BaseEntity<String> implements UserDetails {
 
     @Id

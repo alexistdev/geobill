@@ -22,6 +22,7 @@ import java.util.UUID;
 @Table(name = DatabaseTableNames.TB_INVOICES)
 @SQLDelete(sql = "UPDATE " + DatabaseTableNames.TB_INVOICES + " SET is_deleted = true WHERE uuid = ?")
 @Where(clause = "is_deleted = false")
+@SuppressWarnings("SqlResolve")
 public class Invoice extends BaseEntity<String> implements Serializable {
 
     @Id
