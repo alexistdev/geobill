@@ -32,12 +32,12 @@ public class LicenseVerificationService {
         this.machineIdGenerator = machineIdGenerator;
     }
 
-    public void verify() {
+    public VerificationResult verify() {
         String token = licenseHolder.getToken();
         if (token == null) {
             log.warn("Verification skipped — no license token present");
             licenseHolder.setValid(false);
-            return;
+            return VerificationResult.INVALID;
         }
 
         String machineId = machineIdGenerator.generate();
@@ -62,14 +62,17 @@ public class LicenseVerificationService {
             if (response.statusCode() == 200 && status) {
                 licenseHolder.setValid(true);
                 log.debug("License verified successfully");
-            } else {
-                licenseHolder.setValid(false);
-                String message = root.path("messages").path(0).asText("unknown reason");
-                log.warn("License verification failed: {}", message);
+                return VerificationResult.VALID;
             }
+
+            licenseHolder.setValid(false);
+            String message = root.path("messages").path(0).asText("unknown reason");
+            log.warn("License verification failed: {}", message);
+            return VerificationResult.INVALID;
 
         } catch (Exception e) {
             log.warn("License server unreachable during verification: {}", e.getMessage());
+            return VerificationResult.UNREACHABLE;
         }
     }
 }

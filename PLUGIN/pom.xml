@@ -13,7 +13,7 @@
 
     <groupId>com.alexistdev</groupId>
     <artifactId>geolicense-client-starter</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
     <name>geolicense-client-starter</name>
     <description>Spring Boot starter for validating licenses against the geolicense server</description>
