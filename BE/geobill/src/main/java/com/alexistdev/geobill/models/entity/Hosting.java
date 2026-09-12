@@ -18,8 +18,9 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Entity
 @Table(name = DatabaseTableNames.TB_HOSTING)
-@SQLDelete(sql = "" + DatabaseTableNames.TB_HOSTING + "")
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.TB_HOSTING + " SET is_deleted = true WHERE uuid = ?")
 @Where(clause = "is_deleted = false")
+@SuppressWarnings("SqlResolve")
 public class Hosting extends BaseEntity<String> implements Serializable {
 
     @Id
