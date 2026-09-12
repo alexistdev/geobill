@@ -4,6 +4,7 @@ import com.alexistdev.geobill.controllers.HostingController;
 import com.alexistdev.geobill.dto.HostingDTO;
 import com.alexistdev.geobill.dto.InvoiceDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.utils.TestMessagesUtils;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
 import com.alexistdev.geobill.services.UserService;
@@ -41,7 +42,7 @@ class HostingControllerTest {
     void setUp() {
         hostingService = new StubHostingService();
         UserService userService = new StubUserService();
-        hostingController = new HostingController(hostingService, userService);
+        hostingController = new HostingController(hostingService, userService, TestMessagesUtils.create());
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();

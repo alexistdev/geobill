@@ -3,6 +3,7 @@ package com.alexistdev.geobill.controller;
 import com.alexistdev.geobill.controllers.ProductTypeController;
 import com.alexistdev.geobill.dto.ProductTypeDTO;
 import com.alexistdev.geobill.dto.ResponseData;
+import com.alexistdev.geobill.utils.TestMessagesUtils;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.request.ProductTypeRequest;
@@ -35,7 +36,8 @@ public class ProductTypeControllerTest {
     void setUp() {
         productTypeService = mock(ProductTypeService.class);
         modelMapper = mock(ModelMapper.class);
-        productTypeController = new ProductTypeController(productTypeService, modelMapper);
+        productTypeController = new ProductTypeController(productTypeService, modelMapper,
+                TestMessagesUtils.create());
     }
 
     @Test

@@ -102,7 +102,7 @@ public class UserController {
         responseData.setStatus(false);
         try {
             UserDetailDTO result = userService.getUserDetail(uuid);
-            responseData.getMessages().add("Retrieved user detail");
+            responseData.getMessages().add(messagesUtils.getMessage("usercontroller.user_detail_retrieved"));
             responseData.setStatus(true);
             responseData.setPayload(result);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
@@ -124,7 +124,7 @@ public class UserController {
         responseData.setStatus(false);
         try {
             UserDetailDTO result = userService.updateUser(uuid, request);
-            responseData.getMessages().add("Updated user detail");
+            responseData.getMessages().add(messagesUtils.getMessage("usercontroller.user_detail_updated"));
             responseData.setStatus(true);
             responseData.setPayload(result);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
@@ -141,7 +141,7 @@ public class UserController {
             if (!responseData.getMessages().isEmpty()) {
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + pageNumber + " of products");
+            responseData.getMessages().add(messagesUtils.getMessage("usercontroller.page_retrieved", String.valueOf(pageNumber)));
         }
     }
 }

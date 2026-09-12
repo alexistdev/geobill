@@ -61,7 +61,7 @@ public class InvoiceController {
             invoicePage = invoiceService.getAllInvoicesByUser(fallbackPageable, userFound);
         }
 
-        responseData.getMessages().add("No invoice found");
+        responseData.getMessages().add(messagesUtils.getMessage("invoicecontroller.no_invoice"));
         responseData.setStatus(false);
         handleNonEmptyPage(responseData,invoicePage,page);
         responseData.setPayload(invoicePage);
@@ -74,7 +74,7 @@ public class InvoiceController {
         responseData.setStatus(false);
         responseData.setPayload(null);
         InvoiceUserDTO result = invoiceService.getInvoiceById(uuid);
-        responseData.getMessages().add("Retrieved invoice by id");
+        responseData.getMessages().add(messagesUtils.getMessage("invoicecontroller.invoice_retrieved"));
         responseData.setStatus(true);
         responseData.setPayload(result);
         return ResponseEntity.ok(responseData);
@@ -86,7 +86,7 @@ public class InvoiceController {
             if(!responseData.getMessages().isEmpty()){
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + pageNumber + " of products");
+            responseData.getMessages().add(messagesUtils.getMessage("invoicecontroller.page_retrieved", String.valueOf(pageNumber)));
         }
     }
 

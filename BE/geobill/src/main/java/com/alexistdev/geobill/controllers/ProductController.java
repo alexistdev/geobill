@@ -9,6 +9,7 @@ import com.alexistdev.geobill.models.entity.ProductType;
 import com.alexistdev.geobill.request.ProductRequest;
 import com.alexistdev.geobill.services.ProductService;
 import com.alexistdev.geobill.services.ProductTypeService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +31,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
-    private static final String NO_PRODUCT_FOUND = "No product found";
-
     private final ProductService productService;
     private final ModelMapper modelMapper;
+    private final MessagesUtils messagesUtils;
 
-    public ProductController(ProductService productService, ModelMapper modelMapper) {
+    public ProductController(ProductService productService, ModelMapper modelMapper, MessagesUtils messagesUtils) {
         this.productService = productService;
         this.modelMapper = modelMapper;
+        this.messagesUtils = messagesUtils;
     }
 
 
@@ -64,7 +65,7 @@ public class ProductController {
             productPage = productService.getAllProducts(fallbackPageable);
         }
 
-        responseData.getMessages().add(NO_PRODUCT_FOUND);
+        responseData.getMessages().add(messagesUtils.getMessage("productcontroller.no_product"));
         responseData.setStatus(false);
 
         handleNonEmptyPage(responseData,productPage,page);
@@ -94,7 +95,7 @@ public class ProductController {
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             productPage = productService.getAllProductsByFilter(fallbackPageable, filter);
         }
-        responseData.getMessages().add(NO_PRODUCT_FOUND);
+        responseData.getMessages().add(messagesUtils.getMessage("productcontroller.no_product"));
         responseData.setStatus(false);
 
         if (!productPage.isEmpty()) {
@@ -102,7 +103,7 @@ public class ProductController {
             if (!responseData.getMessages().isEmpty()) {
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + page + " of products");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.page_retrieved", String.valueOf(page)));
         }
         Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
         responseData.setPayload(productDTOPage);
@@ -115,7 +116,7 @@ public class ProductController {
         responseData.setStatus(false);
         try {
             ProductDTO result = productService.findById(uuid);
-            responseData.getMessages().add("Retrieved product by id");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.product_retrieved"));
             responseData.setStatus(true);
             responseData.setPayload(result);
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
@@ -148,7 +149,7 @@ public class ProductController {
             Pageable fallbackPageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
             productPage = productService.getAllProductsByProductTypeId(fallbackPageable, UUID.fromString(id));
         }
-        responseData.getMessages().add(NO_PRODUCT_FOUND);
+        responseData.getMessages().add(messagesUtils.getMessage("productcontroller.no_product"));
         responseData.setStatus(false);
 
         if (!productPage.isEmpty()) {
@@ -156,7 +157,7 @@ public class ProductController {
             if (!responseData.getMessages().isEmpty()) {
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + page + " of products");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.page_retrieved", String.valueOf(page)));
         }
         Page<ProductDTO> productDTOPage = productPage.map(product -> modelMapper.map(product, ProductDTO.class));
         responseData.setPayload(productDTOPage);
@@ -175,7 +176,7 @@ public class ProductController {
         try {
             Product created = productService.save(request);
             responseData.setStatus(true);
-            responseData.getMessages().add("Product created successfully");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.product_created"));
             responseData.setPayload(modelMapper.map(created, ProductDTO.class));
             return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
         } catch (DuplicateException d){
@@ -185,7 +186,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
         } catch (Exception e){
             log.error("Error creating Product", e);
-            responseData.getMessages().add("Error :" + e.getMessage());
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.error", e.getMessage()));
             responseData.setPayload(null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
         }
@@ -197,7 +198,7 @@ public class ProductController {
         responseData.setStatus(false);
         responseData.setPayload(null);
         if(request.getId() == null){
-            responseData.getMessages().add("Product ID is required");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.id_required"));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
 
@@ -209,7 +210,7 @@ public class ProductController {
         try {
             Product result = productService.update(request.getId(), request);
             responseData.setStatus(true);
-            responseData.getMessages().add("Product updated successfully");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.product_updated"));
             responseData.setPayload(modelMapper.map(result, ProductDTO.class));
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         } catch (DuplicateException d) {
@@ -229,7 +230,7 @@ public class ProductController {
         try {
             productService.delete(uuid);
             responseData.setStatus(true);
-            responseData.getMessages().add("Product deleted successfully");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.product_deleted"));
             return ResponseEntity.status(HttpStatus.OK).body(responseData);
         } catch (Exception e) {
             log.error("Error deleting Product", e);
@@ -249,7 +250,7 @@ public class ProductController {
             if(!responseData.getMessages().isEmpty()){
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + pageNumber + " of products");
+            responseData.getMessages().add(messagesUtils.getMessage("productcontroller.page_retrieved", String.valueOf(pageNumber)));
         }
     }
 

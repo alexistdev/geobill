@@ -11,6 +11,7 @@ import com.alexistdev.geobill.request.ticket_system.TicketFilterRequest;
 import com.alexistdev.geobill.request.ticket_system.TicketReplyRequest;
 import com.alexistdev.geobill.request.ticket_system.TicketRequest;
 import com.alexistdev.geobill.services.ticket_system.TicketService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +32,12 @@ import java.util.UUID;
 @RequestMapping("/api/v1/tickets")
 public class TicketController {
 
-    private static final String NO_TICKET_FOUND = "No tickets found";
-
     private final TicketService ticketService;
+    private final MessagesUtils messagesUtils;
 
-    public TicketController(TicketService ticketService) {
+    public TicketController(TicketService ticketService, MessagesUtils messagesUtils) {
         this.ticketService = ticketService;
+        this.messagesUtils = messagesUtils;
     }
 
     /* --------------------------------------------------------------- admin */
@@ -69,7 +70,7 @@ public class TicketController {
 
     @GetMapping("/tabs")
     public ResponseEntity<ResponseData<List<TicketTabDTO>>> getTabs() {
-        return listResponse(ticketService.getTabs(), "Retrieved ticket tabs");
+        return listResponse(ticketService.getTabs(), messagesUtils.getMessage("ticketcontroller.tabs_retrieved"));
     }
 
     /** Antrean tiket yang sedang ditangani staff yang login. */
@@ -101,7 +102,7 @@ public class TicketController {
 
     @GetMapping("/tabs/me")
     public ResponseEntity<ResponseData<List<TicketTabDTO>>> getMyTabs(@AuthenticationPrincipal User currentUser) {
-        return listResponse(ticketService.getTabsByUser(currentUser), "Retrieved ticket tabs");
+        return listResponse(ticketService.getTabsByUser(currentUser), messagesUtils.getMessage("ticketcontroller.tabs_retrieved"));
     }
 
     /* ------------------------------------------------------------ keduanya */
@@ -109,14 +110,15 @@ public class TicketController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<TicketDetailDTO>> getTicketDetail(@PathVariable("id") UUID id,
                                                                         @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.getTicketDetail(id, currentUser), "Ticket found");
+        return okResponse(ticketService.getTicketDetail(id, currentUser), messagesUtils.getMessage("ticketcontroller.ticket_found"));
     }
 
     @GetMapping("/number/{ticketNumber}")
     public ResponseEntity<ResponseData<TicketDetailDTO>> getTicketByNumber(
             @PathVariable("ticketNumber") String ticketNumber,
             @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.getTicketByNumber(ticketNumber, currentUser), "Ticket found");
+        return okResponse(ticketService.getTicketByNumber(ticketNumber, currentUser),
+                messagesUtils.getMessage("ticketcontroller.ticket_found"));
     }
 
     /**
@@ -131,7 +133,7 @@ public class TicketController {
 
         ResponseData<TicketDetailDTO> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Ticket created successfully");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketcontroller.ticket_created"));
         responseData.setPayload(result);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
@@ -146,7 +148,7 @@ public class TicketController {
 
         ResponseData<TicketReplyDTO> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Reply added successfully");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketcontroller.reply_created"));
         responseData.setPayload(result);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
@@ -157,20 +159,23 @@ public class TicketController {
     public ResponseEntity<ResponseData<TicketDetailDTO>> assignTicket(@PathVariable("id") UUID id,
                                                                      @RequestParam UUID staffId,
                                                                      @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.assignTicket(id, staffId, currentUser), "Ticket assigned successfully");
+        return okResponse(ticketService.assignTicket(id, staffId, currentUser),
+                messagesUtils.getMessage("ticketcontroller.ticket_assigned"));
     }
 
     @PatchMapping("/{id}/unassign")
     public ResponseEntity<ResponseData<TicketDetailDTO>> unassignTicket(@PathVariable("id") UUID id,
                                                                        @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.unassignTicket(id, currentUser), "Ticket unassigned successfully");
+        return okResponse(ticketService.unassignTicket(id, currentUser),
+                messagesUtils.getMessage("ticketcontroller.ticket_unassigned"));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<ResponseData<TicketDetailDTO>> changeStatus(@PathVariable("id") UUID id,
                                                                      @RequestParam String status,
                                                                      @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.changeStatus(id, status, currentUser), "Ticket status updated successfully");
+        return okResponse(ticketService.changeStatus(id, status, currentUser),
+                messagesUtils.getMessage("ticketcontroller.status_updated"));
     }
 
     @PatchMapping("/{id}/priority")
@@ -178,7 +183,7 @@ public class TicketController {
                                                                        @RequestParam String priority,
                                                                        @AuthenticationPrincipal User currentUser) {
         return okResponse(ticketService.changePriority(id, priority, currentUser),
-                "Ticket priority updated successfully");
+                messagesUtils.getMessage("ticketcontroller.priority_updated"));
     }
 
     @PatchMapping("/{id}/department")
@@ -186,7 +191,7 @@ public class TicketController {
                                                                          @RequestParam UUID departmentId,
                                                                          @AuthenticationPrincipal User currentUser) {
         return okResponse(ticketService.changeDepartment(id, departmentId, currentUser),
-                "Ticket department updated successfully");
+                messagesUtils.getMessage("ticketcontroller.department_updated"));
     }
 
     /* ------------------------------------------------------------ trash */
@@ -194,13 +199,14 @@ public class TicketController {
     @PatchMapping("/{id}/trash")
     public ResponseEntity<ResponseData<TicketDetailDTO>> moveToTrash(@PathVariable("id") UUID id,
                                                                     @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.moveToTrash(id, currentUser), "Ticket moved to trash");
+        return okResponse(ticketService.moveToTrash(id, currentUser), messagesUtils.getMessage("ticketcontroller.ticket_trashed"));
     }
 
     @PatchMapping("/{id}/restore")
     public ResponseEntity<ResponseData<TicketDetailDTO>> restoreFromTrash(@PathVariable("id") UUID id,
                                                                          @AuthenticationPrincipal User currentUser) {
-        return okResponse(ticketService.restoreFromTrash(id, currentUser), "Ticket restored from trash");
+        return okResponse(ticketService.restoreFromTrash(id, currentUser),
+                messagesUtils.getMessage("ticketcontroller.ticket_restored"));
     }
 
     /** Hanya untuk tiket yang sudah ada di Trash. */
@@ -210,14 +216,14 @@ public class TicketController {
 
         ResponseData<Void> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Ticket has been deleted");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketcontroller.ticket_deleted"));
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
     @PostMapping("/auto-close")
     public ResponseEntity<ResponseData<Integer>> autoCloseIdleTickets() {
         int closed = ticketService.autoCloseIdleTickets();
-        return okResponse(closed, closed + " ticket(s) closed automatically");
+        return okResponse(closed, messagesUtils.getMessage("ticketcontroller.auto_closed", String.valueOf(closed)));
     }
 
     /* ------------------------------------------------------------ bantuan */
@@ -242,7 +248,9 @@ public class TicketController {
     private ResponseEntity<ResponseData<Page<TicketDTO>>> pagedResponse(Page<TicketDTO> result, int page) {
         ResponseData<Page<TicketDTO>> responseData = new ResponseData<>();
         responseData.setStatus(!result.isEmpty());
-        responseData.getMessages().add(result.isEmpty() ? NO_TICKET_FOUND : "Retrieved page " + page + " of tickets");
+        responseData.getMessages().add(result.isEmpty()
+                ? messagesUtils.getMessage("ticketcontroller.no_ticket")
+                : messagesUtils.getMessage("ticketcontroller.page_retrieved", String.valueOf(page)));
         responseData.setPayload(result);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }

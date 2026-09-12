@@ -5,6 +5,7 @@ import com.alexistdev.geobill.dto.ticket_system.TicketCannedReplyDTO;
 import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.request.ticket_system.TicketCannedReplyRequest;
 import com.alexistdev.geobill.services.ticket_system.TicketCannedReplyService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +25,12 @@ import java.util.UUID;
 @RequestMapping("/api/v1/ticket-canned-replies")
 public class TicketCannedReplyController {
 
-    private static final String NO_CANNED_REPLY_FOUND = "No canned replies found";
-
     private final TicketCannedReplyService cannedReplyService;
+    private final MessagesUtils messagesUtils;
 
-    public TicketCannedReplyController(TicketCannedReplyService cannedReplyService) {
+    public TicketCannedReplyController(TicketCannedReplyService cannedReplyService, MessagesUtils messagesUtils) {
         this.cannedReplyService = cannedReplyService;
+        this.messagesUtils = messagesUtils;
     }
 
     @GetMapping
@@ -47,15 +48,16 @@ public class TicketCannedReplyController {
         ResponseData<Page<TicketCannedReplyDTO>> responseData = new ResponseData<>();
         responseData.setStatus(!result.isEmpty());
         responseData.getMessages().add(result.isEmpty()
-                ? NO_CANNED_REPLY_FOUND
-                : "Retrieved page " + page + " of canned replies");
+                ? messagesUtils.getMessage("ticketcannedreplycontroller.no_canned_reply")
+                : messagesUtils.getMessage("ticketcannedreplycontroller.page_retrieved", String.valueOf(page)));
         responseData.setPayload(result);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
     @GetMapping("/active")
     public ResponseEntity<ResponseData<List<TicketCannedReplyDTO>>> getActiveCannedReplies() {
-        return listResponse(cannedReplyService.getActiveCannedReplies(), "Retrieved active canned replies");
+        return listResponse(cannedReplyService.getActiveCannedReplies(),
+                messagesUtils.getMessage("ticketcannedreplycontroller.active_retrieved"));
     }
 
     /** Template milik departemen tersebut digabung dengan template global. */
@@ -63,12 +65,13 @@ public class TicketCannedReplyController {
     public ResponseEntity<ResponseData<List<TicketCannedReplyDTO>>> getAvailableForDepartment(
             @PathVariable("departmentId") UUID departmentId) {
         return listResponse(cannedReplyService.getAvailableForDepartment(departmentId),
-                "Retrieved canned replies for department");
+                messagesUtils.getMessage("ticketcannedreplycontroller.department_retrieved"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<TicketCannedReplyDTO>> getCannedReplyById(@PathVariable("id") UUID id) {
-        return okResponse(cannedReplyService.getCannedReplyById(id), "Canned reply found", HttpStatus.OK);
+        return okResponse(cannedReplyService.getCannedReplyById(id),
+                messagesUtils.getMessage("ticketcannedreplycontroller.canned_reply_found"), HttpStatus.OK);
     }
 
     @PostMapping
@@ -76,7 +79,7 @@ public class TicketCannedReplyController {
             @Valid @RequestBody TicketCannedReplyRequest request) {
         try {
             return okResponse(cannedReplyService.addCannedReply(request),
-                    "Canned reply successfully added", HttpStatus.CREATED);
+                    messagesUtils.getMessage("ticketcannedreplycontroller.canned_reply_created"), HttpStatus.CREATED);
         } catch (DuplicateException d) {
             log.error("Error creating canned reply", d);
             return conflictResponse(d.getMessage());
@@ -89,7 +92,7 @@ public class TicketCannedReplyController {
             @Valid @RequestBody TicketCannedReplyRequest request) {
         try {
             return okResponse(cannedReplyService.updateCannedReply(id, request),
-                    "Canned reply successfully updated", HttpStatus.OK);
+                    messagesUtils.getMessage("ticketcannedreplycontroller.canned_reply_updated"), HttpStatus.OK);
         } catch (DuplicateException d) {
             log.error("Error updating canned reply", d);
             return conflictResponse(d.getMessage());
@@ -102,7 +105,7 @@ public class TicketCannedReplyController {
 
         ResponseData<Void> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Canned reply has been deleted");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketcannedreplycontroller.canned_reply_deleted"));
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 

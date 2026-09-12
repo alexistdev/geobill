@@ -7,6 +7,7 @@ import com.alexistdev.geobill.exceptions.DuplicateException;
 import com.alexistdev.geobill.request.ticket_system.TicketDepartmentRequest;
 import com.alexistdev.geobill.request.ticket_system.TicketStaffRequest;
 import com.alexistdev.geobill.services.ticket_system.TicketDepartmentService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +27,12 @@ import java.util.UUID;
 @RequestMapping("/api/v1/ticket-departments")
 public class TicketDepartmentController {
 
-    private static final String NO_DEPARTMENT_FOUND = "No ticket departments found";
-
     private final TicketDepartmentService departmentService;
+    private final MessagesUtils messagesUtils;
 
-    public TicketDepartmentController(TicketDepartmentService departmentService) {
+    public TicketDepartmentController(TicketDepartmentService departmentService, MessagesUtils messagesUtils) {
         this.departmentService = departmentService;
+        this.messagesUtils = messagesUtils;
     }
 
     @GetMapping
@@ -61,12 +62,14 @@ public class TicketDepartmentController {
     /** Isi dropdown Department saat klien membuka tiket baru. */
     @GetMapping("/active")
     public ResponseEntity<ResponseData<List<TicketDepartmentDTO>>> getActiveDepartments() {
-        return listResponse(departmentService.getActiveDepartments(), "Retrieved active ticket departments");
+        return listResponse(departmentService.getActiveDepartments(),
+                messagesUtils.getMessage("ticketdepartmentcontroller.active_retrieved"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<TicketDepartmentDTO>> getDepartmentById(@PathVariable("id") UUID id) {
-        return okResponse(departmentService.getDepartmentById(id), "Ticket department found", HttpStatus.OK);
+        return okResponse(departmentService.getDepartmentById(id),
+                messagesUtils.getMessage("ticketdepartmentcontroller.department_found"), HttpStatus.OK);
     }
 
     @PostMapping
@@ -74,7 +77,7 @@ public class TicketDepartmentController {
             @Valid @RequestBody TicketDepartmentRequest request) {
         try {
             return okResponse(departmentService.addDepartment(request),
-                    "Ticket department successfully added", HttpStatus.CREATED);
+                    messagesUtils.getMessage("ticketdepartmentcontroller.department_created"), HttpStatus.CREATED);
         } catch (DuplicateException d) {
             log.error("Error creating ticket department", d);
             return conflictResponse(d.getMessage());
@@ -87,7 +90,7 @@ public class TicketDepartmentController {
             @Valid @RequestBody TicketDepartmentRequest request) {
         try {
             return okResponse(departmentService.updateDepartment(id, request),
-                    "Ticket department successfully updated", HttpStatus.OK);
+                    messagesUtils.getMessage("ticketdepartmentcontroller.department_updated"), HttpStatus.OK);
         } catch (DuplicateException d) {
             log.error("Error updating ticket department", d);
             return conflictResponse(d.getMessage());
@@ -100,7 +103,7 @@ public class TicketDepartmentController {
 
         ResponseData<Void> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Ticket department has been deleted");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketdepartmentcontroller.department_deleted"));
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
@@ -109,14 +112,15 @@ public class TicketDepartmentController {
     /** Isi dropdown Assigned To untuk satu departemen. */
     @GetMapping("/{id}/staffs")
     public ResponseEntity<ResponseData<List<TicketStaffDTO>>> getStaffByDepartment(@PathVariable("id") UUID id) {
-        return listResponse(departmentService.getStaffByDepartment(id), "Retrieved ticket department staff");
+        return listResponse(departmentService.getStaffByDepartment(id),
+                messagesUtils.getMessage("ticketdepartmentcontroller.staff_retrieved"));
     }
 
     @PostMapping("/staffs")
     public ResponseEntity<ResponseData<TicketStaffDTO>> assignStaff(@Valid @RequestBody TicketStaffRequest request) {
         ResponseData<TicketStaffDTO> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Staff assigned to ticket department");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketdepartmentcontroller.staff_assigned"));
         responseData.setPayload(departmentService.assignStaff(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
@@ -128,7 +132,7 @@ public class TicketDepartmentController {
 
         ResponseData<Void> responseData = new ResponseData<>();
         responseData.setStatus(true);
-        responseData.getMessages().add("Staff removed from ticket department");
+        responseData.getMessages().add(messagesUtils.getMessage("ticketdepartmentcontroller.staff_removed"));
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
@@ -144,8 +148,8 @@ public class TicketDepartmentController {
         ResponseData<Page<TicketDepartmentDTO>> responseData = new ResponseData<>();
         responseData.setStatus(!result.isEmpty());
         responseData.getMessages().add(result.isEmpty()
-                ? NO_DEPARTMENT_FOUND
-                : "Retrieved page " + page + " of ticket departments");
+                ? messagesUtils.getMessage("ticketdepartmentcontroller.no_department")
+                : messagesUtils.getMessage("ticketdepartmentcontroller.page_retrieved", String.valueOf(page)));
         responseData.setPayload(result);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }

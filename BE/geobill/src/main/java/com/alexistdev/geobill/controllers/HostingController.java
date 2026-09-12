@@ -9,6 +9,7 @@ import com.alexistdev.geobill.models.entity.User;
 import com.alexistdev.geobill.request.HostingRequest;
 import com.alexistdev.geobill.services.HostingService;
 import com.alexistdev.geobill.services.UserService;
+import com.alexistdev.geobill.utils.MessagesUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +30,13 @@ public class HostingController {
 
     private final HostingService hostingService;
     private final UserService userService;
+    private final MessagesUtils messagesUtils;
 
-    public HostingController(HostingService hostingService, UserService userService) {
+    public HostingController(HostingService hostingService, UserService userService,
+                             MessagesUtils messagesUtils) {
         this.hostingService = hostingService;
         this.userService = userService;
+        this.messagesUtils = messagesUtils;
     }
 
     @GetMapping("/{userId}/hostings")
@@ -50,7 +54,7 @@ public class HostingController {
         User userFound = userService.findUserByUUID(UUID.fromString(userId));
 
         if (userFound == null) {
-            responseData.getMessages().add("User not found");
+            responseData.getMessages().add(messagesUtils.getMessage("hostingcontroller.user_not_found"));
             responseData.setStatus(false);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         }
@@ -63,7 +67,7 @@ public class HostingController {
             hostingPage = hostingService.getAllHostingsByUser(fallbackPageable, userFound);
         }
 
-        responseData.getMessages().add("No hostings found");
+        responseData.getMessages().add(messagesUtils.getMessage("hostingcontroller.no_hosting"));
         responseData.setStatus(false);
         handleNonEmptyPage(responseData,hostingPage,page);
         responseData.setPayload(hostingPage);
@@ -78,7 +82,7 @@ public class HostingController {
         responseData.setStatus(false);
         responseData.setPayload(null);
         responseData.setStatus(true);
-        responseData.getMessages().add("Hosting added successfully");
+        responseData.getMessages().add(messagesUtils.getMessage("hostingcontroller.hosting_created"));
         responseData.setPayload(hostingDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
@@ -89,7 +93,7 @@ public class HostingController {
             if(!responseData.getMessages().isEmpty()){
                 responseData.getMessages().removeFirst();
             }
-            responseData.getMessages().add("Retrieved page " + pageNumber + " of products");
+            responseData.getMessages().add(messagesUtils.getMessage("hostingcontroller.page_retrieved", String.valueOf(pageNumber)));
         }
     }
 
