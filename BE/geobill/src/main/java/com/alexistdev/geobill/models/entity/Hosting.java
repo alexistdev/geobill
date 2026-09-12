@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-import org.hibernate.generator.EventType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,6 +20,7 @@ import java.util.UUID;
 @Table(name = DatabaseTableNames.TB_HOSTING)
 @SQLDelete(sql = "UPDATE " + DatabaseTableNames.TB_HOSTING + " SET is_deleted = true WHERE uuid = ?")
 @Where(clause = "is_deleted = false")
+@SuppressWarnings("SqlResolve")
 public class Hosting extends BaseEntity<String> implements Serializable {
 
     @Id
