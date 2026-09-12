@@ -10,14 +10,14 @@ import lombok.Setter;
 public class TicketReplyRequest {
 
     /** Diisi controller dari path, bukan dari kiriman klien. */
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "ticketId must be a valid UUID")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketReplyRequest.ticketId.uuid}")
     private String ticketId;
 
     /** Diisi controller dari pengguna yang sedang login, bukan dari kiriman klien. */
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "userId must be a valid UUID")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketReplyRequest.userId.uuid}")
     private String userId;
 
-    @NotBlank(message = "message is required")
+    @NotBlank(message = "{ticketReplyRequest.message.required}")
     private String message;
 
     /** Catatan internal tidak pernah dikirim ke klien dan tidak mengubah status tiket. */

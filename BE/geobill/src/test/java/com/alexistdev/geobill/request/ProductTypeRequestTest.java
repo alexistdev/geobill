@@ -1,10 +1,8 @@
 package com.alexistdev.geobill.request;
 
-import com.alexistdev.geobill.config.ValidationConstant;
+import com.alexistdev.geobill.utils.TestValidators;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +17,7 @@ public class ProductTypeRequestTest {
 
     @BeforeAll
     static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        validator = TestValidators.create();
     }
 
     @Test
@@ -75,8 +72,8 @@ public class ProductTypeRequestTest {
                         violation.getPropertyPath().toString().equals("name")));
         Assertions.assertTrue(violations.stream()
                 .anyMatch(v ->
-                        v.getMessage().equals(ValidationConstant.nameMax)),
-                "Violation message should match ValidationConstant.nameMax");
+                        v.getMessage().equals("Maximum Name's character length is 150 characters")),
+                "Violation message should come from the message bundle");
     }
 
     @Test

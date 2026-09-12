@@ -11,29 +11,29 @@ import lombok.Setter;
 public class TicketRequest {
 
     /** Diisi controller dari pengguna yang sedang login, bukan dari kiriman klien. */
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "userId must be a valid UUID")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketRequest.userId.uuid}")
     private String userId;
 
-    @NotBlank(message = "departmentId is required")
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "departmentId must be a valid UUID")
+    @NotBlank(message = "{ticketRequest.departmentId.required}")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketRequest.departmentId.uuid}")
     private String departmentId;
 
-    @NotBlank(message = "subject is required")
-    @Size(max = 200, message = "subject must be less than 200 characters")
+    @NotBlank(message = "{ticketRequest.subject.required}")
+    @Size(max = 200, message = "{ticketRequest.subject.size}")
     private String subject;
 
-    @NotBlank(message = "message is required")
+    @NotBlank(message = "{ticketRequest.message.required}")
     private String message;
 
     /** LOW, MEDIUM, HIGH, atau URGENT. Kosong berarti MEDIUM. */
     private String priority;
 
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "hostingId must be a valid UUID")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketRequest.hostingId.uuid}")
     private String hostingId;
 
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "invoiceId must be a valid UUID")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketRequest.invoiceId.uuid}")
     private String invoiceId;
 
-    @Size(max = 500, message = "ccEmails must be less than 500 characters")
+    @Size(max = 500, message = "{ticketRequest.ccEmails.size}")
     private String ccEmails;
 }

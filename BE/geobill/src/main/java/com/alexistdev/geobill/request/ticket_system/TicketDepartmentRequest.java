@@ -10,25 +10,25 @@ import lombok.Setter;
 @Setter
 public class TicketDepartmentRequest {
 
-    @NotBlank(message = "name is required")
-    @Size(max = 100, message = "name must be less than 100 characters")
+    @NotBlank(message = "{ticketDepartmentRequest.name.required}")
+    @Size(max = 100, message = "{ticketDepartmentRequest.name.size}")
     private String name;
 
-    @NotBlank(message = "code is required")
-    @Size(max = 50, message = "code must be less than 50 characters")
+    @NotBlank(message = "{ticketDepartmentRequest.code.required}")
+    @Size(max = 50, message = "{ticketDepartmentRequest.code.size}")
     private String code;
 
-    @Size(max = 150, message = "email must be less than 150 characters")
+    @Size(max = 150, message = "{ticketDepartmentRequest.email.size}")
     private String email;
 
-    @Size(max = 255, message = "description must be less than 255 characters")
+    @Size(max = 255, message = "{ticketDepartmentRequest.description.size}")
     private String description;
 
-    @Min(value = 0, message = "sortOrder must be zero or greater")
+    @Min(value = 0, message = "{ticketDepartmentRequest.sortOrder.min}")
     private Integer sortOrder;
 
     private Boolean isActive;
 
-    @Min(value = 1, message = "autoCloseDays must be at least 1 day")
+    @Min(value = 1, message = "{ticketDepartmentRequest.autoCloseDays.min}")
     private Integer autoCloseDays;
 }

@@ -9,12 +9,12 @@ import lombok.Setter;
 @Setter
 public class TicketStaffRequest {
 
-    @NotBlank(message = "departmentId is required")
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "departmentId must be a valid UUID")
+    @NotBlank(message = "{ticketStaffRequest.departmentId.required}")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketStaffRequest.departmentId.uuid}")
     private String departmentId;
 
-    @NotBlank(message = "userId is required")
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "userId must be a valid UUID")
+    @NotBlank(message = "{ticketStaffRequest.userId.required}")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketStaffRequest.userId.uuid}")
     private String userId;
 
     private boolean supervisor;

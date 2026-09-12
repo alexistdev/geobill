@@ -12,18 +12,18 @@ import lombok.Setter;
 public class TicketCannedReplyRequest {
 
     /** Kosong berarti template berlaku untuk semua departemen. */
-    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "departmentId must be a valid UUID")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$", message = "{ticketCannedReplyRequest.departmentId.uuid}")
     private String departmentId;
 
-    @NotBlank(message = "title is required")
-    @Size(max = 150, message = "title must be less than 150 characters")
+    @NotBlank(message = "{ticketCannedReplyRequest.title.required}")
+    @Size(max = 150, message = "{ticketCannedReplyRequest.title.size}")
     private String title;
 
-    @NotBlank(message = "body is required")
+    @NotBlank(message = "{ticketCannedReplyRequest.body.required}")
     private String body;
 
     private Boolean isActive;
 
-    @Min(value = 0, message = "sortOrder must be zero or greater")
+    @Min(value = 0, message = "{ticketCannedReplyRequest.sortOrder.min}")
     private Integer sortOrder;
 }
